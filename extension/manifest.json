@@ -5,7 +5,8 @@
   "description": "Overlays CourseForum data onto UVA course planning sites.",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "storage"
   ],
   "host_permissions": [
     "https://thecourseforum.com/api/*",

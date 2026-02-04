@@ -2,76 +2,8 @@
 
 console.log("Plan Your Future - TCF Overlay: Content script loaded.");
 
-const TCF_BASE_URL = "https://thecourseforum.com";
-let subdepartments = {};
-let courseCache = {}; // { subdept_id: { course_number: courseData } }
-
-// Helper: Fetch with error handling
-async function tcfFetch(endpoint) {
-  try {
-    const response = await fetch(`${TCF_BASE_URL}${endpoint}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.warn(`TCF Fetch Error for ${endpoint}:`, error);
-    return null;
-  }
-}
-
-// 1. Fetch Subdepartments on init
-async function initSubdepartments() {
-  const data = await tcfFetch("/api/subdepartments/");
-  if (data) {
-    // API returns a list (maybe paginated? The serializer seems to imply just list or results)
-    // The previous code snippet showed `$.each(data, ...)` so it might be a raw array.
-    // But ViewSets usually return { count, next, previous, results } unless paginator is off.
-    // I'll check if it's an array or object.
-    const results = Array.isArray(data) ? data : (data.results || []);
-    
-    results.forEach(sub => {
-      // Map mnemonic (e.g. "CS") to ID (e.g. 5)
-      if (sub.mnemonic && sub.id) {
-        subdepartments[sub.mnemonic.toUpperCase()] = sub.id;
-      }
-    });
-    console.log("TCF Subdepartments loaded:", Object.keys(subdepartments).length);
-  }
-}
-
-// 2. Fetch courses for a specific subdepartment (cached)
-async function fetchCoursesForSubdept(subdeptId) {
-  if (courseCache[subdeptId]) return courseCache[subdeptId];
-
-  // Using simplestats to get ratings and GPA
-  // Page size 1000 to hopefully get all courses in one go or pagination loop might be needed.
-  // The code snippet showed `pageSize = "100"` in new_review.js.
-  // I'll try a large page size.
-  const endpoint = `/api/courses/?subdepartment=${subdeptId}&simplestats&page_size=500`;
-  
-  const data = await tcfFetch(endpoint);
-  const map = {};
-  
-  if (data) {
-    const results = Array.isArray(data) ? data : (data.results || []);
-    results.forEach(course => {
-      // Map course number (e.g. "1010") to data
-      if (course.number) {
-        map[course.number] = course;
-      }
-    });
-  }
-  
-  courseCache[subdeptId] = map;
-  return map;
-}
-
 // 3. Scan and overlay
 async function scanAndOverlay() {
-  if (Object.keys(subdepartments).length === 0) {
-    await initSubdepartments();
-  }
 
   // Simple regex for "CS 1010" or "CS1010"
   // Mnemonic: 2-4 letters, space optional, 4 digits
@@ -92,6 +24,11 @@ async function scanAndOverlay() {
     if (node.parentElement && ["SCRIPT", "STYLE", "TEXTAREA", "INPUT"].includes(node.parentElement.tagName)) {
       continue;
     }
+    // Skip the specific Stellic sidebar code element so the specialized handler can take it
+    if (node.parentElement && node.parentElement.getAttribute("data-testid") === "course-sidebar-code") {
+      continue;
+    }
+
     if (node.textContent.match(regex)) {
       nodesToProcess.push(node);
     }
@@ -188,6 +125,7 @@ function createTooltip() {
   document.body.appendChild(tooltip);
 }
 
+// Request Data from Background Script
 async function showOverlay(event, mnemonic, number) {
   createTooltip();
   
@@ -197,32 +135,35 @@ async function showOverlay(event, mnemonic, number) {
   tooltip.style.display = "block";
   tooltip.innerHTML = `Loading data for ${mnemonic} ${number}...`;
   
-  // Fetch data
-  const subdeptId = subdepartments[mnemonic];
-  if (!subdeptId) {
-    tooltip.innerHTML = `Subject ${mnemonic} not found in TCF.`;
-    return;
-  }
-  
-  const deptCourses = await fetchCoursesForSubdept(subdeptId);
-  const course = deptCourses[number];
-  
-  if (course) {
-    const rating = course.average_rating ? course.average_rating.toFixed(2) : "N/A";
-    const gpa = course.average_gpa ? course.average_gpa.toFixed(2) : "N/A";
-    const difficulty = course.average_difficulty ? course.average_difficulty.toFixed(2) : "N/A";
-    
-    tooltip.innerHTML = `
-      <strong>${course.title}</strong><br/>
-      <hr style="margin: 5px 0"/>
-      Rating: ${rating} / 5.00<br/>
-      GPA: ${gpa}<br/>
-      Difficulty: ${difficulty} / 5.00<br/>
-      <a href="https://thecourseforum.com/course/${mnemonic}/${number}" target="_blank" style="color: #007bc2">View on theCourseForum</a>
-    `;
-  } else {
-    tooltip.innerHTML = `Course ${mnemonic} ${number} not found on TCF.`;
-  }
+  // Use Message Passing to Background Script
+  chrome.runtime.sendMessage(
+    { action: "GET_COURSE", mnemonic: mnemonic, number: number },
+    (response) => {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError);
+        tooltip.innerHTML = "Error connecting to extension.";
+        return;
+      }
+      
+      if (response && response.data) {
+        const course = response.data;
+        const rating = course.average_rating ? course.average_rating.toFixed(2) : "N/A";
+        const gpa = course.average_gpa ? course.average_gpa.toFixed(2) : "N/A";
+        const difficulty = course.average_difficulty ? course.average_difficulty.toFixed(2) : "N/A";
+        
+        tooltip.innerHTML = `
+          <strong>${course.title}</strong><br/>
+          <hr style="margin: 5px 0"/>
+          Rating: ${rating} / 5.00<br/>
+          GPA: ${gpa}<br/>
+          Difficulty: ${difficulty} / 5.00<br/>
+          <a href="https://thecourseforum.com/course/${mnemonic}/${number}" target="_blank" style="color: #007bc2">View on theCourseForum</a>
+        `;
+      } else {
+        tooltip.innerHTML = `Course ${mnemonic} ${number} not found or error loading.`;
+      }
+    }
+  );
 }
 
 function hideOverlay() {
@@ -231,7 +172,71 @@ function hideOverlay() {
   }
 }
 
-// Run scan periodically (mutation observer is better but this is MVP)
-setInterval(scanAndOverlay, 3000);
-scanAndOverlay();
 
+// Helper to handle Stellic's sidebar specifically
+function handleStellicSidebar() {
+  const sidebarCodeEl = document.querySelector('[data-testid="course-sidebar-code"]');
+  if (!sidebarCodeEl) return;
+  
+  if (sidebarCodeEl.classList.contains("tcf-processed")) return;
+  sidebarCodeEl.classList.add("tcf-processed");
+
+  const text = sidebarCodeEl.textContent.trim();
+  const match = text.match(/([A-Z]{2,4})\s?(\d{4})/);
+  if (!match) return;
+
+  const mnemonic = match[1];
+  const number = match[2];
+
+  // Create a badge/button
+  const container = document.createElement("div");
+  container.className = "tcf-stellic-badge";
+  container.style.display = "inline-flex";
+  container.style.alignItems = "center";
+  container.style.marginLeft = "12px";
+  container.style.padding = "4px 8px";
+  container.style.backgroundColor = "#fff";
+  container.style.border = "1px solid #e57200";
+  container.style.borderRadius = "4px";
+  container.style.cursor = "pointer";
+  container.style.fontSize = "12px";
+  
+  container.innerHTML = `
+    <span style="color: #e57200; font-weight: bold; margin-right: 5px;">TCF</span>
+    <span id="tcf-stellic-rating">Loading...</span>
+  `;
+
+  sidebarCodeEl.parentNode.insertBefore(container, sidebarCodeEl.nextSibling);
+
+  // Fetch data
+  chrome.runtime.sendMessage(
+    { action: "GET_COURSE", mnemonic: mnemonic, number: number },
+    (response) => {
+      const ratingSpan = container.querySelector("#tcf-stellic-rating");
+      if (chrome.runtime.lastError || !response || !response.data) {
+        ratingSpan.textContent = "N/A";
+        return;
+      }
+      
+      const course = response.data;
+      const rating = course.average_rating ? course.average_rating.toFixed(2) : "N/A";
+      ratingSpan.textContent = `${rating} / 5`;
+      
+      container.addEventListener("click", (e) => {
+        e.stopPropagation();
+        window.open(`https://thecourseforum.com/course/${mnemonic}/${number}`, "_blank");
+      });
+      // Also setup tooltip
+      container.addEventListener("mouseenter", (e) => showOverlay(e, mnemonic, number));
+      container.addEventListener("mouseleave", hideOverlay);
+    }
+  );
+}
+
+// Run scan periodically (mutation observer is better but this is MVP)
+setInterval(() => {
+  scanAndOverlay();
+  handleStellicSidebar();
+}, 3000);
+scanAndOverlay();
+handleStellicSidebar();
