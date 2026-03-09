@@ -63,7 +63,7 @@ export default function Home() {
             </div>
           ) : courses.length === 0 ? (
             <div className="text-center text-gray-500 py-12 bg-white rounded-lg shadow">
-              No courses found matching "{searchQuery}".
+              No courses found matching &quot;{searchQuery}&quot;.
             </div>
           ) : (
             courses.map((course) => (

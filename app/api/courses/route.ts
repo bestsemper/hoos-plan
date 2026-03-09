@@ -12,12 +12,12 @@ function getCourses() {
   try {
     const filePath = path.join(process.cwd(), 'public', 'audit_requirements.csv');
     const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const records = parse(fileContent, { columns: true, skip_empty_lines: true });
+    const records = parse(fileContent, { columns: true, skip_empty_lines: true }) as Record<string, string>[];
 
     const courseSet = new Set<string>();
     const courses: { id: string, mnemonic: string, number: string, title: string }[] = [];
 
-    records.forEach((record: any) => {
+    records.forEach((record) => {
       const reqName = record['Requirement Name'];
       // Match course format like "CS 1110"
       if (reqName && /^[A-Z]{2,4}\s\d{4}$/.test(reqName)) {
