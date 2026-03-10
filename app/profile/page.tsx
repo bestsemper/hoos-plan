@@ -34,7 +34,7 @@ export default function Profile() {
             <button className="bg-uva-blue text-white px-5 py-2.5 rounded hover:bg-uva-blue-dark font-bold shadow-sm transition-colors cursor-pointer">
               Edit Profile
             </button>
-            <button className="border-2 border-dashed border-panel-border-strong px-5 py-2.5 rounded hover:bg-hover-bg text-text-primary font-semibold transition-colors cursor-pointer">
+            <button className="border border-dashed border-panel-border-strong px-5 py-2.5 rounded hover:bg-hover-bg text-text-primary font-semibold transition-colors cursor-pointer">
               Upload Previous Classes
             </button>
           </div>
@@ -87,7 +87,7 @@ export default function Profile() {
             <div className="bg-badge-blue-bg text-badge-blue-text px-3 py-2 rounded-md flex items-center gap-2 text-sm font-bold border border-uva-blue/20 shadow-sm">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> Active Participant
             </div>
-            <div className="bg-panel-bg-alt text-gray-500 px-3 py-2 rounded-md text-sm border-2 border-panel-border-strong border-dashed flex items-center gap-2 font-semibold cursor-pointer hover:border-uva-orange hover:text-uva-orange transition-colors">
+            <div className="bg-panel-bg-alt text-gray-500 px-3 py-2 rounded-md text-sm border border-panel-border-strong border-dashed flex items-center gap-2 font-semibold cursor-pointer hover:border-uva-orange hover:text-uva-orange transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Earn more badges
             </div>
           </div>

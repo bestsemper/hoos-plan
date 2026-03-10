@@ -56,7 +56,7 @@ export default function Forum() {
 
       <div className="space-y-4">
         {[1, 2, 3].map((post) => (
-          <div key={post} className="bg-panel-bg border border-panel-border p-5 rounded-md hover:shadow-md transition-all cursor-pointer flex gap-4">
+          <div key={post} className="bg-panel-bg border border-panel-border p-5 rounded-md shadow-sm hover:shadow-md transition-all cursor-pointer flex gap-4">
             <div className="flex flex-col items-center justify-center min-w-[60px] text-gray-500 bg-panel-bg-alt rounded-md border border-panel-border h-16 w-16 my-auto">
               <span className="font-bold text-lg text-text-secondary">{post * 5}</span>
               <span className="text-[10px] uppercase font-bold text-gray-500">votes</span>
