@@ -33,10 +33,13 @@
   
   --success-text: rgba(34, 197, 94, 0.8);
   --success-text-hover: #16a34a;
+  --badge-orange-bg: #fff7ed;
+  --badge-blue-bg: #eff6ff;
+  --badge-blue-text: #232D4B;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background: #111827;
     --foreground: #f9fafb;
 
@@ -69,8 +72,49 @@
     
     --success-text: #22c55e;
     --success-text-hover: #4ade80;
+  --badge-orange-bg: rgba(124, 45, 18, 0.2);
+  --badge-blue-bg: rgba(30, 58, 138, 0.2);
+  --badge-blue-text: #93c5fd;
   }
 }
+
+:root.dark {
+    --background: #111827;
+    --foreground: #f9fafb;
+
+    /* layout / panels */
+    --panel-bg: #1f2937;
+    --panel-bg-alt: #1f2937; /* Used for sub-panels in dark mode */
+    --panel-border: #374151;
+    --panel-border-strong: #4b5563;
+    
+    /* general text */
+    --text-primary: #ffffff;
+    --text-secondary: #e5e7eb;
+    --text-muted: #d1d5db;
+    --text-tertiary: #9ca3af;
+  --heading-text: #f3f4f6;
+
+    /* interaction */
+    --hover-bg: #374151;
+    --hover-text: #e5e7eb;
+
+    /* inputs */
+    --input-bg: #1f2937;
+    --input-border: #4b5563;
+    --input-bg-disabled: #374151;
+
+    /* semantic */
+    --danger-bg-hover: rgba(127, 29, 29, 0.3);
+    --danger-text: #ef4444;
+    --danger-text-hover: #f87171;
+    
+    --success-text: #22c55e;
+    --success-text-hover: #4ade80;
+  --badge-orange-bg: rgba(124, 45, 18, 0.2);
+  --badge-blue-bg: rgba(30, 58, 138, 0.2);
+  --badge-blue-text: #93c5fd;
+  }
 
 @theme inline {
   --color-background: var(--background);
@@ -116,4 +160,10 @@ body {
 /* add to end of globals just to be safe */
 @theme {
   --color-heading: var(--heading-text);
+}
+
+@theme {
+  --color-badge-orange-bg: var(--badge-orange-bg);
+  --color-badge-blue-bg: var(--badge-blue-bg);
+  --color-badge-blue-text: var(--badge-blue-text);
 }

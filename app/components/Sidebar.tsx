@@ -21,16 +21,15 @@ export default function Sidebar() {
           </svg>
           <span className="text-sm tracking-widest font-semibold border-t border-white/20 pt-2 block text-uva-orange">HOO'S PLAN</span>
         </Link>
-        <nav className="space-y-1">
+        <nav className="space-y-1 -mx-3">
           <Link href="/" className="block px-3 py-2 rounded text-white/90 hover:bg-uva-orange hover:text-white transition-colors font-medium">Dashboard</Link>
           <Link href="/plan" className="block px-3 py-2 rounded text-white/90 hover:bg-uva-orange hover:text-white transition-colors font-medium">Plan Builder</Link>
           <Link href="/forum" className="block px-3 py-2 rounded text-white/90 hover:bg-uva-orange hover:text-white transition-colors font-medium">Forum</Link>
-          <Link href="/profile" className="block px-3 py-2 rounded text-white/90 hover:bg-uva-orange hover:text-white transition-colors font-medium">Profile</Link>
         </nav>
       </div>
       
       <div className="bg-uva-blue-dark p-4 flex flex-col gap-2">
-        <Link href="/profile" className="flex items-center space-x-3 rounded hover:bg-white/5 p-2 transition-colors">
+        <Link href="/profile" className="flex items-center space-x-3 rounded hover:bg-black/20 p-2 transition-colors">
           <div className="w-8 h-8 rounded-full bg-uva-orange flex items-center justify-center text-white font-bold">
             U
           </div>
