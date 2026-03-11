@@ -12,25 +12,14 @@ const prisma = new PrismaClient();
 // MOCK AUTH: In a real app, this would integrate with NetBadge/SSO
 // For MVP, we'll just find or create a user by computingId
 export async function mockLogin(computingId: string, password: string) {
-  if (!computingId) throw new Error("Computing ID is required");
+  if (!computingId) return { error: "Computing ID is required" };
 
   let user = await prisma.user.findUnique({
     where: { computingId }
   });
 
   if (!user) {
-    user = await prisma.user.create({
-      data: {
-        computingId,
-        displayName: computingId,
-        major: 'Undeclared'
-      }
-    });
-
-    // Create an empty goal profile
-    await prisma.goalProfile.create({
-      data: { userId: user.id }
-    });
+    return { error: "Account not found. Please sign up first." };
   }
 
   // Set session cookie mock here if needed
@@ -41,7 +30,42 @@ export async function mockLogin(computingId: string, password: string) {
     path: '/' 
   });
   
-  return user;
+  return { success: true, user };
+}
+
+export async function mockSignUp(computingId: string, password: string) {
+  if (!computingId) return { error: "Computing ID is required" };
+
+  let user = await prisma.user.findUnique({
+    where: { computingId }
+  });
+
+  if (user) {
+    return { error: "Account already exists. Please log in." };
+  }
+
+  user = await prisma.user.create({
+    data: {
+      computingId,
+      displayName: computingId,
+      major: 'Undeclared'
+    }
+  });
+
+  // Create an empty goal profile
+  await prisma.goalProfile.create({
+    data: { userId: user.id }
+  });
+
+  // Set session cookie mock here if needed
+  const cookieStore = await cookies();
+  cookieStore.set('computingId', user.computingId, { 
+    httpOnly: true, 
+    secure: process.env.NODE_ENV === 'production', 
+    path: '/' 
+  });
+  
+  return { success: true, user };
 }
 
 export async function getCurrentUser() {

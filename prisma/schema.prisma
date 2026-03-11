@@ -8,29 +8,29 @@ datasource db {
 }
 
 model User {
-  id              String            @id @default(cuid())
-  computingId     String            @unique
-  displayName     String
-  major           String?
-  gradYear        Int?
-  bio             String?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  courses         CompletedCourse[]
-  plans           Plan[]
-  posts           ForumPost[]
-  answers         ForumAnswer[]
-  votes           Vote[]
-  badges          UserBadge[]
-  goalProfile     GoalProfile?
+  id          String            @id @default(cuid())
+  computingId String            @unique
+  displayName String
+  major       String?
+  gradYear    Int?
+  bio         String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  courses     CompletedCourse[]
+  answers     ForumAnswer[]
+  posts       ForumPost[]
+  goalProfile GoalProfile?
+  plans       Plan[]
+  badges      UserBadge[]
+  votes       Vote[]
 }
 
 model CompletedCourse {
   id            String  @id @default(cuid())
   userId        String
-  courseCode    String  // e.g. CS 1110
+  courseCode    String
   title         String?
-  sourceType    String  // UVA, AP, TRANSFER
+  sourceType    String
   semesterTaken String?
   user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -47,25 +47,25 @@ model GoalProfile {
 }
 
 model Plan {
-  id          String         @id @default(cuid())
+  id          String      @id @default(cuid())
   userId      String
   title       String
-  isPublished Boolean        @default(false)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  semesters   Semester[]
+  isPublished Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   forumPosts  ForumPost[]
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semesters   Semester[]
 }
 
 model Semester {
   id        String          @id @default(cuid())
   planId    String
-  termName  String          // Fall, Spring, Summer, J-Term
+  termName  String
   termOrder Int
   year      Int
-  plan      Plan            @relation(fields: [planId], references: [id], onDelete: Cascade)
   courses   PlannedCourse[]
+  plan      Plan            @relation(fields: [planId], references: [id], onDelete: Cascade)
 }
 
 model PlannedCourse {
@@ -88,9 +88,9 @@ model ForumPost {
   viewCount      Int           @default(0)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  author         User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  attachedPlan   Plan?         @relation(fields: [attachedPlanId], references: [id], onDelete: SetNull)
   answers        ForumAnswer[]
+  attachedPlan   Plan?         @relation(fields: [attachedPlanId], references: [id])
+  author         User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   votes          Vote[]
 }
 
@@ -101,8 +101,8 @@ model ForumAnswer {
   body      String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   votes     Vote[]
 }
 
@@ -111,10 +111,10 @@ model Vote {
   userId   String
   answerId String?
   postId   String?
-  value    Int          // -1 or 1
-  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  value    Int
   answer   ForumAnswer? @relation(fields: [answerId], references: [id], onDelete: Cascade)
   post     ForumPost?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Badge {
@@ -129,6 +129,6 @@ model UserBadge {
   userId   String
   badgeId  String
   earnedAt DateTime @default(now())
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
