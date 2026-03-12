@@ -68,16 +68,18 @@ export default function Sidebar({ user }: { user: { computingId: string, display
                 <p className="text-xs text-white/70 truncate">{user.computingId}</p>
               </div>
             </Link>
-            <form action={logout}>
-              <button type="submit" className="w-full text-center text-xs text-white/50 hover:text-white pb-1 transition-colors cursor-pointer block">
+            <form action={logout} className="mt-2">
+              <button type="submit" className="w-full text-center text-sm text-white bg-white/10 hover:bg-white/20 py-2 rounded transition-colors font-semibold cursor-pointer block">
                 Sign Out
               </button>
             </form>
           </>
         ) : (
-          <Link href="/login" className="block text-center text-sm text-white hover:text-white/80 pb-1 pt-2 transition-colors font-semibold">
-            Sign In
-          </Link>
+          <div className="mt-2">
+            <Link href="/login" className="flex items-center justify-center w-full text-sm text-white bg-uva-orange hover:bg-[#cc6600] py-2.5 rounded transition-colors font-bold shadow-sm">
+              Sign In
+            </Link>
+          </div>
         )}
       </div>
     </aside>
