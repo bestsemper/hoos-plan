@@ -11,6 +11,73 @@ import { scryptSync, randomBytes, timingSafeEqual } from 'crypto';
 const prisma = new PrismaClient();
 const DEFAULT_PLAN_START_YEAR = 2025;
 
+type ParsedStellicCourse = {
+  courseCode: string;
+  termName: 'Fall' | 'Winter' | 'Spring' | 'Summer' | null;
+  year: number | null;
+  status: 'taken' | 'planned';
+};
+
+function parseStellicCoursesFromText(text: string): ParsedStellicCourse[] {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  const results: ParsedStellicCourse[] = [];
+  const seen = new Set<string>();
+
+  let currentTerm: ParsedStellicCourse['termName'] = null;
+  let currentYear: number | null = null;
+  let sectionMode: 'taken' | 'planned' = 'planned';
+
+  const termRegex = /\b(Fall|Winter|Spring|Summer)\s+(20\d{2})\b/i;
+  const courseCodeRegex = /\b([A-Z]{2,4})\s?-?(\d{4})\b/g;
+
+  for (const rawLine of lines) {
+    const line = rawLine.replace(/\s+/g, ' ');
+
+    const termMatch = line.match(termRegex);
+    if (termMatch) {
+      const termValue = termMatch[1].toLowerCase();
+      currentTerm =
+        termValue === 'fall'
+          ? 'Fall'
+          : termValue === 'winter'
+            ? 'Winter'
+            : termValue === 'spring'
+              ? 'Spring'
+              : 'Summer';
+      currentYear = Number.parseInt(termMatch[2], 10);
+    }
+
+    const lowerLine = line.toLowerCase();
+    if (/completed|taken|earned|fulfilled/.test(lowerLine)) {
+      sectionMode = 'taken';
+    }
+    if (/planned|in progress|enrolled|future/.test(lowerLine)) {
+      sectionMode = 'planned';
+    }
+
+    const matches = Array.from(line.matchAll(courseCodeRegex));
+    for (const match of matches) {
+      const code = `${match[1]} ${match[2]}`.toUpperCase();
+      const dedupeKey = `${code}|${currentTerm ?? 'none'}|${currentYear ?? 'none'}|${sectionMode}`;
+      if (seen.has(dedupeKey)) continue;
+      seen.add(dedupeKey);
+
+      results.push({
+        courseCode: code,
+        termName: currentTerm,
+        year: currentYear,
+        status: sectionMode,
+      });
+    }
+  }
+
+  return results;
+}
+
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex');
   const derivedKey = scryptSync(password, salt, 64).toString('hex');
@@ -1018,6 +1085,203 @@ export async function deleteSchoolYearFromPlan(planId: string, schoolYearStart: 
 
   revalidatePath('/plan');
   return { success: true };
+}
+
+export async function importPlanFromStellicPdf(input: {
+  pdfBase64: string;
+  mode: 'new' | 'overwrite';
+  overwritePlanId?: string;
+  newPlanTitle?: string;
+}) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to import a plan.' };
+  }
+
+  if (!input.pdfBase64) {
+    return { error: 'Please upload a PDF file.' };
+  }
+
+  if (input.mode === 'overwrite' && !input.overwritePlanId) {
+    return { error: 'Please select a plan to overwrite.' };
+  }
+
+  try {
+    const normalizedBase64 = input.pdfBase64.includes(',')
+      ? input.pdfBase64.split(',').pop() ?? ''
+      : input.pdfBase64;
+
+    if (!normalizedBase64) {
+      return { error: 'Uploaded file payload was empty.' };
+    }
+
+    const pdfBuffer = Buffer.from(normalizedBase64, 'base64');
+    if (pdfBuffer.length === 0) {
+      return { error: 'Uploaded PDF could not be decoded.' };
+    }
+
+    const pdfParse = require('pdf-parse/lib/pdf-parse.js') as (dataBuffer: Buffer) => Promise<{ text?: string }>;
+    const pdfData = await pdfParse(pdfBuffer);
+
+    const parsedCourses = parseStellicCoursesFromText(pdfData.text || '');
+
+    if (parsedCourses.length === 0) {
+      return { error: 'No courses were detected in the uploaded Stellic PDF.' };
+    }
+
+    let targetPlanId = '';
+
+    if (input.mode === 'overwrite') {
+      const existingPlan = await prisma.plan.findFirst({
+        where: {
+          id: input.overwritePlanId,
+          userId: user.id,
+        },
+        select: { id: true },
+      });
+
+      if (!existingPlan) {
+        return { error: 'Selected plan not found.' };
+      }
+
+      targetPlanId = existingPlan.id;
+      await prisma.semester.deleteMany({ where: { planId: targetPlanId } });
+    } else {
+      const existingCount = await prisma.plan.count({ where: { userId: user.id } });
+      const planTitle = input.newPlanTitle?.trim() || `Imported Plan ${existingCount + 1}`;
+
+      const createdPlan = await prisma.plan.create({
+        data: {
+          userId: user.id,
+          title: planTitle,
+          isPublished: false,
+        },
+      });
+
+      targetPlanId = createdPlan.id;
+    }
+
+    const semesterMap = new Map<string, { termName: 'Fall' | 'Winter' | 'Spring' | 'Summer'; year: number; courses: ParsedStellicCourse[] }>();
+    const fallbackCourses: ParsedStellicCourse[] = [];
+
+    for (const course of parsedCourses) {
+      if (!course.termName || !course.year) {
+        fallbackCourses.push(course);
+        continue;
+      }
+
+      const semesterKey = `${course.termName}-${course.year}`;
+      const existing = semesterMap.get(semesterKey);
+      if (existing) {
+        existing.courses.push(course);
+      } else {
+        semesterMap.set(semesterKey, {
+          termName: course.termName,
+          year: course.year,
+          courses: [course],
+        });
+      }
+    }
+
+    const orderedSemesters = Array.from(semesterMap.values()).sort((a, b) => {
+      const order: Record<'Fall' | 'Winter' | 'Spring' | 'Summer', number> = {
+        Fall: 0,
+        Winter: 1,
+        Spring: 2,
+        Summer: 3,
+      };
+
+      const aStartYear = a.termName === 'Fall' ? a.year : a.year - 1;
+      const bStartYear = b.termName === 'Fall' ? b.year : b.year - 1;
+
+      if (aStartYear !== bStartYear) return aStartYear - bStartYear;
+      return order[a.termName] - order[b.termName];
+    });
+
+    let termOrderCounter = 1;
+
+    for (const sem of orderedSemesters) {
+      await prisma.semester.create({
+        data: {
+          planId: targetPlanId,
+          termOrder: termOrderCounter,
+          termName: sem.termName,
+          year: sem.year,
+          courses: {
+            create: sem.courses.map((course) => ({
+              courseCode: course.courseCode,
+              credits: null,
+              locked: course.status === 'taken',
+              notes: course.status === 'taken' ? 'Imported as completed from Stellic PDF' : null,
+            })),
+          },
+        },
+      });
+      termOrderCounter += 1;
+    }
+
+    if (fallbackCourses.length > 0) {
+      const totalCoreSemesters = 8;
+      const startYear = DEFAULT_PLAN_START_YEAR;
+      const buckets: ParsedStellicCourse[][] = Array.from({ length: totalCoreSemesters }, () => []);
+
+      fallbackCourses.forEach((course, idx) => {
+        buckets[idx % totalCoreSemesters].push(course);
+      });
+
+      for (let i = 0; i < totalCoreSemesters; i++) {
+        if (buckets[i].length === 0) continue;
+
+        await prisma.semester.create({
+          data: {
+            planId: targetPlanId,
+            termOrder: termOrderCounter,
+            termName: i % 2 === 0 ? 'Fall' : 'Spring',
+            year: startYear + Math.floor(i / 2),
+            courses: {
+              create: buckets[i].map((course) => ({
+                courseCode: course.courseCode,
+                credits: null,
+                locked: course.status === 'taken',
+                notes: course.status === 'taken' ? 'Imported as completed from Stellic PDF' : null,
+              })),
+            },
+          },
+        });
+        termOrderCounter += 1;
+      }
+    }
+
+    const takenCodes = Array.from(new Set(parsedCourses.filter((c) => c.status === 'taken').map((c) => c.courseCode)));
+    if (takenCodes.length > 0) {
+      const existingCompleted = await prisma.completedCourse.findMany({
+        where: { userId: user.id },
+        select: { courseCode: true },
+      });
+      const existingSet = new Set(existingCompleted.map((c) => c.courseCode.toUpperCase()));
+
+      const newCompleted = takenCodes.filter((code) => !existingSet.has(code));
+      if (newCompleted.length > 0) {
+        await prisma.completedCourse.createMany({
+          data: newCompleted.map((courseCode) => ({
+            userId: user.id,
+            courseCode,
+            sourceType: 'stellic_pdf',
+            semesterTaken: null,
+          })),
+        });
+      }
+    }
+
+    revalidatePath('/plan');
+    revalidatePath('/profile');
+
+    return { success: true, planId: targetPlanId };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown import error.';
+    console.error('stellic pdf import error:', message);
+    return { error: `Failed to parse/import Stellic PDF: ${message}` };
+  }
 }
 
 export async function getAllPossibleCoursesFromCSV(): Promise<string[]> {

@@ -2,6 +2,7 @@ import { getCurrentUser } from '../actions';
 import { redirect } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
 import EditProfileForm from './EditProfileForm';
+import ImportPlan from './ImportPlan';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -16,6 +17,11 @@ export default async function Profile() {
   // Also pre-fetch some minimal stats like plan count, post count
   const planCount = await prisma.plan.count({ where: { userId: user.id } });
   const postCount = await prisma.forumPost.count({ where: { authorId: user.id } });
+  const plans = await prisma.plan.findMany({
+    where: { userId: user.id },
+    select: { id: true, title: true },
+    orderBy: { createdAt: 'desc' },
+  });
 
   return (
     <div className="max-w-5xl mx-auto py-8">
@@ -38,9 +44,7 @@ export default async function Profile() {
               gradYear={user.gradYear}
               bio={user.bio}
             />
-            <button className="border border-dashed border-panel-border-strong px-5 py-2.5 rounded hover:bg-hover-bg text-text-primary font-semibold transition-colors cursor-pointer">
-              Upload Previous Classes
-            </button>
+            <ImportPlan plans={plans} />
           </div>
         </div>
         
