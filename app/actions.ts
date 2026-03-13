@@ -9,6 +9,7 @@ import { parse } from 'csv-parse/sync';
 import { scryptSync, randomBytes, timingSafeEqual } from 'crypto';
 
 const prisma = new PrismaClient();
+const DEFAULT_PLAN_START_YEAR = 2025;
 
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex');
@@ -537,7 +538,7 @@ export async function createNewPlan(title?: string) {
     },
   });
 
-  const baseYear = new Date().getFullYear();
+  const baseYear = DEFAULT_PLAN_START_YEAR;
   for (let termOrder = 1; termOrder <= 8; termOrder++) {
     await prisma.semester.create({
       data: {
@@ -659,6 +660,69 @@ export async function getPlanBuilderData() {
   };
 }
 
+export async function getAttachedPlanViewData(planId: string) {
+  const currentUser = await getCurrentUser();
+
+  const plan = await prisma.plan.findFirst({
+    where: { id: planId },
+    select: {
+      id: true,
+      title: true,
+      userId: true,
+      user: {
+        select: {
+          displayName: true,
+        },
+      },
+      semesters: {
+        orderBy: { termOrder: 'asc' },
+        select: {
+          id: true,
+          termName: true,
+          termOrder: true,
+          year: true,
+          courses: {
+            orderBy: { courseCode: 'asc' },
+            select: {
+              id: true,
+              courseCode: true,
+              credits: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!plan) {
+    return { error: 'not_found' as const };
+  }
+
+  const ownedByCurrentUser = currentUser?.id === plan.userId;
+  let attachedToForumPost = false;
+
+  if (!ownedByCurrentUser) {
+    const attachedPost = await prisma.forumPost.findFirst({
+      where: { attachedPlanId: plan.id },
+      select: { id: true },
+    });
+    attachedToForumPost = Boolean(attachedPost);
+  }
+
+  if (!ownedByCurrentUser && !attachedToForumPost) {
+    return { error: 'forbidden' as const };
+  }
+
+  return {
+    plan: {
+      id: plan.id,
+      title: plan.title,
+      ownerDisplayName: plan.user.displayName,
+      semesters: plan.semesters,
+    },
+  };
+}
+
 export async function generatePreliminaryPlan(userId: string, major: string, goals: string[]) {
   // 1. Fetch user's completed courses
   const completed = await prisma.completedCourse.findMany({
@@ -691,7 +755,7 @@ export async function generatePreliminaryPlan(userId: string, major: string, goa
   });
 
   let termOrder = 1;
-  let currentYear = new Date().getFullYear();
+  let currentYear = DEFAULT_PLAN_START_YEAR;
 
   // Simple chunking (2 courses per semester mock)
   for (let i = 0; i < remainingReqs.length; i += 2) {
@@ -737,6 +801,223 @@ export async function removeCourseFromSemester(courseId: string) {
     where: { id: courseId }
   });
   revalidatePath('/plan');
+}
+
+export async function addSemesterToPlan(
+  planId: string,
+  schoolYearStart: number,
+  termName: 'Fall' | 'Winter' | 'Spring' | 'Summer'
+) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to edit a plan.' };
+  }
+
+  const plan = await prisma.plan.findFirst({
+    where: {
+      id: planId,
+      userId: user.id,
+    },
+    include: {
+      semesters: {
+        orderBy: { termOrder: 'desc' },
+        take: 1,
+      },
+    },
+  });
+
+  if (!plan) {
+    return { error: 'Plan not found.' };
+  }
+
+  const latestSemester = plan.semesters[0];
+  const nextTermOrder = latestSemester ? latestSemester.termOrder + 1 : 1;
+
+  const semesterYear = termName === 'Fall' ? schoolYearStart : schoolYearStart + 1;
+
+  const existingSemester = await prisma.semester.findFirst({
+    where: {
+      planId: plan.id,
+      termName,
+      year: semesterYear,
+    },
+    select: { id: true },
+  });
+
+  if (existingSemester) {
+    return { error: 'That semester already exists.' };
+  }
+
+  await prisma.semester.create({
+    data: {
+      planId: plan.id,
+      termOrder: nextTermOrder,
+      termName,
+      year: semesterYear,
+    },
+  });
+
+  revalidatePath('/plan');
+  return { success: true };
+}
+
+export async function deleteSemesterFromPlan(semesterId: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to edit a plan.' };
+  }
+
+  const semester = await prisma.semester.findFirst({
+    where: {
+      id: semesterId,
+      plan: {
+        userId: user.id,
+      },
+    },
+    select: {
+      id: true,
+      planId: true,
+      termName: true,
+    },
+  });
+
+  if (!semester) {
+    return { error: 'Semester not found.' };
+  }
+
+  if (semester.termName === 'Fall' || semester.termName === 'Spring') {
+    return { error: 'Fall and Spring semesters cannot be deleted.' };
+  }
+
+  const semesterCount = await prisma.semester.count({
+    where: { planId: semester.planId },
+  });
+
+  if (semesterCount <= 1) {
+    return { error: 'A plan must have at least one semester.' };
+  }
+
+  await prisma.semester.delete({
+    where: { id: semester.id },
+  });
+
+  revalidatePath('/plan');
+  return { success: true };
+}
+
+export async function addSchoolYearToPlan(planId: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to edit a plan.' };
+  }
+
+  const plan = await prisma.plan.findFirst({
+    where: {
+      id: planId,
+      userId: user.id,
+    },
+    include: {
+      semesters: {
+        orderBy: { termOrder: 'desc' },
+      },
+    },
+  });
+
+  if (!plan) {
+    return { error: 'Plan not found.' };
+  }
+
+  const schoolYearStarts = new Set<number>();
+  for (const sem of plan.semesters) {
+    if (!['Fall', 'Winter', 'Spring', 'Summer'].includes(sem.termName)) continue;
+    schoolYearStarts.add(sem.termName === 'Fall' ? sem.year : sem.year - 1);
+  }
+
+  const nextSchoolYearStart =
+    schoolYearStarts.size > 0 ? Math.max(...Array.from(schoolYearStarts)) + 1 : DEFAULT_PLAN_START_YEAR;
+
+  const latestTermOrder = plan.semesters[0]?.termOrder ?? 0;
+
+  await prisma.semester.createMany({
+    data: [
+      {
+        planId: plan.id,
+        termOrder: latestTermOrder + 1,
+        termName: 'Fall',
+        year: nextSchoolYearStart,
+      },
+      {
+        planId: plan.id,
+        termOrder: latestTermOrder + 2,
+        termName: 'Spring',
+        year: nextSchoolYearStart + 1,
+      },
+    ],
+  });
+
+  revalidatePath('/plan');
+  return { success: true };
+}
+
+export async function deleteSchoolYearFromPlan(planId: string, schoolYearStart: number) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to edit a plan.' };
+  }
+
+  const plan = await prisma.plan.findFirst({
+    where: {
+      id: planId,
+      userId: user.id,
+    },
+    select: { id: true },
+  });
+
+  if (!plan) {
+    return { error: 'Plan not found.' };
+  }
+
+  const semesters = await prisma.semester.findMany({
+    where: { planId: plan.id },
+    select: {
+      id: true,
+      termName: true,
+      year: true,
+    },
+  });
+
+  const schoolYearStarts = new Set<number>();
+  for (const sem of semesters) {
+    if (!['Fall', 'Winter', 'Spring', 'Summer'].includes(sem.termName)) continue;
+    schoolYearStarts.add(sem.termName === 'Fall' ? sem.year : sem.year - 1);
+  }
+
+  if (schoolYearStarts.size <= 1) {
+    return { error: 'A plan must have at least one school year.' };
+  }
+
+  const semesterIdsToDelete = semesters
+    .filter((sem) => {
+      if (sem.termName === 'Fall') return sem.year === schoolYearStart;
+      if (sem.termName === 'Winter' || sem.termName === 'Spring' || sem.termName === 'Summer') {
+        return sem.year === schoolYearStart + 1;
+      }
+      return false;
+    })
+    .map((sem) => sem.id);
+
+  if (semesterIdsToDelete.length === 0) {
+    return { error: 'School year not found.' };
+  }
+
+  await prisma.semester.deleteMany({
+    where: {
+      id: { in: semesterIdsToDelete },
+    },
+  });
+
+  revalidatePath('/plan');
+  return { success: true };
 }
 
 export async function getAllPossibleCoursesFromCSV(): Promise<string[]> {

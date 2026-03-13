@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '../components/ConfirmModal';
 import {
+  addSchoolYearToPlan,
+  addSemesterToPlan,
   addCourseToSemester,
   createNewPlan,
+  deleteSchoolYearFromPlan,
+  deleteSemesterFromPlan,
   deletePlan,
   generatePreliminaryPlan,
   getCourseCreditsFromCSV,
@@ -41,6 +45,11 @@ type PlanItem = {
   semesters: PlanSemester[];
 };
 
+type SchoolYearRow = {
+  startYear: number;
+  terms: Partial<Record<'Fall' | 'Winter' | 'Spring' | 'Summer', PlanSemester>>;
+};
+
 export default function PlanBuilderPage() {
   const router = useRouter();
   const isMountedRef = useRef(true);
@@ -62,6 +71,14 @@ export default function PlanBuilderPage() {
   const [loadingInfo, setLoadingInfo] = useState(false);
   const [deletingPlan, setDeletingPlan] = useState(false);
   const [isDeletePlanConfirmOpen, setIsDeletePlanConfirmOpen] = useState(false);
+  const [semesterToDelete, setSemesterToDelete] = useState<{ id: string; label: string } | null>(null);
+  const [isDeleteSemesterConfirmOpen, setIsDeleteSemesterConfirmOpen] = useState(false);
+  const [updatingSemester, setUpdatingSemester] = useState(false);
+  const [isDeleteYearConfirmOpen, setIsDeleteYearConfirmOpen] = useState(false);
+  const [yearToDelete, setYearToDelete] = useState<number | null>(null);
+  const [updatingYear, setUpdatingYear] = useState(false);
+  const [semesterActionError, setSemesterActionError] = useState<string | null>(null);
+  const [collapsedSchoolYears, setCollapsedSchoolYears] = useState<Record<number, boolean>>({});
   const [dataLoaded, setDataLoaded] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -109,6 +126,25 @@ export default function PlanBuilderPage() {
   }, [selectedPlanId, optimisticPlans]);
 
   const activePlan = optimisticPlans.find((p) => p.id === selectedPlanId) || optimisticPlans[0];
+
+  const schoolYearRows = useMemo<SchoolYearRow[]>(() => {
+    if (!activePlan) return [];
+
+    const rows = new Map<number, SchoolYearRow>();
+
+    for (const sem of activePlan.semesters) {
+      if (!['Fall', 'Winter', 'Spring', 'Summer'].includes(sem.termName)) {
+        continue;
+      }
+
+      const startYear = sem.termName === 'Fall' ? sem.year : sem.year - 1;
+      const existingRow = rows.get(startYear) ?? { startYear, terms: {} };
+      existingRow.terms[sem.termName as 'Fall' | 'Winter' | 'Spring' | 'Summer'] = sem;
+      rows.set(startYear, existingRow);
+    }
+
+    return Array.from(rows.values()).sort((a, b) => a.startYear - b.startYear);
+  }, [activePlan]);
 
   const filteredCourses = courseCode
     ? allCourses.filter((c) => c.toLowerCase().includes(courseCode.toLowerCase()))
@@ -212,6 +248,79 @@ export default function PlanBuilderPage() {
     setLoadingInfo(false);
   };
 
+  const handleAddSemester = async (schoolYearStart: number, termName: 'Fall' | 'Winter' | 'Spring' | 'Summer') => {
+    if (!activePlan?.id) return;
+    setSemesterActionError(null);
+    setUpdatingSemester(true);
+    const res = await addSemesterToPlan(activePlan.id, schoolYearStart, termName);
+    setUpdatingSemester(false);
+    if (res?.error) {
+      setSemesterActionError(res.error);
+      return;
+    }
+    await loadData();
+  };
+
+  const requestDeleteSemester = (semesterId: string, label: string) => {
+    setSemesterToDelete({ id: semesterId, label });
+    setIsDeleteSemesterConfirmOpen(true);
+  };
+
+  const handleDeleteSemester = async () => {
+    if (!semesterToDelete) return;
+    setIsDeleteSemesterConfirmOpen(false);
+    setSemesterActionError(null);
+    setUpdatingSemester(true);
+    const res = await deleteSemesterFromPlan(semesterToDelete.id);
+    setUpdatingSemester(false);
+    if (res?.error) {
+      setSemesterActionError(res.error);
+      return;
+    }
+    setSemesterToDelete(null);
+    await loadData();
+  };
+
+  const handleAddYear = async () => {
+    if (!activePlan?.id) return;
+    setSemesterActionError(null);
+    setUpdatingYear(true);
+    const res = await addSchoolYearToPlan(activePlan.id);
+    setUpdatingYear(false);
+    if (res?.error) {
+      setSemesterActionError(res.error);
+      return;
+    }
+    await loadData();
+  };
+
+  const requestDeleteYear = (schoolYearStart: number) => {
+    setYearToDelete(schoolYearStart);
+    setIsDeleteYearConfirmOpen(true);
+  };
+
+  const handleDeleteYear = async () => {
+    if (!activePlan?.id || yearToDelete === null) return;
+    setIsDeleteYearConfirmOpen(false);
+    setSemesterActionError(null);
+    setUpdatingYear(true);
+    const res = await deleteSchoolYearFromPlan(activePlan.id, yearToDelete);
+    setUpdatingYear(false);
+    if (res?.error) {
+      setSemesterActionError(res.error);
+      return;
+    }
+    setYearToDelete(null);
+    await loadData();
+  };
+
+  const toggleSchoolYearCollapse = (startYear: number) => {
+    setCollapsedSchoolYears((prev) => ({
+      ...prev,
+      [startYear]: !prev[startYear],
+    }));
+  };
+
   const selectedPlanLabel = optimisticPlans.find((p) => p.id === selectedPlanId)?.title || 'Select plan';
 
   if (!dataLoaded) {
@@ -303,6 +412,14 @@ export default function PlanBuilderPage() {
           </button>
 
           <button
+            onClick={() => void handleAddYear()}
+            disabled={!activePlan || updatingYear}
+            className="px-4 py-2 border border-panel-border-strong text-text-primary rounded hover:bg-hover-bg font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {updatingYear ? 'Adding Year...' : 'Add Year'}
+          </button>
+
+          <button
             onClick={requestDeletePlan}
             disabled={!activePlan || deletingPlan}
             className="px-4 py-2 border border-red-400 text-red-500 rounded hover:bg-red-500/10 font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -324,87 +441,168 @@ export default function PlanBuilderPage() {
       </div>
 
       <div>
+        {semesterActionError && (
+          <div className="mb-4 bg-red-500/10 border border-red-500/40 text-red-500 px-4 py-2 rounded-md text-sm font-semibold">
+            {semesterActionError}
+          </div>
+        )}
+
         {!activePlan ? (
           <div className="p-8 text-center text-gray-500">No plan found. Click New Plan to get started.</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {activePlan.semesters.map((sem) => (
-              <div key={sem.id} className="bg-panel-bg border border-panel-border rounded-lg p-5 min-h-[150px]">
-                <div className="flex justify-between items-center border-b border-panel-border pb-2 mb-3">
-                  <h3 className="font-bold text-lg text-heading ">
-                    {sem.termName} {sem.year}
-                  </h3>
-                  <span className="text-xs font-semibold bg-input-disabled px-2 py-1 rounded text-text-secondary">
-                    {sem.courses.reduce((acc, c) => acc + (c.credits ?? 0), 0)} cr
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  {sem.courses.map((course) => (
-                    <div key={course.id} onClick={() => handleCourseClick(course.courseCode)} className="px-3 bg-panel-bg-alt border border-panel-border-strong rounded-md text-sm flex justify-between items-center hover:border-uva-blue transition-colors cursor-pointer group h-[46px]">
-                      <span className="font-medium text-text-primary">{course.courseCode}</span>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-gray-500 font-semibold">{course.credits ?? 0} cr</span>
-                        <button onClick={(e) => { e.stopPropagation(); void handleRemoveCourse(course.id); }} className="text-red-500 opacity-0 group-hover:opacity-100 font-bold px-1 transition-opacity cursor-pointer hover:bg-danger-bg-hover rounded">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                        </button>
+          <div className="space-y-6">
+            {schoolYearRows.map((row) => {
+              const orderedTerms = (['Fall', 'Winter', 'Spring', 'Summer'] as const).filter((term) => Boolean(row.terms[term]));
+              const missingTerms = (['Fall', 'Winter', 'Spring', 'Summer'] as const).filter((term) => !row.terms[term]);
+              const columnCount = Math.max(2, Math.min(4, orderedTerms.length));
+              const isCollapsed = Boolean(collapsedSchoolYears[row.startYear]);
+              const totalCourses = orderedTerms.reduce((count, term) => count + (row.terms[term]?.courses.length ?? 0), 0);
+
+              return (
+                <section key={row.startYear} className="space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleSchoolYearCollapse(row.startYear)}
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-panel-border-strong text-text-secondary hover:bg-hover-bg transition-colors cursor-pointer"
+                        aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} school year ${row.startYear}-${row.startYear + 1}`}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 transition-transform ${isCollapsed ? '' : 'rotate-180'}`}><path d="m6 9 6 6 6-6" /></svg>
+                      </button>
+                      <div className="leading-tight">
+                        <p className="text-[11px] uppercase tracking-[0.08em] text-text-tertiary">School Year</p>
+                        <h2 className="text-xl font-semibold text-heading tracking-tight">{row.startYear}-{row.startYear + 1}</h2>
                       </div>
                     </div>
-                  ))}
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => requestDeleteYear(row.startYear)}
+                        disabled={updatingYear || schoolYearRows.length <= 1}
+                        className="px-3 py-1.5 text-xs font-semibold border border-red-400 text-red-500 rounded hover:bg-red-500/10 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Remove Year
+                      </button>
+                      {!isCollapsed && missingTerms.map((term) => (
+                        <button
+                          key={`${row.startYear}-${term}`}
+                          type="button"
+                          onClick={() => void handleAddSemester(row.startYear, term)}
+                          disabled={updatingSemester}
+                          className="px-3 py-1.5 text-xs font-semibold border border-panel-border-strong rounded text-text-primary hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Add {term}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-                  {newCourseSem === sem.id ? (
-                    <div className="flex space-x-2 mt-2 relative h-[46px] items-stretch">
-                      <div className="w-1/2 relative h-full">
-                        <input
-                          type="text"
-                          placeholder="Course Code"
-                          value={courseCode}
-                          onChange={(e) => handleCourseSearchChange(e.target.value)}
-                          onFocus={() => setShowDropdown(true)}
-                          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                          className="w-full px-3 border border-panel-border-strong rounded-md text-sm bg-panel-bg text-text-primary focus:outline-none focus:ring-1 focus:ring-uva-blue h-full"
-                        />
-                        {showDropdown && filteredCourses.length > 0 && (
-                          <div className="absolute z-10 w-full mt-1 bg-panel-bg border border-panel-border-strong rounded-md max-h-48 overflow-y-auto">
-                            {filteredCourses.map((c) => (
-                              <div
-                                key={c}
-                                className="px-3 py-2 text-sm text-text-primary hover:bg-uva-blue hover:text-white hover:bg-uva-blue transition-colors cursor-pointer"
-                                onClick={() => {
-                                  setCourseCode(c);
-                                  getCourseCreditsFromCSV(c).then((res) => setCredits(res));
-                                  setShowDropdown(false);
-                                }}
-                              >
-                                {c}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <input
-                        type="number"
-                        placeholder="Cr"
-                        value={credits}
-                        readOnly
-                        className="w-1/4 px-3 border border-panel-border-strong rounded-md text-sm bg-input-disabled text-text-muted cursor-not-allowed focus:outline-none h-full"
-                      />
-                      <div className="flex items-center space-x-1 px-1">
-                        <button onClick={() => void handleAddCourse(sem.id)} className="text-success-text hover:text-success-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><polyline points="20 6 9 17 4 12"/></svg>
-                        </button>
-                        <button onClick={() => setNewCourseSem(null)} className="text-danger-text hover:text-danger-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                        </button>
-                      </div>
+                  {isCollapsed ? (
+                    <div className="px-4 py-3 rounded-md border border-panel-border bg-panel-bg-alt text-sm text-text-secondary">
+                      {orderedTerms.length} semesters, {totalCourses} courses
                     </div>
                   ) : (
-                    <button onClick={() => setNewCourseSem(sem.id)} className="mt-2 text-sm font-semibold text-gray-500 hover:text-uva-orange hover:border-uva-orange hover:bg-hover-bg hover:text-uva-orange hover:border-uva-orange w-full text-center px-3 border border-dashed border-panel-border-strong rounded-md transition-all cursor-pointer disabled:cursor-not-allowed h-[46px] flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 mr-1"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Course
-                    </button>
+                  <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
+                    {orderedTerms.map((term) => {
+                      const sem = row.terms[term];
+                      if (!sem) return null;
+                      const canDeleteSemester = term === 'Winter' || term === 'Summer';
+
+                      return (
+                        <div key={sem.id} className="bg-panel-bg border border-panel-border rounded-lg p-5 min-h-[150px]">
+                          <div className="flex justify-between items-center border-b border-panel-border pb-2 mb-3">
+                            <h3 className="font-bold text-lg text-heading">
+                              {sem.termName} {sem.year}
+                            </h3>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-semibold bg-input-disabled px-2 py-1 rounded text-text-secondary">
+                                {sem.courses.reduce((acc, c) => acc + (c.credits ?? 0), 0)} cr
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => requestDeleteSemester(sem.id, `${sem.termName} ${sem.year}`)}
+                                disabled={updatingSemester || !canDeleteSemester}
+                                className="inline-flex items-center justify-center w-7 h-7 rounded-full text-text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                aria-label={`Delete ${sem.termName} ${sem.year}`}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                              </button>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            {sem.courses.map((course) => (
+                              <div key={course.id} onClick={() => handleCourseClick(course.courseCode)} className="px-3 bg-panel-bg-alt border border-panel-border-strong rounded-md text-sm flex justify-between items-center hover:border-uva-blue transition-colors cursor-pointer group h-[46px]">
+                                <span className="font-medium text-text-primary">{course.courseCode}</span>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-gray-500 font-semibold">{course.credits ?? 0} cr</span>
+                                  <button onClick={(e) => { e.stopPropagation(); void handleRemoveCourse(course.id); }} className="text-red-500 opacity-0 group-hover:opacity-100 font-bold px-1 transition-opacity cursor-pointer hover:bg-danger-bg-hover rounded">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+
+                            {newCourseSem === sem.id ? (
+                              <div className="flex space-x-2 mt-2 relative h-[46px] items-stretch">
+                                <div className="w-1/2 relative h-full">
+                                  <input
+                                    type="text"
+                                    placeholder="Course Code"
+                                    value={courseCode}
+                                    onChange={(e) => handleCourseSearchChange(e.target.value)}
+                                    onFocus={() => setShowDropdown(true)}
+                                    onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                                    className="w-full px-3 border border-panel-border-strong rounded-md text-sm bg-panel-bg text-text-primary focus:outline-none focus:ring-1 focus:ring-uva-blue h-full"
+                                  />
+                                  {showDropdown && filteredCourses.length > 0 && (
+                                    <div className="absolute z-10 w-full mt-1 bg-panel-bg border border-panel-border-strong rounded-md max-h-48 overflow-y-auto">
+                                      {filteredCourses.map((c) => (
+                                        <div
+                                          key={c}
+                                          className="px-3 py-2 text-sm text-text-primary hover:bg-uva-blue hover:text-white hover:bg-uva-blue transition-colors cursor-pointer"
+                                          onClick={() => {
+                                            setCourseCode(c);
+                                            getCourseCreditsFromCSV(c).then((res) => setCredits(res));
+                                            setShowDropdown(false);
+                                          }}
+                                        >
+                                          {c}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                                <input
+                                  type="number"
+                                  placeholder="Cr"
+                                  value={credits}
+                                  readOnly
+                                  className="w-1/4 px-3 border border-panel-border-strong rounded-md text-sm bg-input-disabled text-text-muted cursor-not-allowed focus:outline-none h-full"
+                                />
+                                <div className="flex items-center space-x-1 px-1">
+                                  <button onClick={() => void handleAddCourse(sem.id)} className="text-success-text hover:text-success-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><polyline points="20 6 9 17 4 12"/></svg>
+                                  </button>
+                                  <button onClick={() => setNewCourseSem(null)} className="text-danger-text hover:text-danger-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button onClick={() => setNewCourseSem(sem.id)} className="mt-2 text-sm font-semibold text-gray-500 hover:text-uva-orange hover:border-uva-orange hover:bg-hover-bg hover:text-uva-orange hover:border-uva-orange w-full text-center px-3 border border-dashed border-panel-border-strong rounded-md transition-all cursor-pointer disabled:cursor-not-allowed h-[46px] flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 mr-1"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Course
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                   )}
-                </div>
-              </div>
-            ))}
+                </section>
+              );
+            })}
           </div>
         )}
       </div>
@@ -456,6 +654,32 @@ export default function PlanBuilderPage() {
         isConfirming={deletingPlan}
         onCancel={() => setIsDeletePlanConfirmOpen(false)}
         onConfirm={() => void handleDeletePlan()}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteSemesterConfirmOpen}
+        title="Delete Semester"
+        message={`Delete ${semesterToDelete?.label ?? 'this semester'} and all its courses? This cannot be undone.`}
+        confirmLabel="Delete"
+        isConfirming={updatingSemester}
+        onCancel={() => {
+          setIsDeleteSemesterConfirmOpen(false);
+          setSemesterToDelete(null);
+        }}
+        onConfirm={() => void handleDeleteSemester()}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteYearConfirmOpen}
+        title="Delete School Year"
+        message={`Delete ${yearToDelete !== null ? `${yearToDelete}-${yearToDelete + 1}` : 'this school year'} and all included semesters/courses? This cannot be undone.`}
+        confirmLabel="Delete"
+        isConfirming={updatingYear}
+        onCancel={() => {
+          setIsDeleteYearConfirmOpen(false);
+          setYearToDelete(null);
+        }}
+        onConfirm={() => void handleDeleteYear()}
       />
 
       {loadingInfo && (

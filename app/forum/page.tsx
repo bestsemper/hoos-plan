@@ -296,9 +296,13 @@ export default function ForumPage() {
                   <div className="flex items-center justify-between gap-3 mt-1">
                     <div>
                       {post.attachedPlan && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded bg-input-disabled text-xs font-semibold text-text-secondary">
-                          {post.attachedPlan.title}
-                        </span>
+                        <Link
+                          href={`/plan/${post.attachedPlan.id}`}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-input-disabled text-xs font-semibold text-text-secondary hover:bg-hover-bg transition-colors"
+                        >
+                          <span className="uppercase tracking-wide text-[10px]">Attached Plan</span>
+                          <span className="text-text-primary">{post.attachedPlan.title}</span>
+                        </Link>
                       )}
                     </div>
                     <p className="text-xs text-text-tertiary whitespace-nowrap">

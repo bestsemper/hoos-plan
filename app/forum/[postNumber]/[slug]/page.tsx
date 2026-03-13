@@ -7,6 +7,7 @@ import ConfirmModal from '../../../components/ConfirmModal';
 import {
   addForumReply,
   deleteForumPost,
+  getAttachedPlanViewData,
   getForumPostPageData,
   voteOnForumPost,
   voteOnForumReply,
@@ -42,6 +43,23 @@ type ForumPostPageData = {
   canPost: boolean;
 };
 
+type AttachedPlanView = {
+  id: string;
+  title: string;
+  ownerDisplayName: string;
+  semesters: Array<{
+    id: string;
+    termName: string;
+    termOrder: number;
+    year: number;
+    courses: Array<{
+      id: string;
+      courseCode: string;
+      credits: number | null;
+    }>;
+  }>;
+};
+
 function formatRelativeTime(isoTimestamp: string): string {
   const created = new Date(isoTimestamp).getTime();
   const now = Date.now();
@@ -66,6 +84,9 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
   const [replyDraft, setReplyDraft] = useState('');
   const [replySort, setReplySort] = useState<'newest' | 'oldest'>('newest');
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [isAttachedPlanModalOpen, setIsAttachedPlanModalOpen] = useState(false);
+  const [loadingAttachedPlan, setLoadingAttachedPlan] = useState(false);
+  const [attachedPlanPreview, setAttachedPlanPreview] = useState<AttachedPlanView | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
@@ -144,6 +165,26 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
         return;
       }
       router.push('/forum');
+    });
+  };
+
+  const handleOpenAttachedPlan = () => {
+    if (!postData?.post.attachedPlan?.id) return;
+
+    setError(null);
+    setLoadingAttachedPlan(true);
+    setIsAttachedPlanModalOpen(true);
+
+    startTransition(async () => {
+      const result = await getAttachedPlanViewData(postData.post.attachedPlan!.id);
+      if ('error' in result) {
+        setError('Unable to load attached plan.');
+        setIsAttachedPlanModalOpen(false);
+        setLoadingAttachedPlan(false);
+        return;
+      }
+      setAttachedPlanPreview(result.plan);
+      setLoadingAttachedPlan(false);
     });
   };
 
@@ -250,9 +291,15 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                       Advice
                     </span>
                     {post.attachedPlan && (
-                      <span className="inline-flex items-center px-2 py-1 rounded border border-panel-border-strong text-xs font-semibold text-text-secondary bg-panel-bg-alt">
-                        {post.attachedPlan.title}
-                      </span>
+                      <button
+                        type="button"
+                        onClick={handleOpenAttachedPlan}
+                        disabled={isPending}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded border border-panel-border-strong text-xs font-semibold text-text-secondary bg-panel-bg-alt hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                          <span className="uppercase tracking-wide text-[10px]">Attached Plan</span>
+                          <span className="text-text-primary">{post.attachedPlan.title}</span>
+                      </button>
                     )}
                   </div>
 
@@ -410,6 +457,80 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
         onCancel={() => setIsDeleteConfirmOpen(false)}
         onConfirm={handleDeletePost}
       />
+
+      {isAttachedPlanModalOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={() => {
+            setIsAttachedPlanModalOpen(false);
+            setAttachedPlanPreview(null);
+            setLoadingAttachedPlan(false);
+          }}
+        >
+          <div
+            className="bg-panel-bg border border-panel-border rounded-lg w-full max-w-3xl max-h-[85vh] overflow-y-auto p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-heading">Attached Plan</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAttachedPlanModalOpen(false);
+                  setAttachedPlanPreview(null);
+                  setLoadingAttachedPlan(false);
+                }}
+                className="text-text-muted hover:text-text-secondary cursor-pointer"
+                aria-label="Close attached plan"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              </button>
+            </div>
+
+            {loadingAttachedPlan && (
+              <div className="animate-pulse space-y-3">
+                <div className="h-6 w-2/3 rounded bg-input-disabled" />
+                <div className="h-4 w-1/3 rounded bg-input-disabled" />
+                <div className="h-24 w-full rounded bg-input-disabled" />
+              </div>
+            )}
+
+            {!loadingAttachedPlan && attachedPlanPreview && (
+              <div>
+                <h4 className="text-2xl font-bold text-heading">{attachedPlanPreview.title}</h4>
+                <p className="text-sm text-text-secondary mt-1 mb-4">
+                  Plan by <span className="text-uva-blue font-semibold">{attachedPlanPreview.ownerDisplayName}</span>
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {attachedPlanPreview.semesters.map((sem) => (
+                    <div key={sem.id} className="bg-panel-bg-alt border border-panel-border rounded-lg p-4">
+                      <div className="flex justify-between items-center border-b border-panel-border pb-2 mb-3">
+                        <h5 className="font-bold text-heading">{sem.termName} {sem.year}</h5>
+                        <span className="text-xs font-semibold bg-input-disabled px-2 py-1 rounded text-text-secondary">
+                          {sem.courses.reduce((acc, c) => acc + (c.credits ?? 0), 0)} cr
+                        </span>
+                      </div>
+
+                      <div className="space-y-2">
+                        {sem.courses.length === 0 && (
+                          <p className="text-sm text-text-secondary">No courses in this semester.</p>
+                        )}
+                        {sem.courses.map((course) => (
+                          <div key={course.id} className="px-3 bg-panel-bg border border-panel-border-strong rounded-md text-sm flex justify-between items-center h-[42px]">
+                            <span className="font-medium text-text-primary">{course.courseCode}</span>
+                            <span className="text-text-secondary font-semibold">{course.credits ?? 0} cr</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
