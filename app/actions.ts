@@ -108,12 +108,378 @@ export async function getCurrentUser() {
   });
 }
 
+export async function updateCurrentUserProfile(data: {
+  displayName: string;
+  major?: string;
+  gradYear?: string;
+  bio?: string;
+}) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'Not authenticated.' };
+  }
+
+  const displayName = data.displayName?.trim();
+  if (!displayName) {
+    return { error: 'Display name is required.' };
+  }
+
+  const major = data.major?.trim() || null;
+  const bio = data.bio?.trim() || null;
+
+  let gradYear: number | null = null;
+  if (data.gradYear && data.gradYear.trim() !== '') {
+    const parsed = Number.parseInt(data.gradYear, 10);
+    if (Number.isNaN(parsed) || parsed < 1900 || parsed > 3000) {
+      return { error: 'Graduation year must be a valid year.' };
+    }
+    gradYear = parsed;
+  }
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      displayName,
+      major,
+      gradYear,
+      bio,
+    },
+  });
+
+  revalidatePath('/profile');
+  revalidatePath('/');
+
+  return { success: true };
+}
+
 import { redirect } from 'next/navigation';
 
 export async function logout() {
   const cookieStore = await cookies();
   cookieStore.delete('computingId');
   redirect('/login');
+}
+
+export async function createForumPost(title: string, body: string, attachedPlanId?: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to post.' };
+  }
+
+  const trimmedTitle = title?.trim();
+  const trimmedBody = body?.trim();
+
+  if (!trimmedTitle) {
+    return { error: 'Post title is required.' };
+  }
+  if (!trimmedBody) {
+    return { error: 'Post body is required.' };
+  }
+
+  let validatedPlanId: string | null = null;
+  if (attachedPlanId && attachedPlanId.trim() !== '') {
+    const plan = await prisma.plan.findFirst({
+      where: {
+        id: attachedPlanId,
+        userId: user.id,
+      },
+      select: { id: true },
+    });
+
+    if (!plan) {
+      return { error: 'Selected plan does not exist.' };
+    }
+
+    validatedPlanId = plan.id;
+  }
+
+  await prisma.forumPost.create({
+    data: {
+      authorId: user.id,
+      title: trimmedTitle,
+      body: trimmedBody,
+      attachedPlanId: validatedPlanId,
+    },
+  });
+
+  revalidatePath('/forum');
+  return { success: true };
+}
+
+export async function addForumReply(postId: string, body: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to reply.' };
+  }
+
+  const trimmedBody = body?.trim();
+  if (!trimmedBody) {
+    return { error: 'Reply cannot be empty.' };
+  }
+
+  await prisma.forumAnswer.create({
+    data: {
+      postId,
+      authorId: user.id,
+      body: trimmedBody,
+    },
+  });
+
+  revalidatePath('/forum');
+  return { success: true };
+}
+
+export async function voteOnForumReply(answerId: string, value: 1 | -1) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to vote.' };
+  }
+
+  if (value !== 1 && value !== -1) {
+    return { error: 'Invalid vote value.' };
+  }
+
+  const existingVote = await prisma.vote.findFirst({
+    where: {
+      userId: user.id,
+      answerId,
+    },
+  });
+
+  if (!existingVote) {
+    await prisma.vote.create({
+      data: {
+        userId: user.id,
+        answerId,
+        value,
+      },
+    });
+  } else if (existingVote.value === value) {
+    // Clicking the same vote removes it (toggle off).
+    await prisma.vote.delete({
+      where: { id: existingVote.id },
+    });
+  } else {
+    await prisma.vote.update({
+      where: { id: existingVote.id },
+      data: { value },
+    });
+  }
+
+  revalidatePath('/forum');
+  return { success: true };
+}
+
+export async function getForumPageData() {
+  const currentUser = await getCurrentUser();
+
+  const userPlans = currentUser
+    ? await prisma.plan.findMany({
+        where: { userId: currentUser.id },
+        select: { id: true, title: true },
+        orderBy: { createdAt: 'desc' },
+      })
+    : [];
+
+  const posts = await prisma.forumPost.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      attachedPlan: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+      author: {
+        select: {
+          displayName: true,
+        },
+      },
+      answers: {
+        orderBy: { createdAt: 'asc' },
+        include: {
+          author: {
+            select: {
+              displayName: true,
+            },
+          },
+          votes: {
+            select: {
+              value: true,
+              userId: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const normalizedPosts = posts.map((post) => ({
+    id: post.id,
+    title: post.title,
+    body: post.body,
+    createdAt: post.createdAt.toISOString(),
+    authorDisplayName: post.author.displayName,
+    attachedPlan: post.attachedPlan,
+    answers: post.answers.map((answer) => {
+      const userVote = answer.votes.find((vote) => vote.userId === currentUser?.id)?.value;
+      const currentUserVote: 1 | -1 | 0 = userVote === 1 ? 1 : userVote === -1 ? -1 : 0;
+
+      return {
+        id: answer.id,
+        body: answer.body,
+        createdAt: answer.createdAt.toISOString(),
+        authorDisplayName: answer.author.displayName,
+        voteScore: answer.votes.reduce((sum, vote) => sum + vote.value, 0),
+        currentUserVote,
+      };
+    }),
+  }));
+
+  return {
+    posts: normalizedPosts,
+    plans: userPlans,
+    canPost: Boolean(currentUser),
+  };
+}
+
+export async function createNewPlan(title?: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to create a plan.' };
+  }
+
+  const existingCount = await prisma.plan.count({ where: { userId: user.id } });
+  const planTitle = title?.trim() || `My Plan ${existingCount + 1}`;
+
+  const plan = await prisma.plan.create({
+    data: {
+      userId: user.id,
+      title: planTitle,
+      isPublished: false,
+    },
+  });
+
+  const baseYear = new Date().getFullYear();
+  for (let termOrder = 1; termOrder <= 8; termOrder++) {
+    await prisma.semester.create({
+      data: {
+        planId: plan.id,
+        termOrder,
+        termName: termOrder % 2 === 1 ? 'Fall' : 'Spring',
+        year: baseYear + Math.floor((termOrder - 1) / 2),
+      },
+    });
+  }
+
+  revalidatePath('/plan');
+  revalidatePath('/forum');
+  return { success: true, planId: plan.id };
+}
+
+export async function renamePlan(planId: string, title: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to rename a plan.' };
+  }
+
+  const trimmedTitle = title?.trim();
+  if (!trimmedTitle) {
+    return { error: 'Plan name is required.' };
+  }
+
+  const plan = await prisma.plan.findFirst({
+    where: {
+      id: planId,
+      userId: user.id,
+    },
+    select: { id: true },
+  });
+
+  if (!plan) {
+    return { error: 'Plan not found.' };
+  }
+
+  await prisma.plan.update({
+    where: { id: plan.id },
+    data: { title: trimmedTitle },
+  });
+
+  revalidatePath('/plan');
+  revalidatePath('/forum');
+  return { success: true };
+}
+
+export async function deletePlan(planId: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to delete a plan.' };
+  }
+
+  const plan = await prisma.plan.findFirst({
+    where: {
+      id: planId,
+      userId: user.id,
+    },
+    select: { id: true },
+  });
+
+  if (!plan) {
+    return { error: 'Plan not found.' };
+  }
+
+  await prisma.forumPost.updateMany({
+    where: { attachedPlanId: plan.id },
+    data: { attachedPlanId: null },
+  });
+
+  await prisma.plan.delete({
+    where: { id: plan.id },
+  });
+
+  revalidatePath('/plan');
+  revalidatePath('/forum');
+  return { success: true };
+}
+
+export async function getPlanBuilderData() {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'unauthenticated' };
+  }
+
+  const plans = await prisma.plan.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      title: true,
+      semesters: {
+        orderBy: { termOrder: 'asc' },
+        select: {
+          id: true,
+          termName: true,
+          termOrder: true,
+          year: true,
+          courses: {
+            select: {
+              id: true,
+              courseCode: true,
+              credits: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const allCourses = await getAllPossibleCoursesFromCSV();
+
+  return {
+    userId: user.id,
+    plans,
+    allCourses,
+  };
 }
 
 export async function generatePreliminaryPlan(userId: string, major: string, goals: string[]) {

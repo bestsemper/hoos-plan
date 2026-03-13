@@ -12,11 +12,11 @@ export default async function Home() {
   }) : [];
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="max-w-5xl mx-auto py-8">
       {user ? (
-        <h1 className="text-4xl font-bold mb-2 text-heading">Welcome, {user.displayName}</h1>
+        <h1 className="text-3xl font-bold mb-2 text-heading">Welcome, {user.displayName}</h1>
       ) : (
-        <h1 className="text-4xl font-bold mb-2 text-heading">Welcome to Plan Your Future</h1>
+        <h1 className="text-3xl font-bold mb-2 text-heading">Welcome to Plan Your Future</h1>
       )}
       <p className="text-text-secondary mb-10">
         Your companion for 4-year course planning at UVA.

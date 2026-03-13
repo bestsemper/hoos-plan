@@ -1,6 +1,7 @@
 import { getCurrentUser } from '../actions';
 import { redirect } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
+import EditProfileForm from './EditProfileForm';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -17,7 +18,7 @@ export default async function Profile() {
   const postCount = await prisma.forumPost.count({ where: { authorId: user.id } });
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="max-w-5xl mx-auto py-8">
       <div className="bg-panel-bg p-8 rounded-lg border border-panel-border mb-8 flex justify-between items-start">
         <div>
           <div className="flex items-center gap-6 mb-6">
@@ -30,10 +31,13 @@ export default async function Profile() {
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <button className="bg-uva-blue text-white px-5 py-2.5 rounded hover:bg-uva-blue-dark font-bold transition-colors cursor-pointer">
-              Edit Profile
-            </button>
+          <div className="flex gap-4 items-start">
+            <EditProfileForm
+              displayName={user.displayName}
+              major={user.major}
+              gradYear={user.gradYear}
+              bio={user.bio}
+            />
             <button className="border border-dashed border-panel-border-strong px-5 py-2.5 rounded hover:bg-hover-bg text-text-primary font-semibold transition-colors cursor-pointer">
               Upload Previous Classes
             </button>

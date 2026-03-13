@@ -65,8 +65,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      <div className="max-w-md mx-auto mt-12 bg-panel-bg border border-panel-border p-8 rounded-lg">
+    <div className="max-w-5xl mx-auto py-8">
+      <div className="max-w-md mx-auto bg-panel-bg border border-panel-border p-8 rounded-lg">
         <div className="flex flex-col mb-6 border-b border-panel-border pb-6">
           <div className="flex justify-between items-center mb-2">
             <h1 className="text-3xl font-bold text-heading">{isSignUp ? 'Create Account' : 'Sign In'}</h1>
