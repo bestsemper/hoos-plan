@@ -125,18 +125,59 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
     return { nextVote, scoreDelta };
   };
 
+  const createOptimisticReply = (body: string, parentId: string | null): ForumAnswerItem => ({
+    id: `temp-reply-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    parentId,
+    body,
+    isDeleted: false,
+    canDelete: true,
+    createdAt: new Date().toISOString(),
+    authorDisplayName: 'You',
+    voteScore: 0,
+    currentUserVote: 0,
+  });
+
   const handleReply = () => {
     if (!postData) return;
+    const trimmed = replyDraft.trim();
+    if (!trimmed) {
+      setError('Reply cannot be empty.');
+      return;
+    }
+
     setError(null);
+    const optimisticReply = createOptimisticReply(trimmed, null);
+
+    setPostData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        post: {
+          ...prev.post,
+          answers: [...prev.post.answers, optimisticReply],
+        },
+      };
+    });
+    setReplyDraft('');
 
     startTransition(async () => {
-      const res = await addForumReply(postData.post.id, replyDraft);
+      const res = await addForumReply(postData.post.id, trimmed);
       if (res?.error) {
+        setPostData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            post: {
+              ...prev.post,
+              answers: prev.post.answers.filter((answer) => answer.id !== optimisticReply.id),
+            },
+          };
+        });
         setError(res.error);
         return;
       }
-      setReplyDraft('');
-      await loadData();
+
+      void loadData();
     });
   };
 
@@ -149,15 +190,39 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
     }
 
     setError(null);
+    const optimisticReply = createOptimisticReply(trimmed, parentReplyId);
+
+    setPostData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        post: {
+          ...prev.post,
+          answers: [...prev.post.answers, optimisticReply],
+        },
+      };
+    });
+    setInlineReplyDraft('');
+    setActiveReplyEditorId(null);
+
     (async () => {
       const res = await addForumReply(postData.post.id, trimmed, parentReplyId);
       if (res?.error) {
+        setPostData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            post: {
+              ...prev.post,
+              answers: prev.post.answers.filter((answer) => answer.id !== optimisticReply.id),
+            },
+          };
+        });
         setError(res.error);
         return;
       }
-      setInlineReplyDraft('');
-      setActiveReplyEditorId(null);
-      await loadData();
+
+      void loadData();
     })();
   };
 

@@ -182,7 +182,7 @@ export default function PlanBuilderPage() {
     setLoading(true);
     await generatePreliminaryPlan(userId, 'Computer Science (BA)', []);
     setLoading(false);
-    await loadData();
+    void loadData();
   };
 
   const handleCreatePlan = async () => {
@@ -190,7 +190,7 @@ export default function PlanBuilderPage() {
     const res = await createNewPlan();
     setCreatingPlan(false);
     if (!res?.error && res?.planId) {
-      await loadData(res.planId);
+      void loadData(res.planId);
     }
   };
 
@@ -199,7 +199,7 @@ export default function PlanBuilderPage() {
     setSavingTitle(true);
     await renamePlan(activePlan.id, planTitle);
     setSavingTitle(false);
-    await loadData();
+    void loadData();
   };
 
   const requestDeletePlan = () => {
@@ -214,7 +214,7 @@ export default function PlanBuilderPage() {
     setDeletingPlan(true);
     await deletePlan(activePlan.id);
     setDeletingPlan(false);
-    await loadData();
+    void loadData();
   };
 
   const handleCourseSearchChange = (value: string) => {
@@ -249,7 +249,7 @@ export default function PlanBuilderPage() {
     setCourseCode('');
 
     await addCourseToSemester(semesterId, code, cr);
-    await loadData();
+    void loadData();
   };
 
   const handleRemoveCourse = async (courseId: string) => {
@@ -264,7 +264,7 @@ export default function PlanBuilderPage() {
     );
 
     await removeCourseFromSemester(courseId);
-    await loadData();
+    void loadData();
   };
 
   const handleCourseClick = async (code: string) => {
@@ -277,14 +277,46 @@ export default function PlanBuilderPage() {
   const handleAddSemester = async (schoolYearStart: number, termName: 'Fall' | 'Winter' | 'Spring' | 'Summer') => {
     if (!activePlan?.id) return;
     setSemesterActionError(null);
+
+    const tempId = `temp-sem-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const tempYear = termName === 'Fall' ? schoolYearStart : schoolYearStart + 1;
+    const termOrderBase: Record<'Fall' | 'Winter' | 'Spring' | 'Summer', number> = {
+      Fall: 1,
+      Winter: 2,
+      Spring: 3,
+      Summer: 4,
+    };
+    const tempSemester: PlanSemester = {
+      id: tempId,
+      termName,
+      termOrder: schoolYearStart * 10 + termOrderBase[termName],
+      year: tempYear,
+      courses: [],
+    };
+
+    setOptimisticPlans((prev) =>
+      prev.map((plan) =>
+        plan.id === activePlan.id
+          ? { ...plan, semesters: [...plan.semesters, tempSemester] }
+          : plan
+      )
+    );
+
     setUpdatingSemester(true);
     const res = await addSemesterToPlan(activePlan.id, schoolYearStart, termName);
     setUpdatingSemester(false);
     if (res?.error) {
+      setOptimisticPlans((prev) =>
+        prev.map((plan) =>
+          plan.id === activePlan.id
+            ? { ...plan, semesters: plan.semesters.filter((semester) => semester.id !== tempId) }
+            : plan
+        )
+      );
       setSemesterActionError(res.error);
       return;
     }
-    await loadData();
+    void loadData();
   };
 
   const requestDeleteSemester = (semesterId: string, label: string) => {
@@ -293,31 +325,101 @@ export default function PlanBuilderPage() {
   };
 
   const handleDeleteSemester = async () => {
-    if (!semesterToDelete) return;
+    if (!semesterToDelete || !activePlan?.id) return;
+
+    const semesterToRestore = activePlan.semesters.find((semester) => semester.id === semesterToDelete.id);
     setIsDeleteSemesterConfirmOpen(false);
     setSemesterActionError(null);
+
+    setOptimisticPlans((prev) =>
+      prev.map((plan) =>
+        plan.id === activePlan.id
+          ? { ...plan, semesters: plan.semesters.filter((semester) => semester.id !== semesterToDelete.id) }
+          : plan
+      )
+    );
+
     setUpdatingSemester(true);
     const res = await deleteSemesterFromPlan(semesterToDelete.id);
     setUpdatingSemester(false);
     if (res?.error) {
+      if (semesterToRestore) {
+        setOptimisticPlans((prev) =>
+          prev.map((plan) =>
+            plan.id === activePlan.id
+              ? { ...plan, semesters: [...plan.semesters, semesterToRestore] }
+              : plan
+          )
+        );
+      }
       setSemesterActionError(res.error);
       return;
     }
     setSemesterToDelete(null);
-    await loadData();
+    void loadData();
   };
 
   const handleAddYear = async () => {
     if (!activePlan?.id) return;
     setSemesterActionError(null);
+
+    const schoolYearStarts = new Set<number>();
+    for (const sem of activePlan.semesters) {
+      if (!['Fall', 'Winter', 'Spring', 'Summer'].includes(sem.termName)) continue;
+      schoolYearStarts.add(sem.termName === 'Fall' ? sem.year : sem.year - 1);
+    }
+
+    const nextSchoolYearStart =
+      schoolYearStarts.size > 0 ? Math.max(...Array.from(schoolYearStarts)) + 1 : 2025;
+    const latestTermOrder = activePlan.semesters.reduce((max, sem) => Math.max(max, sem.termOrder), 0);
+
+    const tempFallId = `temp-sem-${Date.now()}-fall`;
+    const tempSpringId = `temp-sem-${Date.now()}-spring`;
+    const optimisticYearSemesters: PlanSemester[] = [
+      {
+        id: tempFallId,
+        termName: 'Fall',
+        termOrder: latestTermOrder + 1,
+        year: nextSchoolYearStart,
+        courses: [],
+      },
+      {
+        id: tempSpringId,
+        termName: 'Spring',
+        termOrder: latestTermOrder + 2,
+        year: nextSchoolYearStart + 1,
+        courses: [],
+      },
+    ];
+
+    setOptimisticPlans((prev) =>
+      prev.map((plan) =>
+        plan.id === activePlan.id
+          ? { ...plan, semesters: [...plan.semesters, ...optimisticYearSemesters] }
+          : plan
+      )
+    );
+
     setUpdatingYear(true);
     const res = await addSchoolYearToPlan(activePlan.id);
     setUpdatingYear(false);
     if (res?.error) {
+      setOptimisticPlans((prev) =>
+        prev.map((plan) =>
+          plan.id === activePlan.id
+            ? {
+                ...plan,
+                semesters: plan.semesters.filter(
+                  (sem) => sem.id !== tempFallId && sem.id !== tempSpringId
+                ),
+              }
+            : plan
+        )
+      );
       setSemesterActionError(res.error);
       return;
     }
-    await loadData();
+    void loadData();
   };
 
   const requestDeleteYear = (schoolYearStart: number) => {
@@ -327,17 +429,45 @@ export default function PlanBuilderPage() {
 
   const handleDeleteYear = async () => {
     if (!activePlan?.id || yearToDelete === null) return;
+
+    const semestersToRestore = activePlan.semesters.filter((sem) => {
+      if (sem.termName === 'Fall') return sem.year === yearToDelete;
+      if (sem.termName === 'Winter' || sem.termName === 'Spring' || sem.termName === 'Summer') {
+        return sem.year === yearToDelete + 1;
+      }
+      return false;
+    });
+
     setIsDeleteYearConfirmOpen(false);
     setSemesterActionError(null);
+
+    setOptimisticPlans((prev) =>
+      prev.map((plan) =>
+        plan.id === activePlan.id
+          ? {
+              ...plan,
+              semesters: plan.semesters.filter((sem) => !semestersToRestore.some((target) => target.id === sem.id)),
+            }
+          : plan
+      )
+    );
+
     setUpdatingYear(true);
     const res = await deleteSchoolYearFromPlan(activePlan.id, yearToDelete);
     setUpdatingYear(false);
     if (res?.error) {
+      setOptimisticPlans((prev) =>
+        prev.map((plan) =>
+          plan.id === activePlan.id
+            ? { ...plan, semesters: [...plan.semesters, ...semestersToRestore] }
+            : plan
+        )
+      );
       setSemesterActionError(res.error);
       return;
     }
     setYearToDelete(null);
-    await loadData();
+    void loadData();
   };
 
   const handleImportFromPdf = async () => {
@@ -373,7 +503,7 @@ export default function PlanBuilderPage() {
       setImportMode('new');
       setIsImportPlanDropdownOpen(false);
       setImportingPdf(false);
-      await loadData(res?.planId);
+      void loadData(res?.planId);
     } catch {
       setImportError('Unable to read PDF file.');
       setImportingPdf(false);
