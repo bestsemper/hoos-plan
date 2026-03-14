@@ -425,7 +425,7 @@ export default function PlanBuilderPage() {
               {/* Semester cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Array.from({ length: 2 }).map((_, si) => (
-                  <div key={si} className="bg-panel-bg border border-panel-border rounded-lg p-5 min-h-[180px]">
+                  <div key={si} className="bg-panel-bg border border-panel-border rounded-xl p-5 min-h-[180px]">
                     {/* Card header */}
                     <div className="flex justify-between items-center border-b border-panel-border pb-2 mb-3">
                       <div className="h-6 w-28 rounded bg-input-disabled" />
@@ -656,7 +656,7 @@ export default function PlanBuilderPage() {
                       if (!sem) return null;
 
                       return (
-                        <div key={sem.id} className="bg-panel-bg border border-panel-border rounded-lg p-5 min-h-[150px]">
+                        <div key={sem.id} className="bg-panel-bg border border-panel-border rounded-xl p-5">
                           <div className="flex justify-between items-center border-b border-panel-border pb-2 mb-3">
                             <h3 className="font-bold text-lg text-heading">
                               {sem.termName} {sem.year}
@@ -678,11 +678,11 @@ export default function PlanBuilderPage() {
                           </div>
                           <div className="space-y-2">
                             {sem.courses.map((course) => (
-                              <div key={course.id} onClick={() => handleCourseClick(course.courseCode)} className="px-3 bg-panel-bg-alt border border-panel-border-strong rounded-lg text-sm flex justify-between items-center hover:border-uva-blue transition-colors cursor-pointer group h-[46px]">
+                              <div key={course.id} onClick={() => handleCourseClick(course.courseCode)} className="px-3 bg-panel-bg-alt border border-panel-border-strong rounded-xl text-sm flex justify-between items-center hover:border-uva-blue transition-colors cursor-pointer group h-[46px]">
                                 <span className="font-medium text-text-primary">{course.courseCode}</span>
                                 <div className="flex items-center space-x-2">
                                   <span className="text-gray-500 font-semibold">{course.credits ?? 0} cr</span>
-                                  <button onClick={(e) => { e.stopPropagation(); void handleRemoveCourse(course.id); }} className="text-red-500 opacity-0 group-hover:opacity-100 font-bold px-1 transition-opacity cursor-pointer rounded">
+                                  <button onClick={(e) => { e.stopPropagation(); void handleRemoveCourse(course.id); }} className="text-danger-text hover:text-danger-text-hover opacity-0 group-hover:opacity-100 p-2 cursor-pointer flex items-center justify-center transition-all hover:scale-110">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                   </button>
                                 </div>
@@ -691,44 +691,42 @@ export default function PlanBuilderPage() {
 
                             {newCourseSem === sem.id ? (
                               <div className="flex space-x-2 mt-2 relative h-[46px] items-stretch">
-                                <div className="w-1/2 relative h-full">
-                                  <input
-                                    type="text"
-                                    placeholder="Course Code"
-                                    value={courseCode}
-                                    onChange={(e) => handleCourseSearchChange(e.target.value)}
-                                    onFocus={() => setShowDropdown(true)}
-                                    onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                                    className="w-full px-3 border border-panel-border-strong rounded-xl text-sm bg-panel-bg text-text-primary focus:outline-none h-full"
-                                  />
-                                  {showDropdown && filteredCourses.length > 0 && (
-                                    <div className="absolute z-10 w-full mt-1.5 bg-panel-bg border border-panel-border rounded-xl shadow-lg overflow-hidden">
-                                      <div className="max-h-48 overflow-y-auto p-1.5 space-y-0.5">
-                                      {filteredCourses.map((c) => (
-                                        <div
-                                          key={c}
-                                          className="px-3 py-2 text-sm text-text-primary rounded-lg hover:bg-hover-bg transition-colors cursor-pointer"
-                                          onClick={() => {
-                                            setCourseCode(c);
-                                            getCourseCreditsFromCSV(c).then((res) => setCredits(res));
-                                            setShowDropdown(false);
-                                          }}
-                                        >
-                                          {c}
+                                <div className="flex-1 relative h-full">
+                                  <div className="h-full px-3 bg-panel-bg-alt border border-panel-border-strong rounded-xl text-sm flex items-center justify-between gap-2">
+                                    <div className="relative flex-1 h-full">
+                                      <input
+                                        type="text"
+                                        placeholder="Course Code"
+                                        value={courseCode}
+                                        onChange={(e) => handleCourseSearchChange(e.target.value)}
+                                        onFocus={() => setShowDropdown(true)}
+                                        onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                                        className="w-full h-full bg-transparent text-text-primary focus:outline-none"
+                                      />
+                                      {showDropdown && filteredCourses.length > 0 && (
+                                        <div className="absolute z-10 left-0 top-full w-full mt-1.5 bg-panel-bg border border-panel-border rounded-xl shadow-lg overflow-hidden">
+                                          <div className="max-h-48 overflow-y-auto p-1.5 space-y-0.5">
+                                            {filteredCourses.map((c) => (
+                                              <div
+                                                key={c}
+                                                className="px-3 py-2 text-sm text-text-primary rounded-lg hover:bg-hover-bg transition-colors cursor-pointer"
+                                                onClick={() => {
+                                                  setCourseCode(c);
+                                                  getCourseCreditsFromCSV(c).then((res) => setCredits(res));
+                                                  setShowDropdown(false);
+                                                }}
+                                              >
+                                                {c}
+                                              </div>
+                                            ))}
+                                          </div>
                                         </div>
-                                      ))}
-                                      </div>
+                                      )}
                                     </div>
-                                  )}
+                                    <span className="text-gray-500 font-semibold whitespace-nowrap">{credits} cr</span>
+                                  </div>
                                 </div>
-                                <input
-                                  type="number"
-                                  placeholder="Cr"
-                                  value={credits}
-                                  readOnly
-                                  className="w-1/4 px-3 border border-panel-border-strong rounded-xl text-sm bg-input-disabled text-text-muted cursor-not-allowed focus:outline-none h-full"
-                                />
-                                <div className="flex items-center space-x-1 px-1">
+                                <div className="ml-auto flex items-center justify-end space-x-1 px-1">
                                   <button onClick={() => void handleAddCourse(sem.id)} className="text-success-text hover:text-success-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><polyline points="20 6 9 17 4 12"/></svg>
                                   </button>

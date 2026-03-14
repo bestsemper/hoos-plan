@@ -6,6 +6,7 @@ import { use, useEffect, useState, useTransition } from 'react';
 import ConfirmModal from '../../../components/ConfirmModal';
 import {
   addForumReply,
+  deleteForumReply,
   deleteForumPost,
   getAttachedPlanViewData,
   getForumPostPageData,
@@ -15,7 +16,10 @@ import {
 
 type ForumAnswerItem = {
   id: string;
+  parentId: string | null;
   body: string;
+  isDeleted: boolean;
+  canDelete: boolean;
   createdAt: string;
   authorDisplayName: string;
   voteScore: number;
@@ -82,13 +86,15 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
   const [isPending, startTransition] = useTransition();
   const [postData, setPostData] = useState<ForumPostPageData | null>(null);
   const [replyDraft, setReplyDraft] = useState('');
-  const [replySort, setReplySort] = useState<'newest' | 'oldest'>('newest');
+  const [replySort, setReplySort] = useState<'newest' | 'oldest' | 'popular'>('newest');
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [isAttachedPlanModalOpen, setIsAttachedPlanModalOpen] = useState(false);
   const [loadingAttachedPlan, setLoadingAttachedPlan] = useState(false);
   const [attachedPlanPreview, setAttachedPlanPreview] = useState<AttachedPlanView | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [activeReplyEditorId, setActiveReplyEditorId] = useState<string | null>(null);
+  const [inlineReplyDraft, setInlineReplyDraft] = useState('');
 
   const loadData = async () => {
     const parsedPostNumber = Number.parseInt(postNumber, 10);
@@ -113,6 +119,12 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
     void loadData();
   }, [postNumber]);
 
+  const getOptimisticVoteUpdate = (currentVote: 1 | -1 | 0, clickedValue: 1 | -1) => {
+    const nextVote: 1 | -1 | 0 = currentVote === clickedValue ? 0 : clickedValue;
+    const scoreDelta = nextVote - currentVote;
+    return { nextVote, scoreDelta };
+  };
+
   const handleReply = () => {
     if (!postData) return;
     setError(null);
@@ -128,16 +140,72 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
     });
   };
 
-  const handleVote = (answerId: string, value: 1 | -1) => {
-    setError(null);
+  const handleReplyToReply = (parentReplyId: string) => {
+    if (!postData) return;
+    const trimmed = inlineReplyDraft.trim();
+    if (!trimmed) {
+      setError('Reply cannot be empty.');
+      return;
+    }
 
+    setError(null);
     (async () => {
-      const res = await voteOnForumReply(answerId, value);
+      const res = await addForumReply(postData.post.id, trimmed, parentReplyId);
       if (res?.error) {
         setError(res.error);
         return;
       }
+      setInlineReplyDraft('');
+      setActiveReplyEditorId(null);
       await loadData();
+    })();
+  };
+
+  const handleVote = (answerId: string, value: 1 | -1) => {
+    if (!postData) return;
+    setError(null);
+
+    const targetAnswer = postData.post.answers.find((answer) => answer.id === answerId);
+    if (!targetAnswer) return;
+
+    const previousVote = targetAnswer.currentUserVote;
+    const { nextVote, scoreDelta } = getOptimisticVoteUpdate(previousVote, value);
+
+    setPostData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        post: {
+          ...prev.post,
+          answers: prev.post.answers.map((answer) =>
+            answer.id === answerId
+              ? { ...answer, currentUserVote: nextVote, voteScore: answer.voteScore + scoreDelta }
+              : answer
+          ),
+        },
+      };
+    });
+
+    (async () => {
+      const res = await voteOnForumReply(answerId, value);
+      if (res?.error) {
+        setPostData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            post: {
+              ...prev.post,
+              answers: prev.post.answers.map((answer) =>
+                answer.id === answerId
+                  ? { ...answer, currentUserVote: previousVote, voteScore: answer.voteScore - scoreDelta }
+                  : answer
+              ),
+            },
+          };
+        });
+        setError(res.error);
+        return;
+      }
     })();
   };
 
@@ -145,13 +213,82 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
     if (!postData) return;
     setError(null);
 
+    const previousVote = postData.post.currentUserVote;
+    const { nextVote, scoreDelta } = getOptimisticVoteUpdate(previousVote, value);
+
+    setPostData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        post: {
+          ...prev.post,
+          currentUserVote: nextVote,
+          voteScore: prev.post.voteScore + scoreDelta,
+        },
+      };
+    });
+
     (async () => {
       const res = await voteOnForumPost(postData.post.id, value);
       if (res?.error) {
+        setPostData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            post: {
+              ...prev.post,
+              currentUserVote: previousVote,
+              voteScore: prev.post.voteScore - scoreDelta,
+            },
+          };
+        });
         setError(res.error);
         return;
       }
-      await loadData();
+    })();
+  };
+
+  const handleDeleteReply = (answerId: string) => {
+    if (!postData) return;
+    setError(null);
+
+    const targetAnswer = postData.post.answers.find((answer) => answer.id === answerId);
+    if (!targetAnswer || targetAnswer.isDeleted) return;
+
+    setPostData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        post: {
+          ...prev.post,
+          answers: prev.post.answers.map((answer) =>
+            answer.id === answerId
+              ? { ...answer, body: '', isDeleted: true, canDelete: false }
+              : answer
+          ),
+        },
+      };
+    });
+
+    (async () => {
+      const res = await deleteForumReply(answerId);
+      if (res?.error) {
+        setPostData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            post: {
+              ...prev.post,
+              answers: prev.post.answers.map((answer) =>
+                answer.id === answerId
+                  ? { ...answer, body: targetAnswer.body, isDeleted: false, canDelete: targetAnswer.canDelete }
+                  : answer
+              ),
+            },
+          };
+        });
+        setError(res.error);
+      }
     })();
   };
 
@@ -207,8 +344,149 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
     if (replySort === 'newest') {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
+    if (replySort === 'popular') {
+      return b.voteScore - a.voteScore || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
   });
+
+  const replySortLabel =
+    replySort === 'newest' ? 'Newest first' : replySort === 'oldest' ? 'Oldest first' : 'Most votes';
+
+  const repliesByParent = new Map<string | null, ForumAnswerItem[]>();
+  for (const answer of sortedAnswers) {
+    const key = answer.parentId;
+    const existing = repliesByParent.get(key) ?? [];
+    existing.push(answer);
+    repliesByParent.set(key, existing);
+  }
+
+  const rootAnswers = repliesByParent.get(null) ?? [];
+
+  const renderReplyTree = (answers: ForumAnswerItem[], depth = 0) => {
+    return answers.map((answer) => {
+      const children = repliesByParent.get(answer.id) ?? [];
+      const indentPx = Math.min(depth * 24, 96);
+
+      return (
+        <div key={answer.id} className="space-y-3" style={{ marginLeft: indentPx }}>
+          <article className="border-t border-panel-border pt-4">
+            <div className="grid grid-cols-[38px_minmax(0,1fr)] gap-3 items-start">
+              <div className="inline-flex flex-col items-center gap-1 pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => handleVote(answer.id, 1)}
+                  disabled={!canPost || isPending}
+                  aria-label="Like reply"
+                  className={`inline-flex items-center justify-center w-8 h-8 rounded-full border transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                    answer.currentUserVote === 1
+                      ? 'border-uva-orange text-uva-orange bg-badge-orange-bg'
+                      : 'border-panel-border text-text-secondary hover:bg-hover-bg'
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+                    <path d="m18 15-6-6-6 6" />
+                  </svg>
+                </button>
+
+                <span className="min-w-8 text-center text-sm font-bold text-text-primary">{answer.voteScore}</span>
+
+                <button
+                  type="button"
+                  onClick={() => handleVote(answer.id, -1)}
+                  disabled={!canPost || isPending}
+                  aria-label="Unlike reply"
+                  className={`inline-flex items-center justify-center w-8 h-8 rounded-full border transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                    answer.currentUserVote === -1
+                      ? 'border-red-400 text-red-500 bg-red-500/10'
+                      : 'border-panel-border text-text-secondary hover:bg-hover-bg'
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-text-tertiary mb-2">
+                  {answer.isDeleted ? (
+                    <>deleted {formatRelativeTime(answer.createdAt)}</>
+                  ) : (
+                    <><span className="text-uva-blue font-semibold">{answer.authorDisplayName}</span> replied {formatRelativeTime(answer.createdAt)}</>
+                  )}
+                </p>
+                {answer.isDeleted ? (
+                  <p className="text-sm italic text-text-tertiary">[deleted]</p>
+                ) : (
+                  <p className="text-text-primary whitespace-pre-wrap leading-relaxed">{answer.body}</p>
+                )}
+                <div className="mt-3 flex items-center justify-end gap-2">
+                  {answer.canDelete && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteReply(answer.id)}
+                      disabled={isPending}
+                      className="px-3 py-1.5 rounded-xl border border-red-400 text-red-500 hover:bg-red-500/10 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Delete
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveReplyEditorId(answer.id);
+                      setInlineReplyDraft('');
+                    }}
+                    disabled={!canPost || isPending}
+                    className="px-3 py-1.5 rounded-xl border border-panel-border-strong text-text-primary hover:bg-hover-bg text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Reply
+                  </button>
+                </div>
+
+                {activeReplyEditorId === answer.id && (
+                  <div className="mt-3 rounded-lg border border-panel-border bg-panel-bg-alt p-3 space-y-2">
+                    <textarea
+                      value={inlineReplyDraft}
+                      onChange={(e) => setInlineReplyDraft(e.target.value)}
+                      rows={2}
+                      placeholder={answer.isDeleted ? 'Reply to this comment...' : `Reply to ${answer.authorDisplayName}...`}
+                      className="w-full p-2.5 border border-panel-border rounded-lg bg-input-bg text-text-primary outline-none"
+                      disabled={!canPost || isPending}
+                    />
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveReplyEditorId(null);
+                          setInlineReplyDraft('');
+                        }}
+                        disabled={isPending}
+                        className="px-3 py-1.5 border border-panel-border-strong rounded-xl text-xs font-semibold text-text-primary hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleReplyToReply(answer.id)}
+                        disabled={!canPost || isPending}
+                        className="px-3 py-1.5 bg-uva-blue/90 text-white rounded-xl text-xs font-semibold hover:bg-uva-blue transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isPending ? 'Posting...' : 'Post Reply'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </article>
+
+          {children.length > 0 && renderReplyTree(children, depth + 1)}
+        </div>
+      );
+    });
+  };
 
   return (
     <div className="max-w-5xl mx-auto py-8">
@@ -323,7 +601,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                   }
                   className="inline-flex items-center gap-2 px-3 py-2 border border-panel-border rounded-xl bg-input-bg text-text-primary cursor-pointer hover:border-panel-border-strong transition-colors"
                 >
-                  <span>Sort: {replySort === 'newest' ? 'Newest first' : 'Oldest first'}</span>
+                  <span>Sort: {replySortLabel}</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -363,6 +641,16 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                     >
                       Oldest first
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReplySort('popular');
+                        setIsSortDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 text-sm rounded-lg cursor-pointer transition-colors ${replySort === 'popular' ? 'bg-uva-blue/10 text-uva-blue font-semibold' : 'text-text-primary hover:bg-hover-bg'}`}
+                    >
+                      Most votes
+                    </button>
                   </div>
                 )}
               </div>
@@ -382,7 +670,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                   type="button"
                   onClick={handleReply}
                   disabled={!canPost || isPending}
-                  className="px-4 py-2 bg-uva-blue/90 text-white rounded-xl hover:bg-uva-blue font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 bg-uva-blue/90 text-white rounded-xl hover:bg-uva-blue text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isPending ? 'Submitting...' : 'Reply'}
                 </button>
@@ -395,56 +683,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
               </div>
             )}
 
-            {sortedAnswers.map((answer) => (
-              <article key={answer.id} className="bg-panel-bg border border-panel-border rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded bg-input-disabled text-text-secondary text-xs font-bold flex items-center justify-center shrink-0 uppercase">
-                    {answer.authorDisplayName.charAt(0)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-text-tertiary mb-2">
-                      <span className="text-uva-blue font-semibold">{answer.authorDisplayName}</span> replied {formatRelativeTime(answer.createdAt)}
-                    </p>
-                    <p className="text-text-primary whitespace-pre-wrap leading-relaxed">{answer.body}</p>
-                    <div className="mt-3 inline-flex flex-col items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => handleVote(answer.id, 1)}
-                        disabled={!canPost || isPending}
-                        aria-label="Like reply"
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-full border transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
-                          answer.currentUserVote === 1
-                            ? 'border-uva-orange text-uva-orange bg-badge-orange-bg'
-                            : 'border-panel-border text-text-secondary hover:bg-hover-bg'
-                        }`}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-                          <path d="m18 15-6-6-6 6" />
-                        </svg>
-                      </button>
-
-                      <span className="min-w-8 text-center text-sm font-bold text-text-primary">{answer.voteScore}</span>
-
-                      <button
-                        type="button"
-                        onClick={() => handleVote(answer.id, -1)}
-                        disabled={!canPost || isPending}
-                        aria-label="Unlike reply"
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-full border transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
-                          answer.currentUserVote === -1
-                            ? 'border-red-400 text-red-500 bg-red-500/10'
-                            : 'border-panel-border text-text-secondary hover:bg-hover-bg'
-                        }`}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
+            {renderReplyTree(rootAnswers)}
           </section>
       </div>
 

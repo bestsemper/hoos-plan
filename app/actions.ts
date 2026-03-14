@@ -322,7 +322,7 @@ export async function deleteForumPost(postId: string) {
   return { success: true };
 }
 
-export async function addForumReply(postId: string, body: string) {
+export async function addForumReply(postId: string, body: string, parentReplyId?: string) {
   const user = await getCurrentUser();
   if (!user) {
     return { error: 'You must be logged in to reply.' };
@@ -333,13 +333,61 @@ export async function addForumReply(postId: string, body: string) {
     return { error: 'Reply cannot be empty.' };
   }
 
+  let validatedParentReplyId: string | null = null;
+  if (parentReplyId && parentReplyId.trim() !== '') {
+    const parentReply = await prisma.forumAnswer.findUnique({
+      where: { id: parentReplyId },
+      select: { id: true, postId: true },
+    });
+
+    if (!parentReply || parentReply.postId !== postId) {
+      return { error: 'Invalid parent reply.' };
+    }
+
+    validatedParentReplyId = parentReply.id;
+  }
+
   await prisma.forumAnswer.create({
     data: {
       postId,
       authorId: user.id,
+      parentId: validatedParentReplyId,
       body: trimmedBody,
     },
   });
+
+  revalidatePath('/forum');
+  return { success: true };
+}
+
+export async function deleteForumReply(answerId: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: 'You must be logged in to delete replies.' };
+  }
+
+  const answer = await prisma.forumAnswer.findUnique({
+    where: { id: answerId },
+    select: { id: true, authorId: true, deletedAt: true },
+  });
+
+  if (!answer) {
+    return { error: 'Reply not found.' };
+  }
+
+  if (answer.authorId !== user.id) {
+    return { error: 'You can only delete your own replies.' };
+  }
+
+  if (!answer.deletedAt) {
+    await prisma.forumAnswer.update({
+      where: { id: answer.id },
+      data: {
+        body: '',
+        deletedAt: new Date(),
+      },
+    });
+  }
 
   revalidatePath('/forum');
   return { success: true };
@@ -494,7 +542,10 @@ export async function getForumPageData() {
 
       return {
         id: answer.id,
+        parentId: answer.parentId,
         body: answer.body,
+        isDeleted: Boolean(answer.deletedAt),
+        canDelete: currentUser?.id === answer.authorId && !answer.deletedAt,
         createdAt: answer.createdAt.toISOString(),
         authorDisplayName: answer.author.displayName,
         voteScore: answer.votes.reduce((sum, vote) => sum + vote.value, 0),
@@ -593,7 +644,10 @@ export async function getForumPostPageData(postNumber: number) {
 
       return {
         id: answer.id,
+        parentId: answer.parentId,
         body: answer.body,
+        isDeleted: Boolean(answer.deletedAt),
+        canDelete: currentUser?.id === answer.authorId && !answer.deletedAt,
         createdAt: answer.createdAt.toISOString(),
         authorDisplayName: answer.author.displayName,
         voteScore: answer.votes.reduce((sum, vote) => sum + vote.value, 0),

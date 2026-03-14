@@ -100,12 +100,18 @@ model ForumAnswer {
   id        String    @id @default(cuid())
   postId    String
   authorId  String
+  parentId  String?
   body      String
+  deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent    ForumAnswer?  @relation("ForumAnswerReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies   ForumAnswer[] @relation("ForumAnswerReplies")
   votes     Vote[]
+
+  @@index([postId, parentId])
 }
 
 model Vote {
