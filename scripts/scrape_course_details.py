@@ -17,13 +17,15 @@ CLASS_DETAILS_URL = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLI
 CATALOG_COURSE_DETAILS_URL = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_COURSE_CATALOG.FieldFormula.IScript_CatalogCourseDetails"
 
 SUBJECT_PATTERN = re.compile(r"\b([A-Z]{2,6})\s*-\s*(.*?)\s+View Courses\b")
+SUBJECT_FROM_HREF_PATTERN = re.compile(r"[?&]subject=([A-Z0-9]{2,8})\b", re.IGNORECASE)
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (educational research)",
 }
 
-# Max simultaneous HTTP requests — raise for more speed, lower to be gentler on the server
-CONCURRENCY = 100
+# Max simultaneous HTTP requests.
+# Keep this at 1 for fully sequential scraping.
+CONCURRENCY = 1
 
 
 # ---------------------------------------------------------------------------
@@ -69,18 +71,99 @@ async def get_catalog_text() -> str:
             await browser.close()
 
 
+async def get_subjects_from_catalog() -> list[tuple[str, str]]:
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(headless=True)
+        page = await browser.new_page()
+        try:
+            await page.goto(CATALOG_URL, wait_until="domcontentloaded", timeout=60000)
+            await page.wait_for_selector("#main_iframe", timeout=60000)
+
+            iframe_element = await page.locator("#main_iframe").element_handle()
+            if iframe_element is None:
+                raise RuntimeError("catalog iframe was not found")
+
+            frame = await iframe_element.content_frame()
+            if frame is None:
+                raise RuntimeError("catalog iframe did not load")
+
+            try:
+                await frame.wait_for_load_state("networkidle", timeout=60000)
+            except PlaywrightTimeoutError:
+                pass
+
+            link_rows = await frame.evaluate(
+                """() => {
+                    return Array.from(document.querySelectorAll('a[href*="IScript_SubjectCourses"]')).map((a) => ({
+                        href: a.getAttribute('href') || '',
+                        text: (a.textContent || '').trim(),
+                    }));
+                }"""
+            )
+
+            subjects: list[tuple[str, str]] = []
+            seen: set[tuple[str, str]] = set()
+
+            for row in link_rows:
+                href = str(row.get("href", ""))
+                text = str(row.get("text", "")).strip()
+                match = SUBJECT_FROM_HREF_PATTERN.search(href)
+                if not match:
+                    continue
+
+                code = match.group(1).upper()
+                cleaned_text = re.sub(r"\s+View\s+Courses\s*$", "", text, flags=re.IGNORECASE)
+                name = cleaned_text.strip()
+                if name.upper().startswith(f"{code} -"):
+                    name = name[len(code) + 1 :].lstrip(" -")
+
+                item = (code, name)
+                if code and item not in seen:
+                    seen.add(item)
+                    subjects.append(item)
+
+            if subjects:
+                return subjects
+
+            return []
+        finally:
+            await browser.close()
+
+
 # ---------------------------------------------------------------------------
 # Async HTTP helpers
 # ---------------------------------------------------------------------------
 
-async def _get_json(session: aiohttp.ClientSession, sem: asyncio.Semaphore, url: str, params: dict) -> dict | list:
+async def _get_json(
+    session: aiohttp.ClientSession,
+    sem: asyncio.Semaphore,
+    url: str,
+    params: dict,
+    quiet: bool = False,
+) -> dict | list:
     async with sem:
         try:
-            async with session.get(url, params=params, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+            async with session.get(url, params=params, timeout=aiohttp.ClientTimeout(total=20)) as resp:
                 resp.raise_for_status()
-                return await resp.json(content_type=None)
-        except Exception:
-            return {}
+                raw_body = await resp.text()
+                if not raw_body.strip():
+                    return {}
+
+                try:
+                    return json.loads(raw_body)
+                except json.JSONDecodeError:
+                    endpoint = url.rsplit(".", maxsplit=1)[-1]
+                    if not quiet:
+                        if "<html" in raw_body.lower():
+                            print(f"    ✗ Request returned HTML instead of JSON [{endpoint}] params={params}")
+                        else:
+                            print(f"    ✗ Request returned invalid JSON [{endpoint}] params={params}")
+                    return {}
+        except Exception as error:
+            endpoint = url.rsplit(".", maxsplit=1)[-1]
+            if not quiet:
+                print(f"    ✗ Request failed [{endpoint}] params={params}: {error}")
+    return {}
 
 
 async def get_courses_by_subject_async(session: aiohttp.ClientSession, sem: asyncio.Semaphore, subject: str) -> list[dict]:
@@ -110,6 +193,97 @@ async def get_class_details_async(session: aiohttp.ClientSession, sem: asyncio.S
     params = {"institution": "UVA01", "term": term, "class_nbr": class_nbr}
     data = await _get_json(session, sem, CLASS_DETAILS_URL, params)
     return data if isinstance(data, dict) else {}
+
+
+async def warm_up_http_session(session: aiohttp.ClientSession, sem: asyncio.Semaphore, subject_code: str) -> None:
+    # Warm-up handshake: touch all endpoints once using one real course.
+    subject_payload = await _get_json(
+        session,
+        sem,
+        SUBJECT_COURSES_URL,
+        {"institution": "UVA01", "subject": subject_code},
+        quiet=True,
+    )
+
+    if not isinstance(subject_payload, dict):
+        return
+
+    courses = subject_payload.get("courses", [])
+    if not isinstance(courses, list) or not courses:
+        return
+
+    first_course = courses[0]
+    crse_id = str(first_course.get("crse_id", "")).strip()
+    catalog_nbr = str(first_course.get("catalog_nbr", "")).strip()
+    if not crse_id:
+        return
+
+    await _get_json(
+        session,
+        sem,
+        CATALOG_COURSE_DETAILS_URL,
+        {
+            "institution": "UVA01",
+            "course_id": crse_id,
+            "use_catalog_print": "Y",
+            "effdt": "",
+            "crse_offer_nbr": "1",
+            "subject": subject_code,
+            "catalog_nbr": catalog_nbr,
+        },
+        quiet=True,
+    )
+
+    sections_1268 = await _get_json(
+        session,
+        sem,
+        BROWSE_SECTIONS_URL,
+        {
+            "institution": "UVA01",
+            "campus": "",
+            "location": "",
+            "course_id": crse_id,
+            "x_acad_career": "",
+            "term": "1268",
+            "crse_offer_nbr": "1",
+        },
+        quiet=True,
+    )
+
+    sections_data = sections_1268 if isinstance(sections_1268, dict) else {}
+    sections = sections_data.get("sections", []) if isinstance(sections_data.get("sections", []), list) else []
+    term = "1268"
+
+    if not sections:
+        sections_1262 = await _get_json(
+            session,
+            sem,
+            BROWSE_SECTIONS_URL,
+            {
+                "institution": "UVA01",
+                "campus": "",
+                "location": "",
+                "course_id": crse_id,
+                "x_acad_career": "",
+                "term": "1262",
+                "crse_offer_nbr": "1",
+            },
+            quiet=True,
+        )
+        sections_data = sections_1262 if isinstance(sections_1262, dict) else {}
+        sections = sections_data.get("sections", []) if isinstance(sections_data.get("sections", []), list) else []
+        term = "1262"
+
+    if sections:
+        class_nbr = str(sections[0].get("class_nbr", "")).strip()
+        if class_nbr:
+            await _get_json(
+                session,
+                sem,
+                CLASS_DETAILS_URL,
+                {"institution": "UVA01", "term": term, "class_nbr": class_nbr},
+                quiet=True,
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -148,6 +322,12 @@ def format_term_label(term: str | None) -> str | None:
     }.get(season_code)
 
     return f"{season} {year}" if season else cleaned
+
+
+def is_placeholder_course(course_code: str, description: str) -> bool:
+    normalized_code = course_code.upper().strip()
+    normalized_description = description.lower().strip()
+    return normalized_code.startswith("ZFOR ")
 
 
 def extract_credits_from_class_details(class_details_data: dict) -> str:
@@ -195,13 +375,14 @@ async def get_catalog_details_async(
     if isinstance(data, dict):
         course_details = data.get("course_details", {})
         return {
+            "title": course_details.get("course_title", ""),
             "description": course_details.get("descrlong", ""),
             "credits": format_credit_value(
                 course_details.get("units_minimum"),
                 course_details.get("units_maximum"),
             ),
         }
-    return {"description": "", "credits": ""}
+    return {"title": "", "description": "", "credits": ""}
 
 
 # ---------------------------------------------------------------------------
@@ -217,6 +398,9 @@ async def process_course_async(session: aiohttp.ClientSession, sem: asyncio.Sema
         return None
 
     full_course_code = f"{course_code} {catalog_nbr}"
+    short_description = str(course.get("descr", "")).strip()
+    if is_placeholder_course(full_course_code, short_description):
+        return None
 
     # fetch catalog details + both term sections in parallel
     catalog_details, sections_1268, sections_1262 = await asyncio.gather(
@@ -225,8 +409,11 @@ async def process_course_async(session: aiohttp.ClientSession, sem: asyncio.Sema
         get_sections_async(session, sem, crse_id, "1262"),
     )
 
-    description = catalog_details.get("description", "")
+    title = catalog_details.get("title", "") or str(course.get("descr", "")).strip()
+    description = catalog_details.get("description", "") or short_description
     credits = catalog_details.get("credits", "")
+    if is_placeholder_course(full_course_code, description or short_description):
+        return None
 
     if sections_1268:
         best_term, sections = "1268", sections_1268
@@ -248,6 +435,7 @@ async def process_course_async(session: aiohttp.ClientSession, sem: asyncio.Sema
     print(f"  ✓ {full_course_code}")
     return {
         "course_code": full_course_code,
+        "title": title,
         "credits": credits,
         "crse_id": crse_id,
         "class_nbr": class_nbr,
@@ -261,12 +449,26 @@ async def process_subject_async(session: aiohttp.ClientSession, sem: asyncio.Sem
     print(f"[{idx}/{total}] {subject_code} ({subject_name})...")
     courses = await get_courses_by_subject_async(session, sem, subject_code)
 
-    results = await asyncio.gather(
-        *[process_course_async(session, sem, subject_code, c) for c in courses],
-        return_exceptions=True,
-    )
+    if not courses:
+        print(f"  ! No courses returned for {subject_code}")
+        return []
 
-    return [r for r in results if isinstance(r, dict)]
+    results: list[dict] = []
+    dropped = 0
+    for course in courses:
+        try:
+            row = await process_course_async(session, sem, subject_code, course)
+            if isinstance(row, dict):
+                results.append(row)
+        except Exception as error:
+            dropped += 1
+            course_label = f"{course.get('subject', subject_code)} {course.get('catalog_nbr', '')}".strip()
+            print(f"  ! {subject_code}: failed {course_label}: {error}")
+
+    if dropped:
+        print(f"  ! {subject_code}: dropped {dropped} course(s) due to errors")
+
+    return results
 
 
 async def main_async() -> None:
@@ -276,28 +478,36 @@ async def main_async() -> None:
 
     # Step 1: subjects via Playwright (async, one-time)
     print("\n[Step 1] Fetching subjects via Playwright...")
-    catalog_text = await get_catalog_text()
-    subjects = extract_subjects(catalog_text)
+    subjects = await get_subjects_from_catalog()
+    if not subjects:
+        catalog_text = await get_catalog_text()
+        subjects = extract_subjects(catalog_text)
     print(f"  Found {len(subjects)} subjects\n")
 
-    # Step 2: all subjects + courses concurrently
+    # Step 2: all subjects + courses sequentially
     print(f"[Step 2] Scraping all courses (concurrency={CONCURRENCY})...")
     sem = asyncio.Semaphore(CONCURRENCY)
     connector = aiohttp.TCPConnector(limit=CONCURRENCY)
 
+    subject_results: list[list[dict]] = []
     async with aiohttp.ClientSession(headers=HEADERS, connector=connector) as session:
-        subject_results = await asyncio.gather(
-            *[
-                process_subject_async(session, sem, code, name, i, len(subjects))
-                for i, (code, name) in enumerate(subjects, 1)
-            ],
-            return_exceptions=True,
-        )
+        if subjects:
+            print(f"  Warming up SIS session with subject {subjects[0][0]}...")
+            await warm_up_http_session(session, sem, subjects[0][0])
+        for i, (code, name) in enumerate(subjects, 1):
+            result = await process_subject_async(session, sem, code, name, i, len(subjects))
+            subject_results.append(result)
 
     all_courses: list[dict] = []
     for result in subject_results:
-        if isinstance(result, list):
-            all_courses.extend(result)
+        all_courses.extend(result)
+
+    # Stable output ordering helps detect real data changes between runs.
+    all_courses.sort(key=lambda row: (
+        str(row.get("course_code", "")),
+        str(row.get("term") or ""),
+        str(row.get("class_nbr") or ""),
+    ))
 
     # Step 3: save
     print("\n" + "=" * 80)

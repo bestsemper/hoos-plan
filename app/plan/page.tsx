@@ -22,10 +22,16 @@ import {
 
 interface CourseInfo {
   courseCode: string;
+  title: string | null;
   description: string | null;
   prerequisites: string[];
   terms: string[];
 }
+
+type CourseOption = {
+  code: string;
+  title: string | null;
+};
 
 type PlanCourse = {
   id: string;
@@ -73,7 +79,7 @@ export default function PlanBuilderPage() {
   const isMountedRef = useRef(true);
   const [userId, setUserId] = useState('');
   const [optimisticPlans, setOptimisticPlans] = useState<PlanItem[]>([]);
-  const [allCourses, setAllCourses] = useState<string[]>([]);
+  const [allCourses, setAllCourses] = useState<CourseOption[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState('');
   const [isPlanDropdownOpen, setIsPlanDropdownOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
@@ -175,7 +181,10 @@ export default function PlanBuilderPage() {
   }, [activePlan]);
 
   const filteredCourses = courseCode
-    ? allCourses.filter((c) => c.toLowerCase().includes(courseCode.toLowerCase()))
+    ? allCourses.filter((course) =>
+        course.code.toLowerCase().includes(courseCode.toLowerCase()) ||
+        (course.title ?? '').toLowerCase().includes(courseCode.toLowerCase())
+      )
     : [];
 
   const handleGenerate = async () => {
@@ -222,7 +231,7 @@ export default function PlanBuilderPage() {
     setCourseCode(value);
     setShowDropdown(true);
 
-    if (allCourses.includes(value)) {
+    if (allCourses.some((course) => course.code === value)) {
       getCourseCreditsFromCSV(value).then((res) => setCredits(res));
     }
   };
@@ -840,17 +849,20 @@ export default function PlanBuilderPage() {
                                   {showDropdown && filteredCourses.length > 0 && (
                                     <div className="absolute z-10 left-0 top-full w-full mt-1.5 bg-panel-bg border border-panel-border rounded-xl shadow-lg overflow-hidden">
                                       <div className="max-h-48 overflow-y-auto p-1.5 space-y-0.5">
-                                        {filteredCourses.map((c) => (
+                                        {filteredCourses.map((course) => (
                                           <div
-                                            key={c}
-                                            className="px-3 py-2 text-sm text-text-primary rounded-lg hover:bg-hover-bg transition-colors cursor-pointer"
+                                            key={course.code}
+                                            className="px-3 py-2 rounded-lg hover:bg-hover-bg transition-colors cursor-pointer"
                                             onClick={() => {
-                                              setCourseCode(c);
-                                              getCourseCreditsFromCSV(c).then((res) => setCredits(res));
+                                              setCourseCode(course.code);
+                                              getCourseCreditsFromCSV(course.code).then((res) => setCredits(res));
                                               setShowDropdown(false);
                                             }}
                                           >
-                                            {c}
+                                            <div className="text-sm font-medium text-text-primary">{course.code}</div>
+                                            {course.title && (
+                                              <div className="text-xs text-text-muted truncate">{course.title}</div>
+                                            )}
                                           </div>
                                         ))}
                                       </div>
@@ -1117,7 +1129,12 @@ export default function PlanBuilderPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedCourseInfo(null)}>
           <div className="bg-panel-bg p-6 rounded-2xl max-w-md w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-start mb-4">
-              <h2 className="text-2xl font-bold text-heading">{selectedCourseInfo.courseCode}</h2>
+              <div>
+                <h2 className="text-2xl font-bold text-heading">{selectedCourseInfo.courseCode}</h2>
+                {selectedCourseInfo.title && (
+                  <p className="mt-1 text-sm text-text-muted">{selectedCourseInfo.title}</p>
+                )}
+              </div>
               <button onClick={() => setSelectedCourseInfo(null)} className="text-text-muted hover:text-text-secondary cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
@@ -1155,8 +1172,8 @@ export default function PlanBuilderPage() {
                 </div>
               )}
 
-              {!selectedCourseInfo.description && selectedCourseInfo.prerequisites.length === 0 && selectedCourseInfo.terms.length === 0 && (
-                <p className="text-gray-500 italic text-sm">No course details were found for this code in uva_course_details.csv.</p>
+              {!selectedCourseInfo.title && !selectedCourseInfo.description && selectedCourseInfo.prerequisites.length === 0 && selectedCourseInfo.terms.length === 0 && (
+                <p className="text-gray-500 italic text-sm">No course details were found for this course in the current catalog data.</p>
               )}
             </div>
           </div>

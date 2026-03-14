@@ -1448,10 +1448,13 @@ export async function importPlanFromStellicPdf(input: {
   }
 }
 
-export async function getAllPossibleCoursesFromCSV(): Promise<string[]> {
+export async function getAllPossibleCoursesFromCSV(): Promise<{ code: string; title: string | null }[]> {
   try {
-    const { sortedCourseCodes } = loadCourseDetailsFromJSON();
-    return sortedCourseCodes;
+    const { courseDetailsByCode, sortedCourseCodes } = loadCourseDetailsFromJSON();
+    return sortedCourseCodes.map((code) => ({
+      code,
+      title: courseDetailsByCode.get(code)?.title ?? null,
+    }));
   } catch (err) {
     console.error("Error reading CSV for all courses:", err);
     return [];
@@ -1466,13 +1469,14 @@ export async function getCourseInfoFromCSV(courseCode: string) {
 
     return {
       courseCode: normalizedCode,
+      title: details?.title ?? null,
       description: details?.description ?? null,
       prerequisites: details?.prerequisites ?? [],
       terms: details?.terms ?? [],
     };
   } catch (err) {
     console.error("Error reading CSV for course info:", err);
-    return { courseCode, description: null, prerequisites: [], terms: [] };
+    return { courseCode, title: null, description: null, prerequisites: [], terms: [] };
   }
 }
 
@@ -1489,6 +1493,7 @@ export async function getCourseCreditsFromCSV(courseCode: string): Promise<strin
 
 type CourseDetailsJsonRecord = {
   course_code?: string;
+  title?: string;
   credits?: string;
   description?: string;
   enrollment_requirements?: string;
@@ -1496,6 +1501,7 @@ type CourseDetailsJsonRecord = {
 };
 
 type AggregatedCourseDetails = {
+  title: string | null;
   credits: string;
   description: string | null;
   prerequisites: string[];
@@ -1519,6 +1525,12 @@ function normalizeCsvText(value: string): string {
     .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function isPlaceholderCourse(courseCode: string, description: string): boolean {
+  const normalizedCode = normalizeCourseCode(courseCode);
+  const normalizedDescription = description.toLowerCase();
+  return normalizedCode.startsWith('ZFOR ') || normalizedDescription.includes('placeholder');
 }
 
 function formatTermLabel(term: string): string {
@@ -1574,6 +1586,7 @@ function loadCourseDetailsFromJSON(): {
   const detailsMap = new Map<
     string,
     {
+      title: string | null;
       credits: string;
       description: string | null;
       prerequisites: Set<string>;
@@ -1588,19 +1601,29 @@ function loadCourseDetailsFromJSON(): {
       continue;
     }
 
+    const description = normalizeCsvText(record.description ?? '');
+    if (isPlaceholderCourse(courseCode, description)) {
+      continue;
+    }
+
     const existing = detailsMap.get(courseCode) ?? {
+      title: null,
       credits: '3',
       description: null,
       prerequisites: new Set<string>(),
       terms: new Set<string>(),
     };
 
+    const title = normalizeCsvText(record.title ?? '');
+    if (title && (!existing.title || title.length > existing.title.length)) {
+      existing.title = title;
+    }
+
     const credits = normalizeCsvText(record.credits ?? '');
     if (credits) {
       existing.credits = credits;
     }
 
-    const description = normalizeCsvText(record.description ?? '');
     if (description && (!existing.description || description.length > existing.description.length)) {
       existing.description = description;
     }
@@ -1621,6 +1644,7 @@ function loadCourseDetailsFromJSON(): {
   const courseDetailsByCode = new Map<string, AggregatedCourseDetails>();
   for (const [code, detail] of detailsMap.entries()) {
     courseDetailsByCode.set(code, {
+      title: detail.title,
       credits: detail.credits,
       description: detail.description,
       prerequisites: Array.from(detail.prerequisites),
