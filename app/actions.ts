@@ -10,6 +10,44 @@ import { scryptSync, randomBytes, timingSafeEqual } from 'crypto';
 
 const prisma = new PrismaClient();
 const DEFAULT_PLAN_START_YEAR = 2025;
+const FORUM_VIEW_WINDOW_MS = 15 * 60 * 1000;
+const FORUM_VIEWER_COOKIE = 'forumViewerId';
+
+const forumPostDetailInclude = {
+  votes: {
+    select: {
+      value: true,
+      userId: true,
+    },
+  },
+  attachedPlan: {
+    select: {
+      id: true,
+      title: true,
+    },
+  },
+  author: {
+    select: {
+      displayName: true,
+    },
+  },
+  answers: {
+    orderBy: { createdAt: 'asc' as const },
+    include: {
+      author: {
+        select: {
+          displayName: true,
+        },
+      },
+      votes: {
+        select: {
+          value: true,
+          userId: true,
+        },
+      },
+    },
+  },
+};
 
 type ParsedStellicCourse = {
   courseCode: string;
@@ -531,6 +569,7 @@ export async function getForumPageData() {
     title: post.title,
     body: post.body,
     voteScore: post.votes.reduce((sum, vote) => sum + vote.value, 0),
+    voteCount: post.votes.length,
     viewCount: post.viewCount,
     createdAt: post.createdAt.toISOString(),
     authorDisplayName: post.author.displayName,
@@ -563,6 +602,7 @@ export async function getForumPageData() {
 
 export async function getForumPostPageData(postNumber: number) {
   const currentUser = await getCurrentUser();
+  const cookieStore = await cookies();
 
   const userPlans = currentUser
     ? await prisma.plan.findMany({
@@ -581,47 +621,101 @@ export async function getForumPostPageData(postNumber: number) {
     return { error: 'not_found' as const };
   }
 
-  const post = await prisma.forumPost.update({
-    where: { id: existingPost.id },
-    data: {
-      viewCount: { increment: 1 },
-    },
-    include: {
-      votes: {
-        select: {
-          value: true,
-          userId: true,
-        },
-      },
-      attachedPlan: {
-        select: {
-          id: true,
-          title: true,
-        },
-      },
-      author: {
-        select: {
-          displayName: true,
-        },
-      },
-      answers: {
-        orderBy: { createdAt: 'asc' },
-        include: {
-          author: {
-            select: {
-              displayName: true,
-            },
-          },
-          votes: {
-            select: {
-              value: true,
-              userId: true,
-            },
+  let viewerToken: string | null = null;
+  if (!currentUser) {
+    viewerToken = cookieStore.get(FORUM_VIEWER_COOKIE)?.value ?? null;
+    if (!viewerToken) {
+      viewerToken = randomBytes(16).toString('hex');
+      cookieStore.set(FORUM_VIEWER_COOKIE, viewerToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365,
+      });
+    }
+  }
+
+  const cutoff = new Date(Date.now() - FORUM_VIEW_WINDOW_MS);
+
+  const existingView = currentUser
+    ? await prisma.forumPostView.findUnique({
+        where: {
+          postId_userId: {
+            postId: existingPost.id,
+            userId: currentUser.id,
           },
         },
-      },
-    },
-  });
+      })
+    : viewerToken
+      ? await prisma.forumPostView.findUnique({
+          where: {
+            postId_viewerToken: {
+              postId: existingPost.id,
+              viewerToken,
+            },
+          },
+        })
+      : null;
+
+  const shouldCountView = !existingView || existingView.lastViewedAt < cutoff;
+
+  const post = shouldCountView
+    ? await prisma.$transaction(async (tx) => {
+        if (currentUser) {
+          if (existingView) {
+            await tx.forumPostView.update({
+              where: {
+                postId_userId: {
+                  postId: existingPost.id,
+                  userId: currentUser.id,
+                },
+              },
+              data: { lastViewedAt: new Date() },
+            });
+          } else {
+            await tx.forumPostView.create({
+              data: {
+                postId: existingPost.id,
+                userId: currentUser.id,
+                lastViewedAt: new Date(),
+              },
+            });
+          }
+        } else if (viewerToken) {
+          if (existingView) {
+            await tx.forumPostView.update({
+              where: {
+                postId_viewerToken: {
+                  postId: existingPost.id,
+                  viewerToken,
+                },
+              },
+              data: { lastViewedAt: new Date() },
+            });
+          } else {
+            await tx.forumPostView.create({
+              data: {
+                postId: existingPost.id,
+                viewerToken,
+                lastViewedAt: new Date(),
+              },
+            });
+          }
+        }
+
+        return tx.forumPost.update({
+          where: { id: existingPost.id },
+          data: {
+            viewCount: { increment: 1 },
+          },
+          include: forumPostDetailInclude,
+        });
+      })
+    : await prisma.forumPost.findUniqueOrThrow({
+        where: { id: existingPost.id },
+        include: forumPostDetailInclude,
+      });
 
   const postUserVote = post.votes.find((vote) => vote.userId === currentUser?.id)?.value;
   const currentUserPostVote: 1 | -1 | 0 = postUserVote === 1 ? 1 : postUserVote === -1 ? -1 : 0;

@@ -23,6 +23,7 @@ model User {
   goalProfile GoalProfile?
   plans       Plan[]
   badges      UserBadge[]
+  forumPostViews ForumPostView[]
   votes       Vote[]
 }
 
@@ -93,7 +94,24 @@ model ForumPost {
   answers        ForumAnswer[]
   attachedPlan   Plan?         @relation(fields: [attachedPlanId], references: [id])
   author         User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  views          ForumPostView[]
   votes          Vote[]
+}
+
+model ForumPostView {
+  id           String    @id @default(cuid())
+  postId       String
+  userId       String?
+  viewerToken  String?
+  lastViewedAt DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  post         ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@unique([postId, viewerToken])
+  @@index([userId])
+  @@index([viewerToken])
 }
 
 model ForumAnswer {
