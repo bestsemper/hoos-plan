@@ -133,8 +133,8 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
     canDelete: true,
     createdAt: new Date().toISOString(),
     authorDisplayName: 'You',
-    voteScore: 0,
-    currentUserVote: 0,
+    voteScore: 1,
+    currentUserVote: 1,
   });
 
   const handleReply = () => {

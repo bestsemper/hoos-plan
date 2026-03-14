@@ -384,12 +384,21 @@ export async function addForumReply(postId: string, body: string, parentReplyId?
     validatedParentReplyId = parentReply.id;
   }
 
-  await prisma.forumAnswer.create({
+  const createdAnswer = await prisma.forumAnswer.create({
     data: {
       postId,
       authorId: user.id,
       parentId: validatedParentReplyId,
       body: trimmedBody,
+    },
+  });
+
+  // Automatically upvote the user's own comment
+  await prisma.vote.create({
+    data: {
+      userId: user.id,
+      answerId: createdAnswer.id,
+      value: 1,
     },
   });
 
