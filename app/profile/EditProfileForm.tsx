@@ -62,7 +62,7 @@ export default function EditProfileForm({
       <button
         type="button"
         onClick={() => setIsEditing(true)}
-        className="bg-uva-blue text-white px-5 py-2.5 rounded hover:bg-uva-blue-dark font-bold transition-colors cursor-pointer"
+        className="bg-uva-blue/90 text-white px-5 py-2.5 rounded-xl hover:bg-uva-blue font-bold transition-colors cursor-pointer"
       >
         Edit Profile
       </button>
@@ -70,7 +70,7 @@ export default function EditProfileForm({
   }
 
   return (
-    <div className="w-full max-w-md border border-panel-border rounded-md p-4 bg-panel-bg-alt">
+    <div className="w-full max-w-md border border-panel-border rounded-xl p-4 bg-panel-bg-alt">
       <div className="space-y-3">
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wide text-text-secondary mb-1">Display Name</label>
@@ -78,7 +78,7 @@ export default function EditProfileForm({
             type="text"
             value={formDisplayName}
             onChange={(e) => setFormDisplayName(e.target.value)}
-            className="w-full p-2.5 border border-panel-border rounded-md bg-input-bg text-text-primary outline-none"
+            className="w-full p-2.5 border border-panel-border rounded-xl bg-input-bg text-text-primary outline-none"
             required
           />
         </div>
@@ -89,7 +89,7 @@ export default function EditProfileForm({
             type="text"
             value={formMajor}
             onChange={(e) => setFormMajor(e.target.value)}
-            className="w-full p-2.5 border border-panel-border rounded-md bg-input-bg text-text-primary outline-none"
+            className="w-full p-2.5 border border-panel-border rounded-xl bg-input-bg text-text-primary outline-none"
           />
         </div>
 
@@ -99,7 +99,7 @@ export default function EditProfileForm({
             type="number"
             value={formGradYear}
             onChange={(e) => setFormGradYear(e.target.value)}
-            className="w-full p-2.5 border border-panel-border rounded-md bg-input-bg text-text-primary outline-none"
+            className="w-full p-2.5 border border-panel-border rounded-xl bg-input-bg text-text-primary outline-none"
           />
         </div>
 
@@ -109,7 +109,7 @@ export default function EditProfileForm({
             value={formBio}
             onChange={(e) => setFormBio(e.target.value)}
             rows={3}
-            className="w-full p-2.5 border border-panel-border rounded-md bg-input-bg text-text-primary outline-none"
+            className="w-full p-2.5 border border-panel-border rounded-xl bg-input-bg text-text-primary outline-none"
           />
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function EditProfileForm({
           type="button"
           onClick={handleSave}
           disabled={isPending}
-          className="bg-uva-blue text-white px-4 py-2 rounded font-semibold hover:bg-uva-blue-dark transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-uva-blue/90 text-white px-4 py-2 rounded-xl font-semibold hover:bg-uva-blue transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isPending ? 'Saving...' : 'Save'}
         </button>
@@ -131,7 +131,7 @@ export default function EditProfileForm({
           type="button"
           onClick={handleCancel}
           disabled={isPending}
-          className="border border-panel-border-strong px-4 py-2 rounded font-semibold text-text-primary hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="border border-panel-border-strong px-4 py-2 rounded-xl font-semibold text-text-primary hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>

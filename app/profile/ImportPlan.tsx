@@ -96,7 +96,7 @@ export default function ImportPlan({ plans }: Props) {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="border border-dashed border-panel-border-strong px-5 py-2.5 rounded hover:bg-hover-bg text-text-primary font-semibold transition-colors cursor-pointer"
+        className="border border-dashed border-panel-border-strong px-5 py-2.5 rounded-xl hover:bg-hover-bg text-text-primary font-semibold transition-colors cursor-pointer"
       >
         Import Plan
       </button>
@@ -104,7 +104,7 @@ export default function ImportPlan({ plans }: Props) {
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={closeModal}>
           <div
-            className="bg-panel-bg border border-panel-border rounded-lg p-6 w-full max-w-lg"
+            className="bg-panel-bg border border-panel-border rounded-2xl p-6 w-full max-w-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -131,14 +131,14 @@ export default function ImportPlan({ plans }: Props) {
                     setMode('new');
                     setIsPlanDropdownOpen(false);
                   }}
-                  className={`px-3 py-2 text-sm font-semibold rounded border transition-colors cursor-pointer ${mode === 'new' ? 'bg-uva-blue text-white border-uva-blue' : 'border-panel-border-strong text-text-primary hover:bg-hover-bg'}`}
+                  className={`px-3 py-2 text-sm font-semibold rounded-xl border transition-colors cursor-pointer ${mode === 'new' ? 'bg-uva-blue/90 text-white border-uva-blue' : 'border-panel-border-strong text-text-primary hover:bg-hover-bg'}`}
                 >
                   Make New Plan
                 </button>
                 <button
                   type="button"
                   onClick={() => setMode('overwrite')}
-                  className={`px-3 py-2 text-sm font-semibold rounded border transition-colors cursor-pointer ${mode === 'overwrite' ? 'bg-uva-blue text-white border-uva-blue' : 'border-panel-border-strong text-text-primary hover:bg-hover-bg'}`}
+                  className={`px-3 py-2 text-sm font-semibold rounded-xl border transition-colors cursor-pointer ${mode === 'overwrite' ? 'bg-uva-blue/90 text-white border-uva-blue' : 'border-panel-border-strong text-text-primary hover:bg-hover-bg'}`}
                 >
                   Overwrite Existing
                 </button>
@@ -150,7 +150,7 @@ export default function ImportPlan({ plans }: Props) {
                   value={newPlanTitle}
                   onChange={(e) => setNewPlanTitle(e.target.value)}
                   placeholder="Optional new plan name"
-                  className="w-full px-3 py-2 border border-panel-border rounded-md bg-input-bg text-text-primary outline-none"
+                  className="w-full px-3 py-2 border border-panel-border rounded-xl bg-input-bg text-text-primary outline-none"
                 />
               )}
 
@@ -164,14 +164,15 @@ export default function ImportPlan({ plans }: Props) {
                         setIsPlanDropdownOpen(false);
                       }, 150)
                     }
-                    className="w-full px-3 py-2 border border-panel-border rounded-md bg-input-bg text-text-primary text-left cursor-pointer flex items-center justify-between"
+                    className="w-full px-4 py-2.5 border border-panel-border rounded-xl bg-input-bg text-text-primary text-left cursor-pointer flex items-center justify-between hover:border-panel-border-strong transition-colors"
                   >
-                    <span>{selectedPlanLabel}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 transition-transform ${isPlanDropdownOpen ? 'rotate-180' : ''}`}><path d="m6 9 6 6 6-6" /></svg>
+                    <span className="truncate text-sm font-medium">{selectedPlanLabel}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 text-text-secondary transition-transform duration-200 ${isPlanDropdownOpen ? 'rotate-180' : ''}`}><path d="m6 9 6 6 6-6" /></svg>
                   </button>
 
                   {isPlanDropdownOpen && (
-                    <div className="absolute z-10 mt-1 w-full rounded-md border border-panel-border-strong bg-panel-bg max-h-48 overflow-y-auto">
+                    <div className="absolute z-10 mt-1.5 w-full rounded-xl border border-panel-border bg-panel-bg shadow-lg overflow-hidden">
+                      <div className="max-h-48 overflow-y-auto p-1.5 space-y-0.5">
                       {plans.length === 0 && (
                         <div className="px-3 py-2 text-sm text-text-secondary">No plans available to overwrite.</div>
                       )}
@@ -183,11 +184,12 @@ export default function ImportPlan({ plans }: Props) {
                             setSelectedPlanId(plan.id);
                             setIsPlanDropdownOpen(false);
                           }}
-                          className={`w-full px-3 py-2 text-left text-sm cursor-pointer transition-colors ${selectedPlanId === plan.id ? 'bg-uva-blue text-white' : 'text-text-primary hover:bg-uva-blue hover:text-white'}`}
+                          className={`w-full px-3 py-2 text-left text-sm rounded-lg cursor-pointer transition-colors ${selectedPlanId === plan.id ? 'bg-uva-blue/10 text-uva-blue font-semibold' : 'text-text-primary hover:bg-hover-bg'}`}
                         >
                           {plan.title}
                         </button>
                       ))}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -203,7 +205,7 @@ export default function ImportPlan({ plans }: Props) {
               </div>
 
               {error && (
-                <div className="bg-red-500/10 border border-red-500/40 text-red-500 px-3 py-2 rounded text-sm font-semibold">
+                <div className="bg-red-500/10 border border-red-500/40 text-red-500 px-3 py-2 rounded-xl text-sm font-semibold">
                   {error}
                 </div>
               )}
@@ -212,7 +214,7 @@ export default function ImportPlan({ plans }: Props) {
                 type="button"
                 onClick={handleImport}
                 disabled={isPending || (mode === 'overwrite' && plans.length === 0)}
-                className="w-full px-4 py-2 bg-uva-orange text-white rounded hover:bg-[#cc6600] font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 bg-uva-orange/90 text-white rounded-xl hover:bg-uva-orange font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isPending ? 'Importing...' : 'Import From PDF'}
               </button>
