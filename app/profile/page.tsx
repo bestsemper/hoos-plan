@@ -1,7 +1,8 @@
 import { getCurrentUser } from '../actions';
 import { redirect } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
-import ProfileActions from './ProfileActions';
+import EditProfileForm from './EditProfileForm';
+import EditCompletedCourses from './EditCompletedCourses';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -33,12 +34,15 @@ export default async function Profile() {
           </div>
 
           <div className="w-full">
-            <ProfileActions
-              displayName={user.displayName}
-              major={user.major}
-              gradYear={user.gradYear}
-              bio={user.bio}
-            />
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-start w-full">
+              <EditProfileForm
+                displayName={user.displayName}
+                major={user.major}
+                gradYear={user.gradYear}
+                bio={user.bio}
+              />
+              <EditCompletedCourses />
+            </div>
           </div>
         </div>
         

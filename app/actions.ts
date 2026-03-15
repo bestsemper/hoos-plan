@@ -94,7 +94,7 @@ function hasTransferEquivalentGrade(line: string): boolean {
 }
 
 function shouldIgnoreStellicCourseLine(line: string): boolean {
-  return /\(courses:\s*\(|\bcredits in plan\b|\(through\b|\bremaining\b/i.test(line);
+  return /\(courses:\s*\(|\bcredits in plan\b|\(through\b|\bremaining\b|\b\d{4}-level\s+elective\b/i.test(line);
 }
 
 function decodeAuditPdfText(pdfBase64: string): Promise<string> {
@@ -125,7 +125,7 @@ function decodeAuditPdfText(pdfBase64: string): Promise<string> {
 }
 
 function parseAuditSemesterTaken(line: string): string | null {
-  const termMatch = line.match(/\b(Fall|Winter|Spring|Summer)\s+'(\d{2})\b/i);
+  const termMatch = line.match(/\b(Fall|Winter|Spring|Summer)\s*'(\d{2})(?!\d)/i);
   if (!termMatch) return null;
 
   const term = termMatch[1][0].toUpperCase() + termMatch[1].slice(1).toLowerCase();
@@ -134,11 +134,22 @@ function parseAuditSemesterTaken(line: string): string | null {
   return `${term} ${fullYear}`;
 }
 
+function normalizeAuditPdfText(text: string): string {
+  return text
+    .replace(/\r/g, '')
+    // Join words split across PDF line wraps, e.g. "Spri\nng".
+    .replace(/([A-Za-z])\n\s*([a-z])/g, '$1$2')
+    // Join semester/year tokens split across lines, e.g. "Fall\n'25A".
+    .replace(/\b(Fall|Winter|Spring|Summer)\n\s*'(\d{2})/g, "$1 '$2")
+    // Join common wrapped suffixes after a course/title line.
+    .replace(/(\([^\n]*credits\)|\b(?:TE|PT|CR|A\+?|A-|B\+?|B-|C\+?|C-|D\+?|D-|F)\b)\n\s*(?=(?:Fall|Winter|Spring|Summer|'\d{2}|\d{2}-\d{2}-\d{4},))/g, '$1 ');
+}
+
 function extractAuditCompletedCoursesFromText(
   text: string,
   selection: AuditImportSelection = 'transfer'
 ): ParsedAuditCompletedCourse[] {
-  const rawLines = text
+  const rawLines = normalizeAuditPdfText(text)
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
@@ -177,13 +188,14 @@ function extractAuditCompletedCoursesFromText(
 
     if (!includeForSelection) continue;
 
-    const courseCodeMatch = line.match(/\b([A-Z]{2,4})\s?-?(\d{4})\b/);
+    const courseCodeMatch = line.match(/\b([A-Z]{2,4})\s?-?(\d{4}T?)\b(?!\s*-\s*Level\b)/);
     if (!courseCodeMatch) continue;
 
     const courseCode = `${courseCodeMatch[1]} ${courseCodeMatch[2]}`.toUpperCase();
     const titleSection = line.slice(courseCodeMatch.index! + courseCodeMatch[0].length).trim();
     const title = (titleSection.split(/\(\d+(?:\.\d+)?\s+credits\)/i)[0] || '').trim() || null;
-    const semesterTaken = parseAuditSemesterTaken(line);
+    // TE/PT rows are transfer-equivalent credit and should not be tied to a taken semester.
+    const semesterTaken = isTransfer ? null : parseAuditSemesterTaken(line);
     const nextSourceType: ParsedAuditCompletedCourse['sourceType'] = isTransfer
       ? 'audit_pdf_transfer'
       : isUnmatched
@@ -208,42 +220,28 @@ function extractAuditCompletedCoursesFromText(
 }
 
 function parseStellicCoursesFromText(text: string): ParsedStellicCourse[] {
-  const lines = text
+  const lines = normalizeAuditPdfText(text)
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
 
   const results: ParsedStellicCourse[] = [];
   const seen = new Set<string>();
-  let sectionMode: 'taken' | 'planned' = 'planned';
+  let currentTerm: ParsedStellicCourse['termName'] = null;
+  let currentYear: number | null = null;
 
-  // Match both "Fall 2025" and "Fall '25" formats
-  // Don't use trailing \b since it won't match when followed by letter grades like 'TE', 'A+', etc.
-  const termRegex = /\b(Fall|Winter|Spring|Summer)\s+(?:'(\d{2})|(20\d{2}))/i;
-  const courseCodeRegex = /\b([A-Z]{2,4})\s?-?(\d{4})\b/g;
+  // Stellic "Plan Report" semester header, e.g. "Fall 2025 - 16 credits attempted"
+  const termHeaderRegex = /\b(Fall|Winter|Spring|Summer)\s+(20\d{2})\s*-\s*\d+(?:\.\d+)?\s+credits\s+attempted/i;
+  // Stellic "Plan Report" row, e.g. "CS 2120 ... 3A+Taken" or compact "... (001)3Planned"
+  const courseRowRegex = /^([A-Z]{2,4})\s?-?(\d{4}T?)\s+(.+?)\s*(\d+(?:\.\d+)?)([A-Z][A-Z+-]?|CR|NC|P|S|U|W)?(Taken|Planned)$/i;
 
   for (const rawLine of lines) {
     const line = rawLine.replace(/\s+/g, ' ');
 
-    const lowerLine = line.toLowerCase();
-    if (/completed|taken|earned|fulfilled/.test(lowerLine)) {
-      sectionMode = 'taken';
-    }
-    if (/planned|in progress|enrolled|future/.test(lowerLine)) {
-      sectionMode = 'planned';
-    }
-
-    if (shouldIgnoreStellicCourseLine(line)) {
-      continue;
-    }
-
-    const termMatch = line.match(termRegex);
-    let lineTerm: ParsedStellicCourse['termName'] = null;
-    let lineYear: number | null = null;
-
-    if (termMatch) {
-      const termValue = termMatch[1].toLowerCase();
-      lineTerm =
+    const headerMatch = line.match(termHeaderRegex);
+    if (headerMatch) {
+      const termValue = headerMatch[1].toLowerCase();
+      currentTerm =
         termValue === 'fall'
           ? 'Fall'
           : termValue === 'winter'
@@ -251,49 +249,33 @@ function parseStellicCoursesFromText(text: string): ParsedStellicCourse[] {
             : termValue === 'spring'
               ? 'Spring'
               : 'Summer';
-
-      if (termMatch[2]) {
-        const twoDigitYear = Number.parseInt(termMatch[2], 10);
-        lineYear = twoDigitYear <= 30 ? 2000 + twoDigitYear : 1900 + twoDigitYear;
-      } else {
-        lineYear = Number.parseInt(termMatch[3], 10);
-      }
+      currentYear = Number.parseInt(headerMatch[2], 10);
+      continue;
     }
 
-    const matches = Array.from(line.matchAll(courseCodeRegex));
-    for (const match of matches) {
-      const code = `${match[1]} ${match[2]}`.toUpperCase();
+    if (!currentTerm || !currentYear) continue;
 
-      const statusFromLine: ParsedStellicCourse['status'] | null = /\bTaken\s*$/i.test(line)
-        ? 'taken'
-        : /\bPlanned\s*$/i.test(line)
-          ? 'planned'
-          : null;
-      const courseStatus = statusFromLine ?? sectionMode;
+    const rowMatch = line.match(courseRowRegex);
+    if (!rowMatch) continue;
 
-      const dedupeKey = `${code}|${lineTerm ?? 'none'}|${lineYear ?? 'none'}|${courseStatus}`;
-      if (seen.has(dedupeKey)) continue;
-      seen.add(dedupeKey);
+    const code = `${rowMatch[1]} ${rowMatch[2]}`.toUpperCase();
+    if (/\b\d{4}T\b/i.test(code)) continue;
 
-      // Planned rows usually end with "<credits>Planned" (no grade),
-      // while taken rows usually include a grade token before "Taken".
-      const plannedCreditMatch = line.match(/(\d+(?:\.\d+)?)\s*Planned\s*$/i);
-      const takenCreditMatch = line.match(/(\d+(?:\.\d+)?)\s*(?:[A-F][+-]?|CR|NC|P|S|U|W)?\s*Taken\s*$/i);
-      const genericCreditMatch = line.match(/\b(\d+(?:\.\d+)?)\s*(?:credits?|cr)\b/i);
-      const creditMatch = courseStatus === 'planned'
-        ? plannedCreditMatch ?? takenCreditMatch ?? genericCreditMatch
-        : takenCreditMatch ?? plannedCreditMatch ?? genericCreditMatch;
-      const parsedCredits = creditMatch ? Number.parseFloat(creditMatch[1]) : Number.NaN;
-      const credits = Number.isNaN(parsedCredits) ? null : Math.round(parsedCredits);
+    const status = rowMatch[6].toLowerCase() === 'taken' ? 'taken' : 'planned';
+    const parsedCredits = Number.parseFloat(rowMatch[4]);
+    const credits = Number.isNaN(parsedCredits) ? null : Math.round(parsedCredits);
 
-      results.push({
-        courseCode: code,
-        termName: lineTerm,
-        year: lineYear,
-        status: courseStatus,
-        credits,
-      });
-    }
+    const dedupeKey = `${code}|${currentTerm}|${currentYear}|${status}`;
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    results.push({
+      courseCode: code,
+      termName: currentTerm,
+      year: currentYear,
+      status,
+      credits,
+    });
   }
 
   return results;
