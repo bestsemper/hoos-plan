@@ -18,6 +18,7 @@ export default function Sidebar({ user }: { user: { computingId: string, display
   ];
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const isLoginPage = pathname === "/login";
 
   useEffect(() => {
     const onOutsideClick = (event: MouseEvent) => {
@@ -36,10 +37,6 @@ export default function Sidebar({ user }: { user: { computingId: string, display
     setMenuOpen(false);
   }, [pathname]);
 
-  if (pathname === '/login') {
-    return null;
-  }
-
   return (
     <>
       <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-uva-blue text-white border-b border-white/15 px-4 flex items-center justify-between">
@@ -51,38 +48,44 @@ export default function Sidebar({ user }: { user: { computingId: string, display
             </span>
           </div>
         </Link>
-        <button
-          type="button"
-          onClick={() => setMobileNavOpen((prev) => !prev)}
-          aria-label="Toggle navigation"
-          className="p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            {mobileNavOpen ? (
-              <>
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </>
-            ) : (
-              <>
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </>
-            )}
-          </svg>
-        </button>
+        {!isLoginPage && (
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen((prev) => !prev)}
+            aria-label="Toggle navigation"
+            className="p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              {mobileNavOpen ? (
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </>
+              )}
+            </svg>
+          </button>
+        )}
       </header>
 
-      {mobileNavOpen && (
-        <button
-          type="button"
-          aria-label="Close menu"
-          className="lg:hidden fixed inset-0 z-40 bg-black/40"
-          onClick={() => setMobileNavOpen(false)}
-        />
+      {!isLoginPage && mobileNavOpen && (
+        <>
+          <button
+            type="button"
+            aria-label="Close menu"
+            className="lg:hidden fixed top-14 bottom-0 inset-x-0 z-[45] bg-transparent"
+            onClick={() => setMobileNavOpen(false)}
+          />
+          <div className="pointer-events-none lg:hidden fixed top-[4.25rem] bottom-3 left-3 right-3 z-[45] rounded-3xl bg-black/35" />
+        </>
       )}
 
+      {!isLoginPage && (
       <aside
         className={`lg:hidden fixed top-14 bottom-0 left-0 z-50 w-72 bg-uva-blue text-white px-6 py-6 flex flex-col justify-between transform transition-transform duration-200 ${
           mobileNavOpen ? "translate-x-0" : "-translate-x-full"
@@ -117,7 +120,7 @@ export default function Sidebar({ user }: { user: { computingId: string, display
               >
                 Profile
               </Link>
-              <form action={logout}>
+              <form action={logout} suppressHydrationWarning>
                 <button
                   type="submit"
                   className="w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-white hover:bg-white/10 cursor-pointer"
@@ -133,7 +136,9 @@ export default function Sidebar({ user }: { user: { computingId: string, display
           )}
         </div>
       </aside>
+      )}
 
+      {!isLoginPage && (
       <aside className="hidden lg:flex w-64 h-screen bg-uva-blue text-white flex-col justify-between sticky top-0 shrink-0 px-6 py-6">
         <div>
           <Link href="/" className="block mb-8">
@@ -183,7 +188,7 @@ export default function Sidebar({ user }: { user: { computingId: string, display
                   >
                     Profile
                   </Link>
-                  <form action={logout}>
+                  <form action={logout} suppressHydrationWarning>
                     <button
                       type="submit"
                       className="w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-text-primary hover:bg-hover-bg cursor-pointer"
@@ -201,6 +206,7 @@ export default function Sidebar({ user }: { user: { computingId: string, display
           )}
         </div>
       </aside>
+      )}
     </>
   );
 }
