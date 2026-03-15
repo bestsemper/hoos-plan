@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '../components/ConfirmModal';
 import {
@@ -58,6 +58,74 @@ type SchoolYearRow = {
   startYear: number;
   terms: Partial<Record<'Fall' | 'Winter' | 'Spring' | 'Summer', PlanSemester>>;
 };
+
+type HoverTooltipProps = {
+  message: string;
+  children: ReactNode;
+};
+
+function HoverTooltip({ message, children }: HoverTooltipProps) {
+  const anchorRef = useRef<HTMLSpanElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [position, setPosition] = useState({ left: 0, top: 0, maxWidth: 0 });
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const updatePosition = () => {
+      if (!anchorRef.current) return;
+      const rect = anchorRef.current.getBoundingClientRect();
+      const viewportPadding = 12;
+      const maxWidth = Math.min(576, window.innerWidth - viewportPadding * 2);
+      const idealLeft = rect.left + rect.width / 2;
+      const clampedLeft = Math.min(
+        Math.max(idealLeft, viewportPadding + 24),
+        window.innerWidth - viewportPadding - 24
+      );
+
+      setPosition({
+        left: clampedLeft,
+        top: rect.top,
+        maxWidth,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [isOpen]);
+
+  return (
+    <span
+      ref={anchorRef}
+      className="relative inline-flex"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      {children}
+      {isOpen && (
+        <div
+          className="fixed z-[80] px-3 py-2 bg-gray-900/90 text-white text-xs rounded-lg whitespace-normal text-center shadow-lg"
+          style={{
+            left: `${position.left}px`,
+            top: `${position.top}px`,
+            maxWidth: `${position.maxWidth}px`,
+            transform: 'translate(-50%, calc(-100% - 8px))',
+          }}
+          onMouseEnter={() => setIsOpen(true)}
+          onMouseLeave={() => setIsOpen(false)}
+        >
+          {message}
+        </div>
+      )}
+    </span>
+  );
+}
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -852,6 +920,17 @@ export default function PlanBuilderPage() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-text-secondary"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     Rename Plan
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSettingsOpen(true);
+                      setIsMoreMenuOpen(false);
+                    }}
+                    className="w-full px-3 py-2 rounded-lg text-left text-sm text-text-primary hover:bg-hover-bg transition-colors cursor-pointer flex items-center gap-2.5"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-text-secondary"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="17 3 21 3 21 7"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Import Plan PDF
+                  </button>
                   <div className="my-1 border-t border-panel-border" />
                   <button
                     type="button"
@@ -950,14 +1029,11 @@ export default function PlanBuilderPage() {
                             <h3 className="font-bold text-lg text-heading flex items-center gap-2">
                               {sem.termName} {sem.year}
                               {semestersProblematicCourses.has(sem.id) && (
-                                <div className="group relative">
+                                <HoverTooltip message={`Unsatisfied prereqs: ${Array.from(semestersProblematicCourses.get(sem.id)?.keys() || []).join(', ')}`}>
                                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-yellow-500 cursor-help hover:text-yellow-600 transition-colors" aria-label="Contains course(s) with unsatisfied prerequisites">
                                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05l-8.47-14.14a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
                                   </svg>
-                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900/90 text-white text-xs rounded-lg whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                                    Unsatisfied prereqs: {Array.from(semestersProblematicCourses.get(sem.id)?.keys() || []).join(', ')}
-                                  </div>
-                                </div>
+                                </HoverTooltip>
                               )}
                             </h3>
                             <div className="flex items-center gap-2">
@@ -984,16 +1060,13 @@ export default function PlanBuilderPage() {
                                   <span className="font-medium text-text-primary flex items-center gap-2">
                                     {course.courseCode}
                                     {isProblematic && (
-                                      <div className="group/warning relative">
+                                      <HoverTooltip message={`Missing: ${missingCourses.join(', ')}`}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-yellow-500 flex-shrink-0 cursor-help hover:text-yellow-600 transition-colors">
                                           <circle cx="12" cy="12" r="10"/>
                                           <line x1="12" y1="8" x2="12" y2="12"/>
                                           <line x1="12" y1="16" x2="12.01" y2="16"/>
                                         </svg>
-                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900/90 text-white text-xs rounded-lg whitespace-nowrap pointer-events-none opacity-0 group-hover/warning:opacity-100 transition-opacity z-10">
-                                          Missing: {missingCourses.join(', ')}
-                                        </div>
-                                      </div>
+                                      </HoverTooltip>
                                     )}
                                   </span>
                                   <div className="relative flex items-center justify-end min-w-[84px] h-full pr-1">

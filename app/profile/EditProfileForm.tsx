@@ -70,23 +70,19 @@ export default function EditProfileForm({
   }
 
   return (
-    <>
-      {/* Backdrop overlay */}
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={handleCancel}>
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-        onClick={handleCancel}
-      />
-
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-panel-bg rounded-2xl border border-panel-border shadow-2xl max-w-2xl w-full max-h-screen overflow-y-auto">
+        className="bg-panel-bg rounded-2xl border border-panel-border shadow-xl max-w-2xl w-full max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
           {/* Header */}
-          <div className="sticky top-0 bg-panel-bg border-b border-panel-border px-8 py-6 flex justify-between items-center">
+          <div className="bg-panel-bg border-b border-panel-border px-8 py-6 flex justify-between items-center">
             <h2 className="text-2xl font-bold text-heading">Edit Profile</h2>
             <button
               type="button"
               onClick={handleCancel}
-              className="text-text-tertiary hover:text-text-primary transition-colors"
+              className="text-text-tertiary hover:text-text-primary transition-colors cursor-pointer"
+              aria-label="Close"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
                 <line x1="18" y1="6" x2="6" y2="18"/>
@@ -96,7 +92,7 @@ export default function EditProfileForm({
           </div>
 
           {/* Form Content */}
-          <div className="px-8 py-6 space-y-6">
+          <div className="px-8 py-6 space-y-6 overflow-y-auto">
             <div>
               <label className="block text-sm font-semibold text-text-secondary mb-2">Display Name</label>
               <input
@@ -167,8 +163,7 @@ export default function EditProfileForm({
               {isPending ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
-        </div>
       </div>
-    </>
+    </div>
   );
 }

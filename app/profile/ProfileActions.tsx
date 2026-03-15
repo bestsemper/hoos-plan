@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import EditProfileForm from './EditProfileForm';
-import ImportPlan from './ImportPlan';
 import EditCompletedCourses from './EditCompletedCourses';
 
 interface ProfileActionsProps {
@@ -10,7 +9,6 @@ interface ProfileActionsProps {
   major: string | null;
   gradYear: number | null;
   bio: string | null;
-  plans: Array<{ id: string; title: string }>;
 }
 
 export default function ProfileActions({
@@ -18,7 +16,6 @@ export default function ProfileActions({
   major,
   gradYear,
   bio,
-  plans,
 }: ProfileActionsProps) {
   const [isCompletedCoursesOpen, setIsCompletedCoursesOpen] = useState(false);
 
@@ -31,10 +28,9 @@ export default function ProfileActions({
           gradYear={gradYear}
           bio={bio}
         />
-        <ImportPlan plans={plans} />
         <button
           onClick={() => setIsCompletedCoursesOpen(true)}
-          className="px-4 py-2 rounded-lg bg-uva-orange text-white font-semibold hover:bg-opacity-90 transition"
+          className="border border-dashed border-panel-border-strong px-5 py-2.5 rounded-xl hover:bg-hover-bg text-text-primary font-semibold transition-colors cursor-pointer"
         >
           Completed Courses
         </button>

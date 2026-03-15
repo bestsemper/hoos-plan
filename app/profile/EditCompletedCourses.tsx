@@ -133,23 +133,19 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Backdrop overlay */}
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-panel-bg rounded-2xl border border-panel-border shadow-2xl max-w-2xl w-full max-h-screen overflow-y-auto">
+        className="bg-panel-bg rounded-2xl border border-panel-border shadow-xl max-w-2xl w-full max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
           {/* Header */}
-          <div className="sticky top-0 bg-panel-bg border-b border-panel-border px-8 py-6 flex justify-between items-center">
+          <div className="bg-panel-bg border-b border-panel-border px-8 py-6 flex justify-between items-center">
             <h2 className="text-2xl font-bold text-heading">Completed Courses</h2>
             <button
               type="button"
               onClick={onClose}
-              className="text-text-tertiary hover:text-text-primary transition-colors"
+              className="text-text-tertiary hover:text-text-primary transition-colors cursor-pointer"
+              aria-label="Close"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
                 <line x1="18" y1="6" x2="6" y2="18"/>
@@ -159,7 +155,7 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
           </div>
 
           {/* Content */}
-          <div className="px-8 py-6 space-y-6">
+          <div className="px-8 py-6 space-y-6 overflow-y-auto">
             {error && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
                 <p className="text-red-500 text-sm font-semibold">{error}</p>
@@ -277,18 +273,7 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
               )}
             </div>
           </div>
-
-          {/* Footer */}
-          <div className="sticky bottom-0 bg-panel-bg border-t border-panel-border px-8 py-6 flex justify-end gap-3">
-            <button
-              onClick={onClose}
-              className="px-6 py-2.5 border border-panel-border-strong rounded-xl font-semibold text-text-primary hover:bg-hover-bg transition-colors cursor-pointer"
-            >
-              Close
-            </button>
-          </div>
-        </div>
       </div>
-    </>
+    </div>
   );
 }
