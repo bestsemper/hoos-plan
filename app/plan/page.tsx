@@ -740,7 +740,7 @@ export default function PlanBuilderPage() {
 
   const handleImportFromPdf = async () => {
     if (!importFile) {
-      setImportError('Please choose an audit report PDF file.');
+      setImportError('Please choose a Stellic plan report PDF file.');
       return;
     }
     if (importMode === 'overwrite' && !importOverwritePlanId) {
@@ -974,7 +974,7 @@ export default function PlanBuilderPage() {
                     className="w-full px-3 py-2 rounded-lg text-left text-sm text-text-primary hover:bg-hover-bg transition-colors cursor-pointer flex items-center gap-2.5"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-text-secondary"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="17 3 21 3 21 7"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                    Import Audit Report
+                    Import Plan
                   </button>
                   <div className="my-1 border-t border-panel-border" />
                   <button
@@ -1011,6 +1011,10 @@ export default function PlanBuilderPage() {
               const orderedTerms = (['Fall', 'Winter', 'Spring', 'Summer'] as const).filter((term) => Boolean(row.terms[term]));
               const missingTerms = (['Fall', 'Winter', 'Spring', 'Summer'] as const).filter((term) => !row.terms[term]);
               const columnCount = Math.max(2, Math.min(4, orderedTerms.length));
+              const gridColsClass =
+                columnCount <= 2 ? 'grid-cols-1 md:grid-cols-2' :
+                columnCount === 3 ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' :
+                'grid-cols-1 md:grid-cols-2 xl:grid-cols-4';
               const isCollapsed = Boolean(collapsedSchoolYears[row.startYear]);
               const totalCourses = orderedTerms.reduce((count, term) => count + (row.terms[term]?.courses.length ?? 0), 0);
               const totalCredits = orderedTerms.reduce(
@@ -1063,7 +1067,7 @@ export default function PlanBuilderPage() {
                       {orderedTerms.length} semesters, {totalCourses} courses, {totalCredits} credits
                     </div>
                   ) : (
-                  <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
+                  <div className={`grid gap-4 ${gridColsClass}`}>
                     {orderedTerms.map((term) => {
                       const sem = row.terms[term];
                       if (!sem) return null;
@@ -1225,13 +1229,17 @@ export default function PlanBuilderPage() {
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setIsImportAuditOpen(false)}>
           <div className="bg-panel-bg-alt border border-panel-border rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-xl text-heading">Import Audit Report</h2>
-              <button onClick={() => setIsImportAuditOpen(false)} className="text-text-muted hover:text-text-secondary cursor-pointer" aria-label="Close import audit report">
+              <h2 className="font-bold text-xl text-heading">Import Plan</h2>
+              <button onClick={() => setIsImportAuditOpen(false)} className="text-text-muted hover:text-text-secondary cursor-pointer" aria-label="Close import plan">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
 
             <div className="space-y-3">
+              <p className="text-sm text-text-secondary">
+                Open Stellic → Plan your Path → Download Plan → Create plan report
+              </p>
+
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -1324,7 +1332,7 @@ export default function PlanBuilderPage() {
                 disabled={importingPdf}
                 className="w-full px-4 py-2 bg-uva-blue/90 text-white rounded-xl hover:bg-uva-blue font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {importingPdf ? 'Importing...' : 'Import Audit PDF'}
+                {importingPdf ? 'Importing...' : 'Import Plan PDF'}
               </button>
             </div>
           </div>

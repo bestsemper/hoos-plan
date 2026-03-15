@@ -17,8 +17,8 @@ interface CourseOption {
 }
 
 interface EditCompletedCoursesProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   onCoursesChanged?: () => void;
 }
 
@@ -41,13 +41,12 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged }: EditCompletedCoursesProps) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [courses, setCourses] = useState<CompletedCourse[]>([]);
   const [allCourses, setAllCourses] = useState<CourseOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [courseCode, setCourseCode] = useState('');
-  const [title, setTitle] = useState('');
-  const [semesterTaken, setSemesterTaken] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -55,7 +54,7 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
   const [isImporting, setIsImporting] = useState(false);
   const [showTransfer, setShowTransfer] = useState(true);
   const [showExtra, setShowExtra] = useState(true);
-  const [showTaken, setShowTaken] = useState(true);
+  const [showTaken, setShowTaken] = useState(false);
 
   const getCurrentSemesterRank = () => {
     const now = new Date();
@@ -107,12 +106,21 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
     });
   }, [courses, showTransfer, showExtra, showTaken]);
 
+  const modalIsOpen = typeof isOpen === 'boolean' ? isOpen : internalIsOpen;
+  const closeModal = () => {
+    if (typeof isOpen === 'boolean') {
+      onClose?.();
+      return;
+    }
+    setInternalIsOpen(false);
+  };
+
   useEffect(() => {
-    if (isOpen) {
+    if (modalIsOpen) {
       loadCourses();
       loadAllCourses();
     }
-  }, [isOpen]);
+  }, [modalIsOpen]);
 
   async function loadAllCourses() {
     try {
@@ -141,6 +149,11 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
         })
     : [];
 
+  const handleCourseSearchChange = (value: string) => {
+    setCourseCode(value);
+    setShowDropdown(true);
+  };
+
   async function loadCourses() {
     setLoading(true);
     setError('');
@@ -162,15 +175,13 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
 
     setIsSaving(true);
     setError('');
-    const result = await addCompletedCourse(courseCode.trim(), title.trim() || undefined, semesterTaken.trim() || undefined);
+    const result = await addCompletedCourse(courseCode.trim());
 
     if ('error' in result) {
       setError(result.error || 'Failed to add completed course');
       setIsSaving(false);
     } else {
       setCourseCode('');
-      setTitle('');
-      setSemesterTaken('');
       setShowDropdown(false);
       await loadCourses();
       onCoursesChanged?.();
@@ -178,9 +189,8 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
     }
   }
 
-  const handleCourseSelect = (code: string, courseTitle: string | null) => {
+  const handleCourseSelect = (code: string) => {
     setCourseCode(code);
-    setTitle(courseTitle || '');
     setShowDropdown(false);
   }
 
@@ -205,7 +215,7 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
 
   async function handleImportFromAuditPdf() {
     if (!importFile) {
-      setError('Please choose an audit report PDF file.');
+      setError('Please choose an audit report PDF.');
       return;
     }
 
@@ -231,20 +241,33 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
     }
   }
 
-  if (!isOpen) return null;
+  if (!modalIsOpen) {
+    if (typeof isOpen === 'boolean') {
+      return null;
+    }
+
+    return (
+      <button
+        onClick={() => setInternalIsOpen(true)}
+        className="w-full sm:w-auto border border-dashed border-panel-border-strong px-5 py-2.5 rounded-xl hover:bg-hover-bg text-text-primary font-semibold transition-colors cursor-pointer"
+      >
+        Completed Courses
+      </button>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={closeModal}>
       <div
         className="bg-panel-bg rounded-2xl border border-panel-border shadow-xl max-w-2xl w-full max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
           {/* Header */}
           <div className="bg-panel-bg border-b border-panel-border px-8 py-6 flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-heading">Transfer and Extra Courses</h2>
+            <h2 className="text-2xl font-bold text-heading">Completed Courses</h2>
             <button
               type="button"
-              onClick={onClose}
+              onClick={closeModal}
               className="text-text-tertiary hover:text-text-primary transition-colors cursor-pointer"
               aria-label="Close"
             >
@@ -264,7 +287,10 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
             )}
 
             <div className="border border-panel-border rounded-2xl p-6 bg-panel-bg space-y-3">
-              <h3 className="font-semibold text-heading text-base">Import from Audit Report PDF</h3>
+              <h3 className="font-semibold text-heading text-base">Import Audit Report</h3>
+              <p className="text-sm text-text-secondary">
+                Open Stellic → Plan your Path → Print Audit Report → Create audit report
+              </p>
               <input
                 type="file"
                 accept="application/pdf"
@@ -277,15 +303,15 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
                 disabled={isImporting}
                 className="w-full px-6 py-3 bg-uva-blue/90 text-white rounded-xl font-semibold hover:bg-uva-blue transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isImporting ? 'Importing...' : 'Import Courses'}
+                {isImporting ? 'Importing...' : 'Import Audit Report'}
               </button>
             </div>
 
             {/* Add Course Form */}
             <div className="border border-panel-border rounded-2xl p-6 bg-panel-bg">
-              <h3 className="font-semibold text-heading mb-4 text-base">Add Extra Course (Placement/Skip)</h3>
-              <p className="text-xs text-text-secondary mb-4">
-                Manual add is only for extra courses (for example placement/skip credit). Import transfer courses from the audit PDF section above.
+              <h3 className="font-semibold text-heading mb-4 text-base">Add Extra Course</h3>
+              <p className="text-sm text-text-secondary mb-4">
+                Use this only for extra courses not shown in your audit report (e.g. courses from placement or skip tests).
               </p>
               <form onSubmit={handleAddCourse} className="space-y-4">
                 {/* Course Code with Dropdown */}
@@ -296,7 +322,7 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
                       type="text"
                       placeholder="Search by code or title (e.g., CS 2100)"
                       value={courseCode}
-                      onChange={(e) => setCourseCode(e.target.value)}
+                      onChange={(e) => handleCourseSearchChange(e.target.value)}
                       onFocus={() => setShowDropdown(true)}
                       onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
                       className="w-full px-4 py-3 bg-input-bg border border-panel-border rounded-xl text-text-primary outline-none focus:border-uva-blue focus:ring-2 focus:ring-uva-blue/20 transition-all"
@@ -309,7 +335,7 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
                             <div
                               key={course.code}
                               className="px-3 py-2.5 rounded-lg hover:bg-hover-bg transition-colors cursor-pointer"
-                              onClick={() => handleCourseSelect(course.code, course.title)}
+                              onClick={() => handleCourseSelect(course.code)}
                             >
                               <div className="text-sm font-medium text-text-primary">{course.code}</div>
                               {course.title && (
@@ -320,31 +346,6 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
                         </div>
                       </div>
                     )}
-                  </div>
-                </div>
-
-                {/* Title and Semester Taken - 2 columns */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-semibold text-text-secondary mb-2">Title (Auto-filled)</label>
-                    <input
-                      type="text"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="w-full px-4 py-3 bg-input-bg border border-panel-border rounded-xl text-text-primary outline-none focus:border-uva-blue focus:ring-2 focus:ring-uva-blue/20 transition-all"
-                      disabled={isSaving}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-text-secondary mb-2">Semester Taken</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., Spring 2024"
-                      value={semesterTaken}
-                      onChange={(e) => setSemesterTaken(e.target.value)}
-                      className="w-full px-4 py-3 bg-input-bg border border-panel-border rounded-xl text-text-primary outline-none focus:border-uva-blue focus:ring-2 focus:ring-uva-blue/20 transition-all"
-                      disabled={isSaving}
-                    />
                   </div>
                 </div>
                 <button
@@ -359,7 +360,7 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
 
             {/* Courses List */}
             <div>
-              <h3 className="font-semibold text-heading mb-3 text-base">Your Transfer and Extra Courses ({filteredListedCourses.length}/{courses.length})</h3>
+              <h3 className="font-semibold text-heading mb-3 text-base">Your Completed Courses ({filteredListedCourses.length}/{courses.length})</h3>
               <div className="flex flex-wrap gap-2 mb-3">
                 <button
                   type="button"
@@ -386,7 +387,7 @@ export default function EditCompletedCourses({ isOpen, onClose, onCoursesChanged
               {loading ? (
                 <p className="text-text-secondary">Loading...</p>
               ) : courses.length === 0 ? (
-                <p className="text-text-secondary">No transfer or extra courses yet.</p>
+                <p className="text-text-secondary">No completed courses yet.</p>
               ) : filteredListedCourses.length === 0 ? (
                 <p className="text-text-secondary">No courses match the selected filters.</p>
               ) : (
