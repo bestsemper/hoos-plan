@@ -197,27 +197,33 @@ def parse_prerequisite_tree(tokens: List[str]) -> Optional[Any]:
             return token
         
         def parse_expression(self) -> Optional[Any]:
-            """Parse OR expression (lowest precedence)"""
+            """Parse AND expression (lowest precedence)."""
             left = self.parse_and_expression()
-            
-            while self.peek() == 'OR':
-                self.consume()  # consume 'OR'
+
+            while self.peek() == 'AND':
+                self.consume()  # consume 'AND'
                 right = self.parse_and_expression()
                 if left and right:
-                    left = OperatorNode(type='OR', children=[left, right])
-            
+                    left = OperatorNode(type='AND', children=[left, right])
+
             return left
         
         def parse_and_expression(self) -> Optional[Any]:
-            """Parse AND expression (higher precedence)"""
-            left = self.parse_primary()
-            
-            while self.peek() == 'AND':
-                self.consume()  # consume 'AND'
-                right = self.parse_primary()
+            """Parse OR expression (higher precedence)."""
+            left = self.parse_or_expression()
+
+            while self.peek() == 'OR':
+                self.consume()  # consume 'OR'
+                right = self.parse_or_expression()
                 if left and right:
-                    left = OperatorNode(type='AND', children=[left, right])
-            
+                    left = OperatorNode(type='OR', children=[left, right])
+
+            return left
+
+        def parse_or_expression(self) -> Optional[Any]:
+            """Parse primary expression."""
+            left = self.parse_primary()
+
             return left
         
         def parse_primary(self) -> Optional[Any]:
@@ -243,13 +249,13 @@ def parse_prerequisite_tree(tokens: List[str]) -> Optional[Any]:
                     elif next_token == ')':
                         paren_depth -= 1
                     
-                    # Stop if we hit OR at top level (outside parens)
-                    if next_token == 'OR' and paren_depth == 0:
+                    # Stop if we hit AND at top level (outside parens)
+                    if next_token == 'AND' and paren_depth == 0:
                         break
                     
                     # Parse one expression and add to children
                     if paren_depth == 0:
-                        # Parse at AND level to collect all courses until OR
+                        # Parse at OR level to collect alternatives until AND
                         child = self.parse_and_expression()
                     else:
                         child = self.parse_primary()
