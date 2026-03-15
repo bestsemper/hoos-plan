@@ -42,7 +42,7 @@ export default function Sidebar({ user }: { user: { computingId: string, display
 
   return (
     <>
-      <header className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-uva-blue text-white border-b border-white/15 px-4 flex items-center justify-between">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-uva-blue text-white border-b border-white/15 px-4 flex items-center justify-between">
         <Link href="/" className="min-w-0 block">
           <div className="w-[190px]">
             <img src="/uva-logo.svg" alt="University of Virginia Logo" className="h-6 w-full" />
@@ -78,13 +78,13 @@ export default function Sidebar({ user }: { user: { computingId: string, display
         <button
           type="button"
           aria-label="Close menu"
-          className="md:hidden fixed inset-0 z-40 bg-black/40"
+          className="lg:hidden fixed inset-0 z-40 bg-black/40"
           onClick={() => setMobileNavOpen(false)}
         />
       )}
 
       <aside
-        className={`md:hidden fixed top-14 bottom-0 left-0 z-50 w-72 bg-uva-blue text-white px-6 py-6 flex flex-col justify-between transform transition-transform duration-200 ${
+        className={`lg:hidden fixed top-14 bottom-0 left-0 z-50 w-72 bg-uva-blue text-white px-6 py-6 flex flex-col justify-between transform transition-transform duration-200 ${
           mobileNavOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -134,7 +134,7 @@ export default function Sidebar({ user }: { user: { computingId: string, display
         </div>
       </aside>
 
-      <aside className="hidden md:flex w-64 h-screen bg-uva-blue text-white flex-col justify-between sticky top-0 shrink-0 px-6 py-6">
+      <aside className="hidden lg:flex w-64 h-screen bg-uva-blue text-white flex-col justify-between sticky top-0 shrink-0 px-6 py-6">
         <div>
           <Link href="/" className="block mb-8">
             <img src="/uva-logo.svg" alt="University of Virginia Logo" className="block mb-3 w-full" />

@@ -35,7 +35,7 @@ export default async function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex bg-uva-blue text-text-primary`}>
         <ThemeProvider>
           <Sidebar user={user} />
-          <main className="relative z-10 flex-1 h-screen bg-uva-blue overflow-visible flex flex-col p-3 pt-16 md:pt-3">
+          <main className="relative z-10 flex-1 h-screen bg-uva-blue overflow-visible flex flex-col p-3 pt-16 lg:pt-3">
             <div className="h-full w-full rounded-3xl bg-background border border-black/15 border-l-0 overflow-visible">
               <div className="h-full overflow-y-auto overflow-x-visible p-8">
                 {children}
