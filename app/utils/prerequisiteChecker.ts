@@ -155,6 +155,30 @@ export function getMissingCoursesRecursive(
 }
 
 /**
+ * Get ALL missing courses from a prerequisite tree (flat list)
+ * This recursively finds all course nodes and returns those not yet taken
+ */
+function getAllMissingCoursesFlat(
+  tree: PrerequisiteTree,
+  taken: Set<string>
+): Set<string> {
+  const missing = new Set<string>();
+
+  function traverse(node: PrerequisiteTree) {
+    if (node.type === 'course') {
+      if (!taken.has(node.code.toUpperCase())) {
+        missing.add(node.code);
+      }
+    } else if ('children' in node) {
+      node.children.forEach(traverse);
+    }
+  }
+
+  traverse(tree);
+  return missing;
+}
+
+/**
  * Get detailed missing requirements from a prerequisite tree
  */
 export function getDetailedMissingRequirements(
@@ -220,7 +244,7 @@ export function getDetailedMissingRequirements(
   }
 
   if (tree.type === 'OR') {
-    // Check if at least one is satisfied
+    // Check if at least one branch is satisfied
     const firstSatisfied = tree.children.some((child) =>
       evaluateTreeRecursive(child, taken)
     );
@@ -229,27 +253,53 @@ export function getDetailedMissingRequirements(
       return [];
     }
 
-    // None are satisfied - collect course options
-    const courseOptions: string[] = [];
-    const collectCourses = (node: PrerequisiteTree) => {
-      if (node.type === 'course') {
-        courseOptions.push(node.code);
-      } else if ('children' in node) {
-        node.children.forEach(collectCourses);
+    // None are satisfied - analyze each branch separately
+    const branchRequirements: RequirementMissing[][] = [];
+    const allMissing = new Set<string>();
+    
+    // For each unsatisfied branch, collect its requirements
+    for (const child of tree.children) {
+      const branchReqs = getDetailedMissingRequirements(child, taken);
+      
+      if (branchReqs.length > 0) {
+        branchRequirements.push(branchReqs);
+        branchReqs.forEach(req => {
+          req.missingCourses.forEach(c => allMissing.add(c));
+        });
+      } else if (child.type === 'course') {
+        // If it's a single course that's not taken, it's a missing option
+        if (!taken.has(child.code.toUpperCase())) {
+          const singleCourseReq: RequirementMissing = {
+            type: 'course',
+            description: child.code,
+            missingCourses: [child.code],
+          };
+          branchRequirements.push([singleCourseReq]);
+          allMissing.add(child.code);
+        }
       }
-    };
+    }
 
-    tree.children.forEach(collectCourses);
+    // If we have requirements from multiple branches, group them by branch
+    if (branchRequirements.length > 0) {
+      const descriptions = branchRequirements.map(branchReqs => {
+        const descs = branchReqs.map(r => r.description);
+        if (descs.length === 1) {
+          return descs[0];
+        }
+        return `(${descs.join(' AND ')})`;
+      });
+      
+      return [
+        {
+          type: 'or',
+          description: `Choose one: ${descriptions.join(' OR ')}`,
+          missingCourses: Array.from(allMissing),
+        },
+      ];
+    }
 
-    return [
-      {
-        type: 'or',
-        description: `Need one of: ${courseOptions.join(', ')}`,
-        missingCourses: courseOptions.filter(
-          (c) => !taken.has(c.toUpperCase())
-        ),
-      },
-    ];
+    return [];
   }
 
   return [];
@@ -295,17 +345,49 @@ export function checkPrerequisites(
   }
 
   const isSatisfied = evaluateTreeRecursive(tree, taken);
-  const missingCourses = isSatisfied
-    ? []
-    : getMissingCoursesRecursive(tree, taken);
-  const detailedRequirements = isSatisfied
-    ? []
-    : getDetailedMissingRequirements(tree, taken);
+  
+  if (isSatisfied) {
+    return {
+      isSatisfied: true,
+      hasNoPrerequisites: false,
+      missingCourses: [],
+      detailedRequirements: [],
+      hasUnknownPrerequisites: false,
+    };
+  }
+
+  // Get detailed requirements from tree structure
+  const detailedRequirements = getDetailedMissingRequirements(tree, taken);
+  
+  // Get comprehensive flat list of all missing courses as a safety net
+  const allMissingFlat = Array.from(getAllMissingCoursesFlat(tree, taken)).sort();
+  
+  // Also get the recursive missing courses
+  const missingCourses = getMissingCoursesRecursive(tree, taken);
+
+  // Ensure all missing courses from the flat list are included in detailedRequirements
+  const coveredCourses = new Set<string>();
+  detailedRequirements.forEach(req => {
+    req.missingCourses.forEach(c => coveredCourses.add(c.toUpperCase()));
+  });
+
+  // If there are missing courses not covered in detailed requirements, add a catch-all
+  const uncoveredFromFlat = allMissingFlat.filter(
+    c => !coveredCourses.has(c.toUpperCase())
+  );
+
+  if (uncoveredFromFlat.length > 0) {
+    detailedRequirements.push({
+      type: 'course',
+      description: `Also required: ${uncoveredFromFlat.join(', ')}`,
+      missingCourses: uncoveredFromFlat,
+    });
+  }
 
   return {
-    isSatisfied,
+    isSatisfied: false,
     hasNoPrerequisites: false,
-    missingCourses,
+    missingCourses: allMissingFlat, // Use the comprehensive flat list
     detailedRequirements,
     hasUnknownPrerequisites: false,
   };

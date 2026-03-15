@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import type { RequirementMissing } from './utils/prerequisiteChecker';
+import type { RequirementMissing } from '../utils/prerequisiteChecker';
 import ConfirmModal from '../components/ConfirmModal';
 import {
   addSchoolYearToPlan,
@@ -187,7 +187,7 @@ export default function PlanBuilderPage() {
 
   // Prerequisite tracking
   const [completedCourses, setCompletedCourses] = useState<string[]>([]);
-  const [prereqWarning, setPrereqWarning] = useState<{ type: 'info' | 'warning' | 'error'; message: string; missingCourses?: string[] } | null>(null);
+  const [prereqWarning, setPrereqWarning] = useState<{ type: 'info' | 'warning' | 'error'; message: string; missingCourses?: string[]; detailedRequirements?: RequirementMissing[] } | null>(null);
   const [showPrereqConfirm, setShowPrereqConfirm] = useState(false);
   const [pendingCourseAdd, setPendingCourseAdd] = useState<{ semesterId: string; courseCode: string; credits: number } | null>(null);
   // Map of semesterId -> Map of courseCode -> missing prerequisite codes
@@ -259,7 +259,19 @@ export default function PlanBuilderPage() {
           // If prerequisites are not satisfied and it's not a 1000-level course without prerequisites
           if (!result.isSatisfied && !(result.hasNoPrerequisites && result.hasUnknownPrerequisites)) {
             const existing = newProblematicCourses.get(semester.id) || new Map<string, RequirementMissing[]>();
-            existing.set(course.courseCode, result.detailedRequirements || []);
+            
+            // Use detailed requirements if available, otherwise create from missing courses
+            let requirements = result.detailedRequirements || [];
+            if (requirements.length === 0 && result.missingCourses.length > 0) {
+              // Fallback: create requirement entries from missing courses
+              requirements = result.missingCourses.map(courseCode => ({
+                type: 'course' as const,
+                description: courseCode,
+                missingCourses: [courseCode],
+              }));
+            }
+            
+            existing.set(course.courseCode, requirements);
             newProblematicCourses.set(semester.id, existing);
           }
         }
@@ -392,13 +404,37 @@ export default function PlanBuilderPage() {
       addCourseOptimistically(semesterId, code, cr);
     } else {
       // Prerequisites not satisfied - show hard warning and ask for confirmation
-      const detailMsg = result.detailedRequirements
-        .map(req => req.description)
-        .join('; ');
+      let detailMsg = '';
+      
+      if (result.detailedRequirements && result.detailedRequirements.length > 0) {
+        // Use detailed requirements
+        const detailParts = result.detailedRequirements.map(req => req.description);
+        
+        // Check if all missing courses are covered in detailed requirements
+        const coveredCourses = new Set<string>();
+        result.detailedRequirements.forEach(req => {
+          req.missingCourses.forEach(c => coveredCourses.add(c.toUpperCase()));
+        });
+        
+        const uncoveredCourses = result.missingCourses
+          .filter(c => !coveredCourses.has(c.toUpperCase()));
+        
+        // If there are uncovered courses, add them to the message
+        if (uncoveredCourses.length > 0) {
+          detailParts.push(`Also missing: ${uncoveredCourses.join(', ')}`);
+        }
+        
+        detailMsg = detailParts.join('; ');
+      } else {
+        // Fallback to simple missing courses list
+        detailMsg = result.missingCourses.join(', ');
+      }
+      
       setPrereqWarning({
         type: 'error',
-        message: `${code} requires: ${detailMsg || result.missingCourses.join(', ')}. These courses are not marked as completed or planned in an earlier semester.`,
+        message: `${code} requires: ${detailMsg}. These courses are not marked as completed or planned in an earlier semester.`,
         missingCourses: result.missingCourses,
+        detailedRequirements: result.detailedRequirements,
       });
       setShowPrereqConfirm(true);
       setPendingCourseAdd({ semesterId, courseCode: code, credits: cr });
@@ -435,7 +471,7 @@ export default function PlanBuilderPage() {
   };
 
   const handleProceedWithWarning = () => {
-    if (!pendingCourseAdd || !prereqWarning?.missingCourses) return;
+    if (!pendingCourseAdd || !prereqWarning) return;
     
     // Add the course despite the warning
     setShowPrereqConfirm(false);
@@ -443,8 +479,8 @@ export default function PlanBuilderPage() {
     // Track this course as problematic in the semester
     setSemestersProblematicCourses((prev) => {
       const updated = new Map(prev);
-      const current = updated.get(pendingCourseAdd.semesterId) || new Map<string, string[]>();
-      current.set(pendingCourseAdd.courseCode, prereqWarning.missingCourses || []);
+      const current = updated.get(pendingCourseAdd.semesterId) || new Map<string, RequirementMissing[]>();
+      current.set(pendingCourseAdd.courseCode, prereqWarning.detailedRequirements || []);
       updated.set(pendingCourseAdd.semesterId, current);
       return updated;
     });
@@ -1059,15 +1095,17 @@ export default function PlanBuilderPage() {
                             {sem.courses.map((course) => {
                               const requirementsMissing = semestersProblematicCourses.get(sem.id)?.get(course.courseCode) ?? [];
                               const isProblematic = requirementsMissing.length > 0;
-                              const tooltipMessage = requirementsMissing
-                                .map(req => req.description)
-                                .join('; ');
+                              const tooltipMessage = requirementsMissing.length > 0
+                                ? requirementsMissing
+                                    .map(req => req.description)
+                                    .join('; ')
+                                : 'Prerequisites not satisfied';
                               return (
                                 <div key={course.id} onClick={() => handleCourseClick(course.courseCode)} className="px-3 bg-panel-bg-alt border border-panel-border-strong rounded-xl text-sm flex justify-between items-center hover:border-uva-blue transition-colors cursor-pointer group h-[46px]">
                                   <span className="font-medium text-text-primary flex items-center gap-2">
                                     {course.courseCode}
                                     {isProblematic && (
-                                      <HoverTooltip message={`Missing: ${tooltipMessage}`}>
+                                      <HoverTooltip message={tooltipMessage}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-yellow-500 flex-shrink-0 cursor-help hover:text-yellow-600 transition-colors">
                                           <circle cx="12" cy="12" r="10"/>
                                           <line x1="12" y1="8" x2="12" y2="12"/>
