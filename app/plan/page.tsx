@@ -172,7 +172,7 @@ function storeSelectedPlanId(userId: string, planId: string) {
 
 function formatEnrollmentRequirement(requirement: string): { label: string; value: string } {
   const trimmed = requirement.trim();
-  const prefixMatch = trimmed.match(/^(Major Restriction|Program Restriction|Year Requirement|School Requirement):\s*(.+)$/i);
+  const prefixMatch = trimmed.match(/^(Major Restriction|Program Restriction|Year Requirement|School Requirement|Credit Requirement):\s*(.+)$/i);
 
   if (prefixMatch) {
     return {

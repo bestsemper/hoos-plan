@@ -5,6 +5,7 @@ import { getAdjustedAcademicYearStanding, isFinalAcademicYear } from './academic
 type CourseNode = {
   type: 'course';
   code: string;
+  level?: boolean;
 };
 
 type MajorRequirementNode = {
@@ -27,18 +28,25 @@ type SchoolRequirementNode = {
   requirement: string;
 };
 
+type CreditRequirementNode = {
+  type: 'credit';
+  credits: number;
+  requirement: string;
+  subject?: string;
+};
+
 type OperatorNode = {
   type: 'AND' | 'OR';
-  children: (CourseNode | OperatorNode | CountNode | MajorRequirementNode | ProgramRequirementNode | YearRequirementNode | SchoolRequirementNode)[];
+  children: (CourseNode | OperatorNode | CountNode | MajorRequirementNode | ProgramRequirementNode | YearRequirementNode | SchoolRequirementNode | CreditRequirementNode)[];
 };
 
 type CountNode = {
   type: 'count';
   count: number;
-  children: (CourseNode | OperatorNode | CountNode | MajorRequirementNode | ProgramRequirementNode | YearRequirementNode | SchoolRequirementNode)[];
+  children: (CourseNode | OperatorNode | CountNode | MajorRequirementNode | ProgramRequirementNode | YearRequirementNode | SchoolRequirementNode | CreditRequirementNode)[];
 };
 
-type PrerequisiteTree = CourseNode | OperatorNode | CountNode | MajorRequirementNode | ProgramRequirementNode | YearRequirementNode | SchoolRequirementNode;
+type PrerequisiteTree = CourseNode | OperatorNode | CountNode | MajorRequirementNode | ProgramRequirementNode | YearRequirementNode | SchoolRequirementNode | CreditRequirementNode;
 
 export interface Prerequisites {
   prerequisite_trees: Record<string, PrerequisiteTree>;
@@ -63,12 +71,14 @@ type ManualEquivalentGroups = {
 };
 
 export interface RequirementMissing {
-  type: 'course' | 'count' | 'or' | 'and' | 'major' | 'program' | 'year' | 'school';
+  type: 'course' | 'count' | 'or' | 'and' | 'major' | 'program' | 'year' | 'school' | 'credit';
   description: string;
   missingCourses: string[];
   requisiteType?: 'prerequisite' | 'corequisite' | 'other';
   satisfiedCount?: number; // For count nodes: how many are satisfied
   requiredCount?: number; // For count nodes: how many are needed
+  satisfiedCredits?: number; // For credit nodes: how many credits are satisfied
+  requiredCredits?: number; // For credit nodes: how many credits are required
 }
 
 type UserEnrollmentProfile = {
@@ -84,7 +94,13 @@ type UserEnrollmentProfile = {
 
 type EvaluationContext = {
   levelRequirementByCode?: Map<string, { subject: string; level: number }>;
+  courseCreditByCode?: Map<string, number>;
+  targetCourseSubject?: string;
 };
+
+function formatCreditValue(credits: number): string {
+  return Number.isInteger(credits) ? `${credits}` : `${credits}`;
+}
 
 function parseYearLevels(requirement: string): Set<number> {
   const normalized = requirement.toLowerCase();
@@ -276,7 +292,8 @@ function formatRequirementText(text: string): string {
 
 function formatInlineRequirement(tree: PrerequisiteTree): string {
   if (tree.type === 'course') {
-    return tree.code;
+    const courseDisplay = tree.level ? `${tree.code} level` : tree.code;
+    return courseDisplay;
   }
 
   if (tree.type === 'major') {
@@ -293,6 +310,12 @@ function formatInlineRequirement(tree: PrerequisiteTree): string {
 
   if (tree.type === 'school') {
     return `School Requirement: ${tree.requirement}`;
+  }
+
+  if (tree.type === 'credit') {
+    const creditDisplay = formatCreditValue(tree.credits);
+    const suffix = tree.subject ? ` of ${tree.subject}` : '';
+    return `Credit Requirement: ${creditDisplay} credits${suffix}`;
   }
 
   if (tree.type === 'count') {
@@ -321,6 +344,21 @@ export function formatPrerequisiteTreeForDisplay(tree: PrerequisiteTree): string
 let cachedPrerequisites: Prerequisites | null = null;
 let cachedEquivalentCourseMap: Map<string, Set<string>> | null = null;
 let cachedCourseLevelRequirementMap: Map<string, Map<string, { subject: string; level: number }>> | null = null;
+let cachedCourseCreditMap: Map<string, number> | null = null;
+
+function parseCatalogCredits(rawCredits: unknown): number {
+  const normalized = String(rawCredits ?? '').trim();
+  if (!normalized) return 0;
+
+  const rangeMatch = normalized.match(/^(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)$/);
+  if (rangeMatch) {
+    const high = Number.parseFloat(rangeMatch[2]);
+    return Number.isFinite(high) ? high : 0;
+  }
+
+  const singleValue = Number.parseFloat(normalized);
+  return Number.isFinite(singleValue) ? singleValue : 0;
+}
 
 function loadEquivalentCourseMap(): Map<string, Set<string>> {
   if (cachedEquivalentCourseMap) {
@@ -360,12 +398,17 @@ function loadEquivalentCourseMap(): Map<string, Set<string>> {
 
 function loadCourseRequirementContext(): {
   levelRequirementMap: Map<string, Map<string, { subject: string; level: number }>>;
+  courseCreditMap: Map<string, number>;
 } {
-  if (cachedCourseLevelRequirementMap) {
-    return { levelRequirementMap: cachedCourseLevelRequirementMap };
+  if (cachedCourseLevelRequirementMap && cachedCourseCreditMap) {
+    return {
+      levelRequirementMap: cachedCourseLevelRequirementMap,
+      courseCreditMap: cachedCourseCreditMap,
+    };
   }
 
   const levelRequirementMap = new Map<string, Map<string, { subject: string; level: number }>>();
+  const courseCreditMap = new Map<string, number>();
 
   try {
     const detailsPath = path.join(process.cwd(), 'data/uva_course_details.json');
@@ -374,6 +417,11 @@ function loadCourseRequirementContext(): {
     for (const row of rows) {
       const code = String((row.course_code ?? row.code ?? '')).toUpperCase().trim();
       if (!code) continue;
+
+      const credits = parseCatalogCredits(row.credits);
+      if (credits > 0) {
+        courseCreditMap.set(code, credits);
+      }
 
       const description = String(row.description ?? '');
       const enrollmentRequirements = String(row.enrollment_requirements ?? '');
@@ -412,7 +460,48 @@ function loadCourseRequirementContext(): {
   }
 
   cachedCourseLevelRequirementMap = levelRequirementMap;
-  return { levelRequirementMap };
+  cachedCourseCreditMap = courseCreditMap;
+  return { levelRequirementMap, courseCreditMap };
+}
+
+function getCourseSubject(courseCode: string): string | null {
+  const normalized = courseCode.toUpperCase().replace(/\s+/g, ' ').trim();
+  const match = normalized.match(/^([A-Z]{2,6})\s+\d{4}[A-Z]?$/);
+  return match ? match[1] : null;
+}
+
+function getSatisfiedCredits(
+  taken: Set<string>,
+  context?: EvaluationContext,
+  subjectFilter?: string
+): number {
+  let totalCredits = 0;
+  const normalizedSubjectFilter = subjectFilter?.toUpperCase().trim();
+
+  for (const takenCode of taken) {
+    const normalizedCode = takenCode.toUpperCase().replace(/\s+/g, ' ').trim();
+    if (normalizedSubjectFilter) {
+      const subject = getCourseSubject(normalizedCode);
+      if (subject !== normalizedSubjectFilter) {
+        continue;
+      }
+    }
+
+    const credits = context?.courseCreditByCode?.get(normalizedCode) ?? 0;
+    totalCredits += credits;
+  }
+
+  return totalCredits;
+}
+
+function isCreditRequirementSatisfied(
+  requirement: CreditRequirementNode,
+  taken: Set<string>,
+  context?: EvaluationContext
+): boolean {
+  const requirementSubject = requirement.subject?.trim() || context?.targetCourseSubject;
+  const satisfiedCredits = getSatisfiedCredits(taken, context, requirementSubject);
+  return satisfiedCredits + Number.EPSILON >= requirement.credits;
 }
 
 function courseMatchesLevelRequirement(
@@ -516,6 +605,10 @@ export function evaluateTreeRecursive(
     return isYearRequirementSatisfied(tree.requirement, profile, context);
   }
 
+  if (tree.type === 'credit') {
+    return isCreditRequirementSatisfied(tree, taken, context);
+  }
+
   if (tree.type === 'count') {
     // Count how many children are satisfied
     const satisfiedCount = tree.children.filter((child) =>
@@ -554,6 +647,10 @@ export function getMissingCoursesRecursive(
   }
 
   if (tree.type === 'major' || tree.type === 'program' || tree.type === 'year' || tree.type === 'school') {
+    return [];
+  }
+
+  if (tree.type === 'credit') {
     return [];
   }
 
@@ -619,7 +716,7 @@ function getAllMissingCoursesFlat(
       if (!courseRequirementSatisfied(node.code, taken, context)) {
         missing.add(node.code);
       }
-    } else if (node.type === 'major' || node.type === 'program' || node.type === 'year' || node.type === 'school') {
+    } else if (node.type === 'major' || node.type === 'program' || node.type === 'year' || node.type === 'school' || node.type === 'credit') {
       return;
     } else if (node.type === 'count') {
       // For COUNT nodes, check if requirement is satisfied
@@ -666,10 +763,11 @@ export function getDetailedMissingRequirements(
     if (courseRequirementSatisfied(code, taken, context)) {
       return [];
     }
+    const courseDisplay = tree.level ? `${tree.code} level` : tree.code;
     return [
       {
         type: 'course',
-        description: `Missing: ${tree.code}`,
+        description: `Missing: ${courseDisplay}`,
         missingCourses: [tree.code],
       },
     ];
@@ -703,6 +801,24 @@ export function getDetailedMissingRequirements(
     return [{ type: 'school', description: `School Requirement: ${tree.requirement}`, missingCourses: [] }];
   }
 
+  if (tree.type === 'credit') {
+    if (isCreditRequirementSatisfied(tree, taken, context)) {
+      return [];
+    }
+
+    const requirementSubject = tree.subject?.trim() || context?.targetCourseSubject;
+    const satisfiedCredits = getSatisfiedCredits(taken, context, requirementSubject);
+    const creditDisplay = formatCreditValue(tree.credits);
+    const scopeSuffix = requirementSubject ? ` of ${requirementSubject}` : '';
+    return [{
+      type: 'credit',
+      description: `Credit Requirement: ${creditDisplay} credits${scopeSuffix}`,
+      missingCourses: [],
+      satisfiedCredits,
+      requiredCredits: tree.credits,
+    }];
+  }
+
   if (tree.type === 'count') {
     const satisfied = tree.children.filter((child) =>
       evaluateTreeRecursive(child, taken, profile, context)
@@ -714,10 +830,12 @@ export function getDetailedMissingRequirements(
     }
 
     // Get all course options available
-    const courseOptions: string[] = [];
+    const displayCourseOptions: string[] = [];
+    const rawCourseOptions: string[] = [];
     const collectCourses = (node: PrerequisiteTree) => {
       if (node.type === 'course') {
-        courseOptions.push(node.code);
+        rawCourseOptions.push(node.code);
+        displayCourseOptions.push(node.level ? `${node.code} level` : node.code);
       } else if ('children' in node) {
         node.children.forEach(collectCourses);
       }
@@ -728,8 +846,8 @@ export function getDetailedMissingRequirements(
     return [
       {
         type: 'count',
-        description: `Missing: Need ${needMore} more of: ${courseOptions.join(', ')}`,
-        missingCourses: courseOptions.filter(
+        description: `Missing: Need ${needMore} more of: ${displayCourseOptions.join(', ')}`,
+        missingCourses: rawCourseOptions.filter(
           (c) => !courseRequirementSatisfied(c, taken, context)
         ),
         satisfiedCount: satisfied.length,
@@ -773,9 +891,10 @@ export function getDetailedMissingRequirements(
       } else if (child.type === 'course') {
         // If it's a single course that's not taken, it's a missing option
         if (!courseRequirementSatisfied(child.code, taken, context)) {
+          const courseDisplay = child.level ? `${child.code} level` : child.code;
           const singleCourseReq: RequirementMissing = {
             type: 'course',
-            description: `Missing: ${child.code}`,
+            description: `Missing: ${courseDisplay}`,
             missingCourses: [child.code],
           };
           branchRequirements.push([singleCourseReq]);
@@ -836,9 +955,11 @@ export function checkPrerequisites(
 ): PrerequisiteCheckResult {
   const prerequisites = loadPrerequisites();
   const normalizedCode = courseCode.toUpperCase();
-  const { levelRequirementMap } = loadCourseRequirementContext();
+  const { levelRequirementMap, courseCreditMap } = loadCourseRequirementContext();
   const evaluationContext: EvaluationContext = {
     levelRequirementByCode: levelRequirementMap.get(normalizedCode),
+    courseCreditByCode: courseCreditMap,
+    targetCourseSubject: normalizedCode.split(' ')[0],
   };
   const prerequisiteTree = prerequisites.prerequisite_trees[normalizedCode];
   const corequisiteTree = prerequisites.corequisite_trees?.[normalizedCode];
