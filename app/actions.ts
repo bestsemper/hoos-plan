@@ -1101,7 +1101,7 @@ export async function getPlanBuilderData() {
     },
   });
 
-  const allCourses = await getAllPossibleCoursesFromCSV();
+  const allCourses = await getAllPossibleCoursesFromJSON();
 
   // Get completed courses for prerequisite checking
   const completedCourses = await prisma.completedCourse.findMany({
@@ -1739,7 +1739,7 @@ export async function importCompletedCoursesFromAuditPdf(input: {
   }
 }
 
-export async function getAllPossibleCoursesFromCSV(): Promise<{ code: string; title: string | null }[]> {
+export async function getAllPossibleCoursesFromJSON(): Promise<{ code: string; title: string | null }[]> {
   try {
     const { courseDetailsByCode, sortedCourseCodes } = loadCourseDetailsFromJSON();
     return sortedCourseCodes.map((code) => ({
@@ -1752,7 +1752,7 @@ export async function getAllPossibleCoursesFromCSV(): Promise<{ code: string; ti
   }
 }
 
-export async function getCourseInfoFromCSV(courseCode: string) {
+export async function getCourseInfoFromJSON(courseCode: string) {
   try {
     const normalizedCode = normalizeCourseCode(courseCode);
     const { courseDetailsByCode } = loadCourseDetailsFromJSON();
@@ -1807,7 +1807,7 @@ export async function getCourseInfoFromCSV(courseCode: string) {
   }
 }
 
-export async function getCourseCreditsFromCSV(courseCode: string): Promise<string> {
+export async function getCourseCreditsFromJSON(courseCode: string): Promise<string> {
   try {
     const normalizedCode = normalizeCourseCode(courseCode);
     const { courseDetailsByCode } = loadCourseDetailsFromJSON();
