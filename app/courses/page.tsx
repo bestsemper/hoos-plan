@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { CustomDropdown, CustomDropdownContent, CustomDropdownItem } from '../components/CustomDropdown';
 import { getCourseInfoFromCSV, getCourseCreditsFromCSV } from '../actions';
 
 interface CourseInfo {

@@ -76,7 +76,6 @@ export default function ForumQuestionsPage() {
           href="/forum"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-uva-blue hover:text-uva-orange transition-colors"
         >
-          Back to Forum
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -92,6 +91,7 @@ export default function ForumQuestionsPage() {
           >
             <path d="m9 18 6-6-6-6" />
           </svg>
+          Back to Forum
         </Link>
       </div>
 
