@@ -51,6 +51,10 @@ export interface Prerequisites {
   };
 }
 
+type ManualEquivalentGroups = {
+  groups?: string[][];
+};
+
 export interface RequirementMissing {
   type: 'course' | 'count' | 'or' | 'and' | 'major' | 'program' | 'year' | 'school';
   description: string;
@@ -69,6 +73,8 @@ function normalizeEnrollmentText(text: string): string {
   return text
     .toLowerCase()
     .replace(/&/g, ' and ')
+    .replace(/\bbscs\b/g, 'bs computer science')
+    .replace(/\bbacs\b/g, 'ba computer science')
     .replace(/\bengr\b/g, 'engineering')
     .replace(/\bengr\.?\b/g, 'engineering')
     .replace(/\bstudents?\b/g, ' ')
@@ -168,7 +174,7 @@ function formatRequirementText(text: string): string {
   if (!text) return text;
   const cleaned = text.replace(/^[^A-Za-z0-9]+/, '').replace(/^s:\s*/i, '');
   const capitalized = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
-  return capitalized.replace(/\b(hsm|mba|jd|llm|phd|ms|ma|bs|ba|rotc|uva)\b/gi, (match) => match.toUpperCase());
+  return capitalized.replace(/\b(hsm|mba|jd|llm|phd|ms|ma|bs|ba|bscs|bacs|rotc|uva)\b/gi, (match) => match.toUpperCase());
 }
 
 function formatInlineRequirement(tree: PrerequisiteTree): string {
@@ -212,6 +218,63 @@ export function formatPrerequisiteTreeForDisplay(tree: PrerequisiteTree): string
 }
 
 let cachedPrerequisites: Prerequisites | null = null;
+let cachedEquivalentCourseMap: Map<string, Set<string>> | null = null;
+
+function loadEquivalentCourseMap(): Map<string, Set<string>> {
+  if (cachedEquivalentCourseMap) {
+    return cachedEquivalentCourseMap;
+  }
+
+  const equivalentMap = new Map<string, Set<string>>();
+
+  try {
+    const equivalentPath = path.join(process.cwd(), 'data/manual_equivalent_groups.json');
+    const data = fs.readFileSync(equivalentPath, 'utf-8');
+    const payload = JSON.parse(data) as ManualEquivalentGroups;
+
+    for (const group of payload.groups ?? []) {
+      const normalizedGroup = Array.from(new Set(group.map((code) => code.toUpperCase().trim()).filter(Boolean)));
+      if (normalizedGroup.length < 2) {
+        continue;
+      }
+
+      for (const code of normalizedGroup) {
+        const equivalents = equivalentMap.get(code) ?? new Set<string>();
+        normalizedGroup.forEach((otherCode) => {
+          if (otherCode !== code) {
+            equivalents.add(otherCode);
+          }
+        });
+        equivalentMap.set(code, equivalents);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load manual equivalent groups:', error);
+  }
+
+  cachedEquivalentCourseMap = equivalentMap;
+  return equivalentMap;
+}
+
+function courseRequirementSatisfied(courseCode: string, taken: Set<string>): boolean {
+  const normalizedCode = courseCode.toUpperCase();
+  if (taken.has(normalizedCode)) {
+    return true;
+  }
+
+  const equivalents = loadEquivalentCourseMap().get(normalizedCode);
+  if (!equivalents) {
+    return false;
+  }
+
+  for (const equivalentCode of equivalents) {
+    if (taken.has(equivalentCode)) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 export function loadPrerequisites(): Prerequisites {
   if (cachedPrerequisites) {
@@ -245,7 +308,7 @@ export function evaluateTreeRecursive(
   profile?: UserEnrollmentProfile
 ): boolean {
   if (tree.type === 'course') {
-    return taken.has(tree.code.toUpperCase());
+    return courseRequirementSatisfied(tree.code, taken);
   }
 
   if (tree.type === 'major') {
@@ -294,7 +357,7 @@ export function getMissingCoursesRecursive(
   profile?: UserEnrollmentProfile
 ): string[] {
   if (tree.type === 'course') {
-    if (taken.has(tree.code.toUpperCase())) {
+    if (courseRequirementSatisfied(tree.code, taken)) {
       return [];
     }
     return [tree.code];
@@ -308,7 +371,7 @@ export function getMissingCoursesRecursive(
     // For count nodes, return all courses that haven't been taken
     const missing: string[] = [];
     for (const child of tree.children) {
-      if (child.type === 'course' && !taken.has(child.code.toUpperCase())) {
+      if (child.type === 'course' && !courseRequirementSatisfied(child.code, taken)) {
         missing.push(child.code);
       } else if (child.type !== 'course') {
         // Recursively check complex children
@@ -362,7 +425,7 @@ function getAllMissingCoursesFlat(
 
   function traverse(node: PrerequisiteTree) {
     if (node.type === 'course') {
-      if (!taken.has(node.code.toUpperCase())) {
+      if (!courseRequirementSatisfied(node.code, taken)) {
         missing.add(node.code);
       }
     } else if (node.type === 'major' || node.type === 'program' || node.type === 'year' || node.type === 'school') {
@@ -408,7 +471,7 @@ export function getDetailedMissingRequirements(
 ): RequirementMissing[] {
   if (tree.type === 'course') {
     const code = tree.code.toUpperCase();
-    if (taken.has(code)) {
+    if (courseRequirementSatisfied(code, taken)) {
       return [];
     }
     return [
@@ -472,7 +535,7 @@ export function getDetailedMissingRequirements(
         type: 'count',
         description: `Missing: Need ${needMore} more of: ${courseOptions.join(', ')}`,
         missingCourses: courseOptions.filter(
-          (c) => !taken.has(c.toUpperCase())
+          (c) => !courseRequirementSatisfied(c, taken)
         ),
         satisfiedCount: satisfied.length,
         requiredCount: tree.count,
@@ -514,7 +577,7 @@ export function getDetailedMissingRequirements(
         });
       } else if (child.type === 'course') {
         // If it's a single course that's not taken, it's a missing option
-        if (!taken.has(child.code.toUpperCase())) {
+        if (!courseRequirementSatisfied(child.code, taken)) {
           const singleCourseReq: RequirementMissing = {
             type: 'course',
             description: `Missing: ${child.code}`,

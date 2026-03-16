@@ -164,7 +164,7 @@ def extract_major_program_requirements(enrollment_requirements: str) -> List[Any
     )
     school_pattern = re.compile(
         r'\b(?:'
-        r'SEAS|E-?SCHOOL|SCHOOL\s+OF\s+ENGINEERING(?:\s+AND\s+APPLIED\s+SCIENCE)?|'
+        r'SEAS|E-?SCHOOL|SCHOOL\s+OF\s+ENGINEERING(?:\s+AND\s+APPLIED\s+SCIENCE)?|(?:UNDERGRADUATE\s+)?ENGINEERING(?:\s+STUDENTS?)?|'
         r'CLAS|A\s*&\s*S|ARTS\s*&\s*SCIENCES|COLLEGE\s+(?:AND\s+GRADUATE\s+SCHOOL\s+OF\s+)?ARTS\s*&\s*SCIENCES|'
         r'SCHOOL\s+OF\s+ARCHITECTURE|ARCH|'
         r'MCINTIRE|SCHOOL\s+OF\s+COMMERCE|COMMERCE\s+SCHOOL|'
@@ -610,34 +610,13 @@ def load_manual_equivalent_groups() -> List[List[str]]:
     return normalized_groups
 
 
-def extract_equivalent_allowed_courses(prereq_text: str) -> set[str]:
-    """Return course codes whose local clause explicitly allows an equivalent."""
-    upper_text = prereq_text.upper()
-    allowed_codes: set[str] = set()
-
-    for course_code in {normalize_course_code(code) for code in extract_course_codes(prereq_text)}:
-        course_pattern = re.compile(re.escape(course_code), re.IGNORECASE)
-        for match in course_pattern.finditer(upper_text):
-            clause_end_match = re.search(r'[.;\n\r]', upper_text[match.end():])
-            clause_end = match.end() + clause_end_match.start() if clause_end_match else min(len(upper_text), match.end() + 120)
-            clause_window = upper_text[match.end():clause_end]
-            if 'EQUIVALENT' in clause_window:
-                allowed_codes.add(course_code)
-                break
-
-    return allowed_codes
-
-
-def expand_equivalent_courses(node: Optional[Any], allowed_codes: set[str], equivalent_course_map: Dict[str, List[str]]) -> Optional[Any]:
-    """Expand course leaves with explicit equivalent-language into OR groups."""
+def expand_equivalent_courses(node: Optional[Any], equivalent_course_map: Dict[str, List[str]]) -> Optional[Any]:
+    """Expand course leaves into OR groups when mapped equivalent courses exist."""
     if node is None:
         return None
 
     if isinstance(node, CourseNode):
         course_code = normalize_course_code(node.code)
-        if course_code not in allowed_codes:
-            return node
-
         equivalent_codes = equivalent_course_map.get(course_code, [])
         if not equivalent_codes:
             return node
@@ -654,7 +633,7 @@ def expand_equivalent_courses(node: Optional[Any], allowed_codes: set[str], equi
         node.children = [
             expanded
             for child in node.children
-            for expanded in [expand_equivalent_courses(child, allowed_codes, equivalent_course_map)]
+            for expanded in [expand_equivalent_courses(child, equivalent_course_map)]
             if expanded is not None
         ]
         return node
@@ -663,7 +642,7 @@ def expand_equivalent_courses(node: Optional[Any], allowed_codes: set[str], equi
         node.children = [
             expanded
             for child in node.children
-            for expanded in [expand_equivalent_courses(child, allowed_codes, equivalent_course_map)]
+            for expanded in [expand_equivalent_courses(child, equivalent_course_map)]
             if expanded is not None
         ]
         return node
@@ -1020,32 +999,81 @@ def process_course_prerequisite(
     enrollment_requirements: str,
     equivalent_course_map: Dict[str, List[str]],
 ) -> Optional[Any]:
-    """Process a single course and return its combined prerequisite tree."""
-    non_course_requirements = extract_major_program_requirements(enrollment_requirements)
+    """Process a single course and return the union of prereqs from enrollment text and description."""
 
-    # Extract prerequisite text
-    prereq_text = extract_prerequisite_text(description, enrollment_requirements)
+    def node_key(node: Any) -> str:
+        if isinstance(node, CourseNode):
+            return f"course:{node.code.upper()}"
+        if isinstance(node, MajorRequirementNode):
+            return f"major:{normalize_requirement_text(node.requirement).lower()}"
+        if isinstance(node, ProgramRequirementNode):
+            return f"program:{normalize_requirement_text(node.requirement).lower()}"
+        if isinstance(node, YearRequirementNode):
+            return f"year:{normalize_requirement_text(node.requirement).lower()}"
+        if isinstance(node, SchoolRequirementNode):
+            return f"school:{normalize_requirement_text(node.requirement).lower()}"
+        if hasattr(node, 'to_dict'):
+            return json.dumps(node.to_dict(), sort_keys=True)
+        return str(node)
 
-    course_tree = None
-    if prereq_text:
-        # Check if there are any course codes
+    prereq_snippets: List[str] = []
+    seen_snippets = set()
+
+    enrollment_prereq = extract_prerequisite_text('', enrollment_requirements)
+    description_prereq = extract_prerequisite_text(description, '')
+
+    for snippet in (enrollment_prereq, description_prereq):
+        normalized = normalize_requirement_text(snippet) if snippet else ''
+        if not normalized:
+            continue
+        key = normalized.lower()
+        if key in seen_snippets:
+            continue
+        seen_snippets.add(key)
+        prereq_snippets.append(normalized)
+
+    combined_children: List[Any] = []
+    seen_children = set()
+
+    # Preserve baseline enrollment restriction extraction from full enrollment text.
+    for node in extract_major_program_requirements(enrollment_requirements):
+        key = node_key(node)
+        if key in seen_children:
+            continue
+        seen_children.add(key)
+        combined_children.append(node)
+
+    for prereq_text in prereq_snippets:
+        for node in extract_major_program_requirements(prereq_text):
+            key = node_key(node)
+            if key in seen_children:
+                continue
+            seen_children.add(key)
+            combined_children.append(node)
+
         courses = extract_course_codes(prereq_text)
-        if courses:
-            # Tokenize and parse
-            tokens = tokenize_prerequisite(prereq_text)
-            course_tree = parse_prerequisite_tree(tokens)
-            equivalent_allowed_courses = extract_equivalent_allowed_courses(prereq_text)
-            if equivalent_allowed_courses:
-                course_tree = expand_equivalent_courses(course_tree, equivalent_allowed_courses, equivalent_course_map)
-            # Remove accidental self-references like "COURSE 1234 ..." from descriptions.
-            course_tree = prune_self_reference(course_tree, course_code)
+        if not courses:
+            continue
 
-    combined_children = []
-    if isinstance(course_tree, OperatorNode) and course_tree.type == 'AND':
-        combined_children.extend(course_tree.children)
-    elif course_tree is not None:
-        combined_children.append(course_tree)
-    combined_children.extend(non_course_requirements)
+        tokens = tokenize_prerequisite(prereq_text)
+        course_tree = parse_prerequisite_tree(tokens)
+        course_tree = expand_equivalent_courses(course_tree, equivalent_course_map)
+        course_tree = prune_self_reference(course_tree, course_code)
+
+        if course_tree is None:
+            continue
+
+        if isinstance(course_tree, OperatorNode) and course_tree.type == 'AND':
+            nodes_to_add = course_tree.children
+        else:
+            nodes_to_add = [course_tree]
+
+        for node in nodes_to_add:
+            key = node_key(node)
+            if key in seen_children:
+                continue
+            seen_children.add(key)
+            combined_children.append(node)
 
     if not combined_children:
         return None

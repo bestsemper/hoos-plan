@@ -1,8 +1,8 @@
 {
   "metadata": {
     "total_courses": 9433,
-    "courses_with_prerequisites": 2005,
-    "courses_without_prerequisites": 7428
+    "courses_with_prerequisites": 2089,
+    "courses_without_prerequisites": 7344
   },
   "prerequisite_trees": {
     "ACCT 2020": {
@@ -160,6 +160,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "school",
+          "requirement": "School of Architecture"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -171,10 +175,6 @@
               "code": "LAR 7020"
             }
           ]
-        },
-        {
-          "type": "school",
-          "requirement": "School of Architecture"
         }
       ]
     },
@@ -202,6 +202,10 @@
     "ALAR 8999": {
       "type": "course",
       "code": "ALAR 8100"
+    },
+    "AMST 3001": {
+      "type": "major",
+      "requirement": "american studies major"
     },
     "AMST 4993": {
       "type": "OR",
@@ -287,19 +291,55 @@
       "code": "ANTH 7040"
     },
     "APMA 1090": {
-      "type": "year",
-      "requirement": "1st year"
-    },
-    "APMA 1110": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "APMA 1090"
+          "type": "year",
+          "requirement": "1st year"
         },
         {
-          "type": "course",
-          "code": "MATH 1310"
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        }
+      ]
+    },
+    "APMA 1110": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 1090"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 1310"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1090"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -307,12 +347,30 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "APMA 1110"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MATH 1320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            }
+          ]
         }
       ]
     },
@@ -350,19 +408,62 @@
       "type": "AND",
       "children": [
         {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "APMA 2120"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 2310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 2315"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                }
+              ]
             }
           ]
         },
@@ -423,19 +524,62 @@
       "type": "AND",
       "children": [
         {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "APMA 2120"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 2310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 2315"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                }
+              ]
             }
           ]
         },
@@ -455,16 +599,16 @@
               "code": "APMA 2501"
             }
           ]
-        },
-        {
-          "type": "program",
-          "requirement": "engineering undergraduate"
         }
       ]
     },
     "APMA 3150": {
       "type": "AND",
       "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
         {
           "type": "OR",
           "children": [
@@ -481,27 +625,58 @@
               "code": "APMA 3110"
             }
           ]
-        },
-        {
-          "type": "program",
-          "requirement": "engineering undergraduate"
         }
       ]
     },
     "APMA 3340": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "APMA 2120"
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
         },
         {
-          "type": "course",
-          "code": "MATH 2310"
-        },
-        {
-          "type": "course",
-          "code": "APMA 2512"
+          "type": "OR",
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
+            },
+            {
+              "type": "course",
+              "code": "APMA 2512"
+            }
+          ]
         }
       ]
     },
@@ -589,9 +764,22 @@
         }
       ]
     },
+    "ARAB  256": {
+      "type": "year",
+      "requirement": "1st year"
+    },
     "ARAB  266": {
-      "type": "course",
-      "code": "ARAB 0256"
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "1st year"
+        },
+        {
+          "type": "course",
+          "code": "ARAB 0256"
+        }
+      ]
     },
     "ARAB 3010": {
       "type": "course",
@@ -667,18 +855,22 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "ARCH 1020"
-        },
-        {
           "type": "school",
           "requirement": "School of Architecture"
+        },
+        {
+          "type": "course",
+          "code": "ARCH 1020"
         }
       ]
     },
     "ARCH 2010": {
       "type": "AND",
       "children": [
+        {
+          "type": "school",
+          "requirement": "School of Architecture"
+        },
         {
           "type": "OR",
           "children": [
@@ -691,16 +883,21 @@
               "code": "ARCH 1030"
             }
           ]
-        },
-        {
-          "type": "school",
-          "requirement": "School of Architecture"
         }
       ]
     },
     "ARCH 2020": {
-      "type": "course",
-      "code": "ARCH 2010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Architecture"
+        },
+        {
+          "type": "course",
+          "code": "ARCH 2010"
+        }
+      ]
     },
     "ARCH 2114": {
       "type": "AND",
@@ -733,23 +930,41 @@
       ]
     },
     "ARCH 3010": {
-      "type": "course",
-      "code": "ARCH 2020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Architecture"
+        },
+        {
+          "type": "course",
+          "code": "ARCH 2020"
+        }
+      ]
     },
     "ARCH 3020": {
-      "type": "course",
-      "code": "ARCH 3010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Architecture"
+        },
+        {
+          "type": "course",
+          "code": "ARCH 3010"
+        }
+      ]
     },
     "ARCH 3120": {
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "ARH 1010"
-        },
-        {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "course",
+          "code": "ARH 1010"
         }
       ]
     },
@@ -765,12 +980,16 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "ARCH 3020"
-        },
-        {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Architecture"
+        },
+        {
+          "type": "course",
+          "code": "ARCH 3020"
         }
       ]
     },
@@ -778,12 +997,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "ARCH 4010"
-        },
-        {
           "type": "school",
           "requirement": "School of Architecture"
+        },
+        {
+          "type": "course",
+          "code": "ARCH 4010"
         }
       ]
     },
@@ -795,16 +1014,16 @@
       "type": "AND",
       "children": [
         {
+          "type": "school",
+          "requirement": "School of Architecture"
+        },
+        {
           "type": "course",
           "code": "ARCH 4010"
         },
         {
           "type": "course",
           "code": "ARCH 4100"
-        },
-        {
-          "type": "school",
-          "requirement": "School of Architecture"
         }
       ]
     },
@@ -828,18 +1047,31 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "ARCH 6020"
-        },
-        {
           "type": "school",
           "requirement": "School of Architecture"
+        },
+        {
+          "type": "course",
+          "code": "ARCH 6020"
         }
       ]
     },
     "ARCH 7020": {
-      "type": "course",
-      "code": "ARCH 7010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Architecture"
+        },
+        {
+          "type": "course",
+          "code": "ARCH 7010"
+        }
+      ]
+    },
+    "ARCY 4999": {
+      "type": "program",
+      "requirement": "acceptence into dmp program"
     },
     "ARH 3403": {
       "type": "AND",
@@ -1041,8 +1273,21 @@
       ]
     },
     "ARTS 4110": {
-      "type": "OR",
+      "type": "AND",
       "children": [
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ARTS 3110"
+            },
+            {
+              "type": "course",
+              "code": "ARTS 2112"
+            }
+          ]
+        },
         {
           "type": "course",
           "code": "ARTS 3110"
@@ -1222,8 +1467,17 @@
               "code": "MATH 1210"
             },
             {
-              "type": "course",
-              "code": "MATH 1310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1090"
+                }
+              ]
             },
             {
               "type": "course",
@@ -1253,8 +1507,17 @@
           "code": "MATH 1210"
         },
         {
-          "type": "course",
-          "code": "MATH 1310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1090"
+            }
+          ]
         },
         {
           "type": "course",
@@ -1327,12 +1590,30 @@
           "code": "MATH 1220"
         },
         {
-          "type": "course",
-          "code": "MATH 1320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "APMA 1110"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            }
+          ]
         }
       ]
     },
@@ -1348,12 +1629,30 @@
           "code": "MATH 1210"
         },
         {
-          "type": "course",
-          "code": "MATH 1310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1090"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "APMA 1090"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 1090"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1310"
+            }
+          ]
         }
       ]
     },
@@ -1430,6 +1729,10 @@
         }
       ]
     },
+    "BIOC 8014": {
+      "type": "program",
+      "requirement": "restricted to bims students or departmental approval required"
+    },
     "BIOL 3000": {
       "type": "AND",
       "children": [
@@ -1505,8 +1808,56 @@
       "code": "BIOL 2200"
     },
     "BIOL 3030": {
-      "type": "course",
-      "code": "BIOL 2100"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "BIOL 2100"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "BIOL 2010"
+            },
+            {
+              "type": "course",
+              "code": "BIOL 2100"
+            },
+            {
+              "type": "course",
+              "code": "BME 2104"
+            }
+          ]
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "BIOL 2020"
+            },
+            {
+              "type": "course",
+              "code": "BIOL 2040"
+            }
+          ]
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CHEM 2410"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1820"
+            }
+          ]
+        }
+      ]
     },
     "BIOL 3040": {
       "type": "AND",
@@ -1591,8 +1942,30 @@
       ]
     },
     "BIOL 3240": {
-      "type": "course",
-      "code": "BIOL 2100"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "BIOL 2100"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "BIOL 2010"
+            },
+            {
+              "type": "course",
+              "code": "BIOL 2100"
+            },
+            {
+              "type": "course",
+              "code": "BME 2104"
+            }
+          ]
+        }
+      ]
     },
     "BIOL 3260": {
       "type": "course",
@@ -2136,18 +2509,34 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "PHYS 1425"
-        },
-        {
           "type": "major",
           "requirement": "bme major or minor"
+        },
+        {
+          "type": "course",
+          "code": "PHYS 1425"
         }
       ]
     },
     "BME 2101": {
       "type": "AND",
       "children": [
+        {
+          "type": "major",
+          "requirement": "biomedical major or nanomedical concentration or 3rd or biomedical minor"
+        },
+        {
+          "type": "major",
+          "requirement": "bme major or minor"
+        },
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
         {
           "type": "OR",
           "children": [
@@ -2169,12 +2558,30 @@
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "APMA 1110"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 1320"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                }
+              ]
             }
           ]
         },
@@ -2194,18 +2601,6 @@
               "code": "CHEM 1810"
             }
           ]
-        },
-        {
-          "type": "major",
-          "requirement": "biomedical engineering major or nanomedical concentration or 3rd or biomedical engineering minor"
-        },
-        {
-          "type": "major",
-          "requirement": "bme major or minor"
-        },
-        {
-          "type": "year",
-          "requirement": "4th year"
         }
       ]
     },
@@ -2273,25 +2668,64 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "bme major or minor"
+        },
+        {
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "APMA 2120"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 2310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 2315"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                }
+              ]
             }
           ]
-        },
-        {
-          "type": "major",
-          "requirement": "bme major or minor"
         }
       ]
     },
@@ -2313,6 +2747,23 @@
         {
           "type": "course",
           "code": "BME 2101"
+        }
+      ]
+    },
+    "BME 3080": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "in biomedical major"
+        },
+        {
+          "type": "year",
+          "requirement": "4th year standing"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
         }
       ]
     },
@@ -2424,6 +2875,10 @@
               "code": "CS 1113"
             }
           ]
+        },
+        {
+          "type": "course",
+          "code": "PHYS 2415"
         }
       ]
     },
@@ -2432,11 +2887,15 @@
       "children": [
         {
           "type": "major",
-          "requirement": "in the biomedical engineering major"
+          "requirement": "in the biomedical major"
         },
         {
           "type": "year",
           "requirement": "4th year standing"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
         }
       ]
     },
@@ -2445,11 +2904,15 @@
       "children": [
         {
           "type": "major",
-          "requirement": "in the biomedical engineering major"
+          "requirement": "in the biomedical major"
         },
         {
           "type": "year",
           "requirement": "4th year standing"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
         }
       ]
     },
@@ -2495,6 +2958,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "bme major or minor"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -2527,16 +2994,16 @@
               "code": "CS 1112"
             }
           ]
-        },
-        {
-          "type": "major",
-          "requirement": "bme major or minor"
         }
       ]
     },
     "BME 4360": {
       "type": "AND",
       "children": [
+        {
+          "type": "year",
+          "requirement": "3rd or 4th year standing"
+        },
         {
           "type": "OR",
           "children": [
@@ -2574,10 +3041,6 @@
               "code": "CS 1112"
             }
           ]
-        },
-        {
-          "type": "year",
-          "requirement": "3rd or 4th year standing"
         }
       ]
     },
@@ -2634,6 +3097,10 @@
               "code": "APMA 2501"
             }
           ]
+        },
+        {
+          "type": "course",
+          "code": "APMA 2130"
         }
       ]
     },
@@ -2688,6 +3155,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "bme major or minor"
+        },
+        {
           "type": "course",
           "code": "BME 2101"
         },
@@ -2707,10 +3178,6 @@
               "code": "ECE 2300"
             }
           ]
-        },
-        {
-          "type": "major",
-          "requirement": "bme major or minor"
         }
       ]
     },
@@ -2741,12 +3208,37 @@
         {
           "type": "course",
           "code": "BME 2315"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "BME 2315"
+            },
+            {
+              "type": "course",
+              "code": "BME 2104"
+            },
+            {
+              "type": "course",
+              "code": "BME 4414"
+            }
+          ]
         }
       ]
     },
     "BME 4995": {
       "type": "year",
       "requirement": "4th year standing"
+    },
+    "BME 6001": {
+      "type": "school",
+      "requirement": "School of Engineering and Applied Science"
+    },
+    "BME 6002": {
+      "type": "school",
+      "requirement": "School of Engineering and Applied Science"
     },
     "BME 6004": {
       "type": "program",
@@ -2756,18 +3248,31 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "BME 6001"
-        },
-        {
           "type": "program",
           "requirement": "graduate student in biomedical engr"
+        },
+        {
+          "type": "course",
+          "code": "BME 6001"
         }
       ]
     },
     "BME 6006": {
       "type": "course",
       "code": "BME 6001"
+    },
+    "BME 6060": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "course",
+          "code": "BME 6550"
+        }
+      ]
     },
     "BME 6101": {
       "type": "course",
@@ -2776,6 +3281,36 @@
     "BME 6280": {
       "type": "course",
       "code": "BME 6103"
+    },
+    "BME 6310": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "course",
+          "code": "BME 6101"
+        }
+      ]
+    },
+    "BME 6311": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "graduate student status 3"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "course",
+          "code": "BME 6101"
+        }
+      ]
     },
     "BME 6315": {
       "type": "AND",
@@ -2799,6 +3334,10 @@
         }
       ]
     },
+    "BME 6550": {
+      "type": "school",
+      "requirement": "School of Engineering and Applied Science"
+    },
     "BME 6705": {
       "type": "OR",
       "children": [
@@ -2816,12 +3355,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "BME 6101"
-        },
-        {
           "type": "school",
           "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "course",
+          "code": "BME 6101"
         }
       ]
     },
@@ -2842,8 +3381,17 @@
       "requirement": "graduate student in biomedical engr"
     },
     "BME 8999": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "CE 2001": {
       "type": "OR",
@@ -2862,9 +3410,17 @@
         }
       ]
     },
+    "CE 2010": {
+      "type": "school",
+      "requirement": "School of Engineering and Applied Science"
+    },
     "CE 2100": {
       "type": "AND",
       "children": [
+        {
+          "type": "major",
+          "requirement": "civil engr major minor"
+        },
         {
           "type": "OR",
           "children": [
@@ -2877,10 +3433,6 @@
               "code": "CHEM 1610"
             }
           ]
-        },
-        {
-          "type": "major",
-          "requirement": "civil engr major minor"
         }
       ]
     },
@@ -2905,6 +3457,77 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "civil engr major minor"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MAE 2300"
+                },
+                {
+                  "type": "course",
+                  "code": "CE 2300"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "CE 2300"
+                },
+                {
+                  "type": "course",
+                  "code": "MAE 2300"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "CE 2300"
+                },
+                {
+                  "type": "course",
+                  "code": "MAE 2300"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MAE 2300"
+                },
+                {
+                  "type": "course",
+                  "code": "CE 2300"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "CE 2320": {
+      "type": "OR",
+      "children": [
+        {
           "type": "OR",
           "children": [
             {
@@ -2918,21 +3541,17 @@
           ]
         },
         {
-          "type": "major",
-          "requirement": "civil engr major minor"
-        }
-      ]
-    },
-    "CE 2320": {
-      "type": "OR",
-      "children": [
-        {
-          "type": "course",
-          "code": "MAE 2300"
-        },
-        {
-          "type": "course",
-          "code": "CE 2300"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CE 2300"
+            },
+            {
+              "type": "course",
+              "code": "MAE 2300"
+            }
+          ]
         }
       ]
     },
@@ -3026,25 +3645,52 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "CE 2300"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CE 2300"
+            },
+            {
+              "type": "course",
+              "code": "MAE 2300"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MAE 2300"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MAE 2300"
+            },
+            {
+              "type": "course",
+              "code": "CE 2300"
+            }
+          ]
         }
       ]
     },
     "CE 3220": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "CE 3210"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CE 3210"
+            },
+            {
+              "type": "course",
+              "code": "MAE 3210"
+            }
+          ]
         },
         {
           "type": "course",
-          "code": "MAE 3210"
+          "code": "CE 3210"
         }
       ]
     },
@@ -3053,8 +3699,17 @@
       "code": "CE 3220"
     },
     "CE 3300": {
-      "type": "course",
-      "code": "CE 2310"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "CE 2310"
+        },
+        {
+          "type": "course",
+          "code": "MAE 2310"
+        }
+      ]
     },
     "CE 3310": {
       "type": "course",
@@ -3069,20 +3724,69 @@
       "code": "CE 2010"
     },
     "CE 3402": {
-      "type": "course",
-      "code": "CE 3400"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CE 3400"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CE 2010"
+            },
+            {
+              "type": "course",
+              "code": "CE 2305"
+            },
+            {
+              "type": "course",
+              "code": "CE 3700"
+            }
+          ]
+        }
+      ]
     },
     "CE 3700": {
-      "type": "course",
-      "code": "CE 3702"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CE 3702"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CE 2310"
+            },
+            {
+              "type": "course",
+              "code": "MAE 2310"
+            }
+          ]
+        }
+      ]
     },
     "CE 3702": {
       "type": "course",
       "code": "CE 3700"
     },
     "CE 3710": {
-      "type": "course",
-      "code": "CE 2310"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "CE 2310"
+        },
+        {
+          "type": "course",
+          "code": "MAE 2310"
+        }
+      ]
     },
     "CE 3712": {
       "type": "AND",
@@ -3095,12 +3799,30 @@
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "CE 2310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "CE 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "MAE 2310"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MAE 2310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MAE 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "CE 2310"
+                }
+              ]
             }
           ]
         }
@@ -3169,25 +3891,47 @@
       "requirement": "4th year standing"
     },
     "CE 4600": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "APMA 3100"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 3100"
+            },
+            {
+              "type": "course",
+              "code": "MATH 3100"
+            },
+            {
+              "type": "course",
+              "code": "APMA 3110"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MATH 3100"
-        },
-        {
-          "type": "course",
-          "code": "APMA 3110"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 3110"
+            },
+            {
+              "type": "course",
+              "code": "APMA 3100"
+            }
+          ]
         }
       ]
     },
     "CE 4610": {
       "type": "AND",
       "children": [
+        {
+          "type": "year",
+          "requirement": "4th year standing"
+        },
         {
           "type": "OR",
           "children": [
@@ -3208,10 +3952,6 @@
               "code": "CS 1113"
             }
           ]
-        },
-        {
-          "type": "year",
-          "requirement": "4th year standing"
         }
       ]
     },
@@ -3237,11 +3977,15 @@
       "children": [
         {
           "type": "major",
-          "requirement": "in civil engineering major"
+          "requirement": "in civil major"
         },
         {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
         }
       ]
     },
@@ -3250,11 +3994,19 @@
       "children": [
         {
           "type": "major",
-          "requirement": "in civil engineering major"
+          "requirement": "in civil major"
         },
         {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "major",
+          "requirement": "4th yr standing as ce major"
         }
       ]
     },
@@ -3263,11 +4015,15 @@
       "children": [
         {
           "type": "major",
-          "requirement": "civil or systems engineering major or minor & , or graduate engineering, architecture, , education or provost graduate"
+          "requirement": "civil or systems major or minor & , or graduate , architecture, , education or provost graduate"
         },
         {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
         },
         {
           "type": "school",
@@ -3383,16 +4139,43 @@
       ]
     },
     "CE 6993": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "CE 6995": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "CE 8001": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "CELL 8301": {
       "type": "course",
@@ -3422,16 +4205,55 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "APMA 2120"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MATH 2310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MATH 2315"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            },
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            }
+          ]
         }
       ]
     },
@@ -3459,12 +4281,30 @@
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "APMA 1110"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 1320"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                }
+              ]
             }
           ]
         }
@@ -3473,6 +4313,14 @@
     "CHE 2216": {
       "type": "AND",
       "children": [
+        {
+          "type": "major",
+          "requirement": "chemical major, 2nd major or minor"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
         {
           "type": "course",
           "code": "CHE 2215"
@@ -3499,8 +4347,29 @@
           ]
         },
         {
-          "type": "major",
-          "requirement": "chemical engineering major, 2nd major or minor"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CHE 2215"
+            },
+            {
+              "type": "course",
+              "code": "CS 1110"
+            },
+            {
+              "type": "course",
+              "code": "CS 1111"
+            },
+            {
+              "type": "course",
+              "code": "CS 1112"
+            },
+            {
+              "type": "course",
+              "code": "CS 1113"
+            }
+          ]
         }
       ]
     },
@@ -3639,6 +4508,14 @@
               "code": "CHEM 1810"
             }
           ]
+        },
+        {
+          "type": "course",
+          "code": "APMA 2130"
+        },
+        {
+          "type": "course",
+          "code": "CHEM 1420"
         }
       ]
     },
@@ -3770,11 +4647,15 @@
       "children": [
         {
           "type": "major",
-          "requirement": "students must be a chemical engineering or biomedical engineering major"
+          "requirement": "students must be a chemical or biomedical major"
         },
         {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
         }
       ]
     },
@@ -3797,6 +4678,10 @@
               "code": "CHE 4475"
             }
           ]
+        },
+        {
+          "type": "course",
+          "code": "CHE 3322"
         }
       ]
     },
@@ -3868,9 +4753,47 @@
       "type": "year",
       "requirement": "4th year standing"
     },
+    "CHE 5456": {
+      "type": "year",
+      "requirement": "4th year"
+    },
+    "CHE 6445": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "program",
+          "requirement": "chemical graduate student"
+        }
+      ]
+    },
     "CHE 6449": {
       "type": "course",
       "code": "CHE 3321"
+    },
+    "CHE 6452": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "program",
+          "requirement": "chemical graduate student"
+        }
+      ]
+    },
+    "CHE 6561": {
+      "type": "school",
+      "requirement": "School of Engineering and Applied Science"
+    },
+    "CHE 6605": {
+      "type": "school",
+      "requirement": "School of Engineering and Applied Science"
     },
     "CHE 6618": {
       "type": "AND",
@@ -3886,8 +4809,17 @@
       ]
     },
     "CHE 6625": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "CHE 6630": {
       "type": "AND",
@@ -3902,25 +4834,65 @@
         }
       ]
     },
-    "CHE 7796": {
+    "CHE 6665": {
       "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "requirement": "School of Engineering and Applied Science"
+    },
+    "CHE 7796": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "CHE 7995": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "CHE 8819": {
       "type": "course",
       "code": "CHE 6618"
     },
     "CHE 8897": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "CHE 9897": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "CHEM 1410": {
       "type": "course",
@@ -3943,9 +4915,52 @@
       "type": "course",
       "code": "CHEM 1411"
     },
-    "CHEM 1820": {
+    "CHEM 1810": {
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHEM 1811"
+        },
+        {
+          "type": "course",
+          "code": "CHEM 1411"
+        }
+      ]
+    },
+    "CHEM 1811": {
       "type": "course",
       "code": "CHEM 1810"
+    },
+    "CHEM 1820": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHEM 1810"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CHEM 1810"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 1821"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 2411"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 2311"
+            }
+          ]
+        }
+      ]
     },
     "CHEM 1821": {
       "type": "course",
@@ -4160,15 +5175,24 @@
       "code": "CHEM 1420"
     },
     "CHEM 4410": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "CHEM 2420"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CHEM 2420"
+            },
+            {
+              "type": "course",
+              "code": "CHEM 2810"
+            }
+          ]
         },
         {
           "type": "course",
-          "code": "CHEM 2810"
+          "code": "CHEM 2420"
         }
       ]
     },
@@ -4234,6 +5258,23 @@
       "type": "course",
       "code": "CHEM 7430"
     },
+    "CHEM 5430": {
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHEM 1420"
+        },
+        {
+          "type": "course",
+          "code": "CHEM 1620"
+        },
+        {
+          "type": "course",
+          "code": "CHEM 1810"
+        }
+      ]
+    },
     "CHEM 5720": {
       "type": "course",
       "code": "CHEM 4410"
@@ -4243,24 +5284,55 @@
       "code": "CHEM 5710"
     },
     "CHIN 1020": {
-      "type": "course",
-      "code": "CHIN 1010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHIN 1010"
+        },
+        {
+          "type": "program",
+          "requirement": "contact chinese language program director prof"
+        }
+      ]
     },
     "CHIN 1026": {
       "type": "course",
       "code": "CHIN 1016"
     },
+    "CHIN 1060": {
+      "type": "program",
+      "requirement": "contact chinese language program director prof"
+    },
     "CHIN 2010": {
-      "type": "course",
-      "code": "CHIN 1020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHIN 1020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the chinese language program director prof"
+        }
+      ]
     },
     "CHIN 2016": {
       "type": "course",
       "code": "CHIN 1016"
     },
     "CHIN 2020": {
-      "type": "course",
-      "code": "CHIN 2010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHIN 2010"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the chinese language program director prof"
+        }
+      ]
     },
     "CHIN 2026": {
       "type": "OR",
@@ -4275,38 +5347,96 @@
         }
       ]
     },
+    "CHIN 2060": {
+      "type": "program",
+      "requirement": "contact chinese language program director prof"
+    },
     "CHIN 3010": {
-      "type": "course",
-      "code": "CHIN 2020"
-    },
-    "CHIN 3020": {
-      "type": "course",
-      "code": "CHIN 3010"
-    },
-    "CHIN 3050": {
-      "type": "course",
-      "code": "CHIN 2020"
-    },
-    "CHIN 4010": {
-      "type": "course",
-      "code": "CHIN 3020"
-    },
-    "CHIN 4020": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
           "type": "course",
-          "code": "CHIN 4010"
+          "code": "CHIN 2020"
         },
         {
+          "type": "program",
+          "requirement": "contact the chinese language program director prof"
+        }
+      ]
+    },
+    "CHIN 3020": {
+      "type": "AND",
+      "children": [
+        {
           "type": "course",
-          "code": "CHIN 3050"
+          "code": "CHIN 3010"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the chinese language program director prof"
+        }
+      ]
+    },
+    "CHIN 3050": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHIN 2020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the chinese language program director prof"
+        }
+      ]
+    },
+    "CHIN 4010": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHIN 3020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the chinese language program director prof"
+        }
+      ]
+    },
+    "CHIN 4020": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CHIN 4010"
+            },
+            {
+              "type": "course",
+              "code": "CHIN 3050"
+            }
+          ]
+        },
+        {
+          "type": "program",
+          "requirement": "contact the chinese language program director prof"
         }
       ]
     },
     "CHIN 4030": {
-      "type": "course",
-      "code": "CHIN 4020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHIN 4020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the chinese language program director prof"
+        }
+      ]
     },
     "CHIN 4060": {
       "type": "OR",
@@ -4326,12 +5456,30 @@
       "code": "CHIN 4020"
     },
     "CHIN 4801": {
-      "type": "course",
-      "code": "CHIN 3020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHIN 3020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the chinese language program director prof"
+        }
+      ]
     },
     "CHIN 4810": {
-      "type": "course",
-      "code": "CHIN 4020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CHIN 4020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the chinese language program director prof"
+        }
+      ]
     },
     "CHIN 5680": {
       "type": "course",
@@ -4361,6 +5509,10 @@
     "COGS 4980": {
       "type": "major",
       "requirement": "cognitive science distinguished major"
+    },
+    "COMM 1800": {
+      "type": "school",
+      "requirement": "McIntire School of Commerce"
     },
     "COMM 2001": {
       "type": "AND",
@@ -4500,12 +5652,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "COMM 3110"
-        },
-        {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "course",
+          "code": "COMM 3110"
         }
       ]
     },
@@ -4564,12 +5716,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "COMM 3110"
-        },
-        {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "course",
+          "code": "COMM 3110"
         }
       ]
     },
@@ -4610,16 +5762,20 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "COMM 4259"
-        },
-        {
           "type": "program",
           "requirement": "subplan business analytics track"
         },
         {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "program",
+          "requirement": "subplan business analytics track commerce student"
+        },
+        {
+          "type": "course",
+          "code": "COMM 4259"
         }
       ]
     },
@@ -4652,7 +5808,15 @@
       "type": "course",
       "code": "COMM 2020"
     },
+    "COMM 4520": {
+      "type": "year",
+      "requirement": "4th year"
+    },
     "COMM 4522": {
+      "type": "year",
+      "requirement": "4th year"
+    },
+    "COMM 4535": {
       "type": "year",
       "requirement": "4th year"
     },
@@ -4668,6 +5832,10 @@
           "code": "COMM 3571"
         }
       ]
+    },
+    "COMM 4560": {
+      "type": "year",
+      "requirement": "4th year"
     },
     "COMM 4562": {
       "type": "year",
@@ -4738,6 +5906,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -4749,10 +5921,6 @@
               "code": "COMM 3571"
             }
           ]
-        },
-        {
-          "type": "year",
-          "requirement": "4th year"
         }
       ]
     },
@@ -4760,6 +5928,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -4771,10 +5943,6 @@
               "code": "COMM 4571"
             }
           ]
-        },
-        {
-          "type": "year",
-          "requirement": "4th year"
         }
       ]
     },
@@ -4782,6 +5950,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -4793,10 +5965,6 @@
               "code": "COMM 4571"
             }
           ]
-        },
-        {
-          "type": "year",
-          "requirement": "4th year"
         }
       ]
     },
@@ -4812,6 +5980,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -4823,10 +5995,6 @@
               "code": "COMM 4571"
             }
           ]
-        },
-        {
-          "type": "year",
-          "requirement": "4th year"
         }
       ]
     },
@@ -4851,8 +6019,17 @@
       "requirement": "4th year student"
     },
     "COMM 4840": {
-      "type": "course",
-      "code": "COMM 4839"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "COMM 4839"
+        },
+        {
+          "type": "program",
+          "requirement": "must be admitted into the global commerce scholar program"
+        }
+      ]
     },
     "COMM 4841": {
       "type": "course",
@@ -4870,16 +6047,16 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "COMM 3110"
-        },
-        {
           "type": "year",
           "requirement": "4th year"
         },
         {
           "type": "school",
           "requirement": "McIntire School of Commerce"
+        },
+        {
+          "type": "course",
+          "code": "COMM 3110"
         }
       ]
     },
@@ -4931,6 +6108,58 @@
     "CREO 2020": {
       "type": "course",
       "code": "CREO 2010"
+    },
+    "CS 1111": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CS 1110"
+            },
+            {
+              "type": "course",
+              "code": "CS 1112"
+            },
+            {
+              "type": "course",
+              "code": "CS 1113"
+            }
+          ]
+        },
+        {
+          "type": "course",
+          "code": "CS 1120"
+        }
+      ]
+    },
+    "CS 1112": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CS 1110"
+            },
+            {
+              "type": "course",
+              "code": "CS 1111"
+            },
+            {
+              "type": "course",
+              "code": "CS 1113"
+            }
+          ]
+        },
+        {
+          "type": "course",
+          "code": "CS 1120"
+        }
+      ]
     },
     "CS 1501": {
       "type": "course",
@@ -5072,8 +6301,17 @@
       "code": "CS 3100"
     },
     "CS 3130": {
-      "type": "course",
-      "code": "CS 2100"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CS 2100"
+        },
+        {
+          "type": "course",
+          "code": "CS 2130"
+        }
+      ]
     },
     "CS 3140": {
       "type": "course",
@@ -5162,8 +6400,17 @@
       "code": "CS 3240"
     },
     "CS 4330": {
-      "type": "course",
-      "code": "CS 3130"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "CS 3130"
+        },
+        {
+          "type": "course",
+          "code": "CS 3330"
+        }
+      ]
     },
     "CS 4414": {
       "type": "course",
@@ -5291,8 +6538,17 @@
       ]
     },
     "CS 4970": {
-      "type": "course",
-      "code": "CS 3140"
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "bscs major"
+        },
+        {
+          "type": "course",
+          "code": "CS 3140"
+        }
+      ]
     },
     "CS 4971": {
       "type": "course",
@@ -5302,12 +6558,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "CS 3140"
-        },
-        {
           "type": "major",
           "requirement": "bscs major"
+        },
+        {
+          "type": "course",
+          "code": "CS 3140"
         }
       ]
     },
@@ -5315,16 +6571,16 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "STS 4500"
-        },
-        {
           "type": "major",
           "requirement": "student must be a bs computer science first or second major"
         },
         {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "course",
+          "code": "STS 4500"
         }
       ]
     },
@@ -5332,12 +6588,16 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "must be a bacs major"
+        },
+        {
           "type": "course",
           "code": "CS 3100"
         },
         {
           "type": "major",
-          "requirement": "must be a bacs major"
+          "requirement": "a bacs major"
         }
       ]
     },
@@ -5611,6 +6871,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "student must be in the data science minor"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -5642,10 +6906,6 @@
               "code": "CS 1113"
             }
           ]
-        },
-        {
-          "type": "major",
-          "requirement": "student must be in the data science minor"
         }
       ]
     },
@@ -5700,12 +6960,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "DS 1002"
-        },
-        {
           "type": "major",
           "requirement": "declared ds minor"
+        },
+        {
+          "type": "course",
+          "code": "DS 1002"
         }
       ]
     },
@@ -5747,6 +7007,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "declared ds minor"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -5786,10 +7050,6 @@
               "code": "DS 3006"
             }
           ]
-        },
-        {
-          "type": "major",
-          "requirement": "declared ds minor"
         }
       ]
     },
@@ -5810,16 +7070,16 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "DS 1002"
-        },
-        {
           "type": "major",
           "requirement": "declared data science major"
         },
         {
           "type": "year",
           "requirement": "3rd year"
+        },
+        {
+          "type": "course",
+          "code": "DS 1002"
         }
       ]
     },
@@ -6045,12 +7305,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EALC 4998"
-        },
-        {
           "type": "major",
           "requirement": "student must be enrolled in the distinguished majors program in east asian languages"
+        },
+        {
+          "type": "course",
+          "code": "EALC 4998"
         }
       ]
     },
@@ -6062,12 +7322,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EAST 4998"
-        },
-        {
           "type": "major",
           "requirement": "student must be enrolled in the distinguished majors program in east asian studies"
+        },
+        {
+          "type": "course",
+          "code": "EAST 4998"
         }
       ]
     },
@@ -6084,19 +7344,28 @@
       "code": "EBUS 1800"
     },
     "EBUS 2850": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "STS 1500"
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
         },
         {
-          "type": "course",
-          "code": "ENGR 1020"
-        },
-        {
-          "type": "course",
-          "code": "ENGR 2595"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "STS 1500"
+            },
+            {
+              "type": "course",
+              "code": "ENGR 1020"
+            },
+            {
+              "type": "course",
+              "code": "ENGR 2595"
+            }
+          ]
         }
       ]
     },
@@ -6117,39 +7386,51 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "student must be enrolled in the business minor or entrepreneurship (technology concentration) minor"
+        },
+        {
+          "type": "year",
+          "requirement": "3rd or 4th year standing"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
           "type": "course",
           "code": "EBUS 1800"
         },
         {
           "type": "major",
-          "requirement": "student must be enrolled in the engineering business minor or entrepreneurship (technology concentration) minor"
-        },
-        {
-          "type": "year",
-          "requirement": "3rd or 4th year standing"
+          "requirement": "enrolled in the business minor or entrepreneurship minor tech concentration"
         }
       ]
     },
     "ECE 2200": {
-      "type": "OR",
-      "children": [
-        {
-          "type": "course",
-          "code": "APMA 2120"
-        },
-        {
-          "type": "course",
-          "code": "MATH 2310"
-        },
-        {
-          "type": "course",
-          "code": "MATH 2315"
-        }
-      ]
-    },
-    "ECE 2300": {
       "type": "AND",
       "children": [
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
+        },
+        {
+          "type": "course",
+          "code": "PHYS 1425"
+        },
         {
           "type": "OR",
           "children": [
@@ -6160,6 +7441,46 @@
             {
               "type": "course",
               "code": "MATH 1320"
+            }
+          ]
+        }
+      ]
+    },
+    "ECE 2300": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                }
+              ]
             }
           ]
         },
@@ -6186,24 +7507,37 @@
         }
       ]
     },
+    "ECE 2330": {
+      "type": "school",
+      "requirement": "School of Engineering and Applied Science"
+    },
     "ECE 2410": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "CS 1110"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CS 1110"
+            },
+            {
+              "type": "course",
+              "code": "CS 1111"
+            },
+            {
+              "type": "course",
+              "code": "CS 1112"
+            },
+            {
+              "type": "course",
+              "code": "CS 1113"
+            }
+          ]
         },
         {
           "type": "course",
-          "code": "CS 1111"
-        },
-        {
-          "type": "course",
-          "code": "CS 1112"
-        },
-        {
-          "type": "course",
-          "code": "CS 1113"
+          "code": "CS 111X"
         }
       ]
     },
@@ -6221,8 +7555,17 @@
       ]
     },
     "ECE 2630": {
-      "type": "course",
-      "code": "APMA 1110"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "APMA 1110"
+        },
+        {
+          "type": "course",
+          "code": "MATH 1320"
+        }
+      ]
     },
     "ECE 2660": {
       "type": "AND",
@@ -6338,6 +7681,19 @@
               "code": "ECE 2502"
             }
           ]
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "PHYS 2415"
+            },
+            {
+              "type": "course",
+              "code": "ECE 2200"
+            }
+          ]
         }
       ]
     },
@@ -6362,8 +7718,17 @@
           ]
         },
         {
-          "type": "course",
-          "code": "ECE 2330"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ECE 2330"
+            },
+            {
+              "type": "course",
+              "code": "CS 2330"
+            }
+          ]
         },
         {
           "type": "course",
@@ -6487,8 +7852,17 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "ECE 2330"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ECE 2330"
+            },
+            {
+              "type": "course",
+              "code": "CS 2330"
+            }
+          ]
         },
         {
           "type": "OR",
@@ -6509,8 +7883,17 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "ECE 2330"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ECE 2330"
+            },
+            {
+              "type": "course",
+              "code": "CS 2330"
+            }
+          ]
         },
         {
           "type": "course",
@@ -6557,8 +7940,17 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "ECE 2330"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ECE 2330"
+            },
+            {
+              "type": "course",
+              "code": "CS 2330"
+            }
+          ]
         },
         {
           "type": "course",
@@ -6569,6 +7961,10 @@
     "ECE 4440": {
       "type": "AND",
       "children": [
+        {
+          "type": "year",
+          "requirement": "4th year standing"
+        },
         {
           "type": "OR",
           "children": [
@@ -6594,10 +7990,6 @@
               "code": "ECE 2700"
             }
           ]
-        },
-        {
-          "type": "year",
-          "requirement": "4th year standing"
         }
       ]
     },
@@ -6686,6 +8078,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "year",
+          "requirement": "4th year standing"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -6721,8 +8117,17 @@
           ]
         },
         {
-          "type": "year",
-          "requirement": "4th year standing"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ECE 3750"
+            },
+            {
+              "type": "course",
+              "code": "ECE 2700"
+            }
+          ]
         }
       ]
     },
@@ -6771,8 +8176,17 @@
           "code": "ECE 2630"
         },
         {
-          "type": "course",
-          "code": "ECE 2330"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ECE 2330"
+            },
+            {
+              "type": "course",
+              "code": "CS 2330"
+            }
+          ]
         }
       ]
     },
@@ -6799,8 +8213,17 @@
       ]
     },
     "ECE 6505": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "ECE 6660": {
       "type": "AND",
@@ -6840,14 +8263,32 @@
           "code": "APMA 6150"
         },
         {
-          "type": "course",
-          "code": "ECE 6851"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ECE 6851"
+            },
+            {
+              "type": "course",
+              "code": "MAE 6610"
+            }
+          ]
         }
       ]
     },
     "ECE 6996": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "ECE 7457": {
       "type": "course",
@@ -6885,8 +8326,17 @@
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "ECE 6851"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "ECE 6851"
+                },
+                {
+                  "type": "course",
+                  "code": "MAE 6610"
+                }
+              ]
             },
             {
               "type": "course",
@@ -6897,12 +8347,30 @@
       ]
     },
     "ECE 8999": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "ECE 9999": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "ECON 3010": {
       "type": "AND",
@@ -6923,12 +8391,30 @@
               "code": "MATH 1190"
             },
             {
-              "type": "course",
-              "code": "MATH 1310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1090"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "APMA 1090"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 1090"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 1310"
+                }
+              ]
             }
           ]
         }
@@ -7037,15 +8523,24 @@
       "code": "ECON 2010"
     },
     "ECON 4010": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "ECON 3010"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ECON 3010"
+            },
+            {
+              "type": "course",
+              "code": "ECON 3110"
+            }
+          ]
         },
         {
           "type": "course",
-          "code": "ECON 3110"
+          "code": "STAT 2120"
         }
       ]
     },
@@ -7159,8 +8654,26 @@
       ]
     },
     "ECON 4200": {
-      "type": "course",
-      "code": "ECON 3010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "ECON 3010"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ECON 3010"
+            },
+            {
+              "type": "course",
+              "code": "ECON 3110"
+            }
+          ]
+        }
+      ]
     },
     "ECON 4210": {
       "type": "AND",
@@ -7843,6 +9356,10 @@
         }
       ]
     },
+    "EDHS 7291": {
+      "type": "program",
+      "requirement": "restricted to counselor education graduate students"
+    },
     "EDHS 8030": {
       "type": "OR",
       "children": [
@@ -8003,6 +9520,10 @@
       "type": "program",
       "requirement": "admission to the teacher education program"
     },
+    "EDIS 4887": {
+      "type": "program",
+      "requirement": "admission to the teacher education program"
+    },
     "EDIS 5000": {
       "type": "program",
       "requirement": "students in the graduate education program or the non graduate education program"
@@ -8027,12 +9548,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EDIS 5025"
-        },
-        {
           "type": "program",
           "requirement": "students in the graduate education program or the non graduate education program"
+        },
+        {
+          "type": "course",
+          "code": "EDIS 5025"
         }
       ]
     },
@@ -8052,12 +9573,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EDIS 5020"
-        },
-        {
           "type": "program",
           "requirement": "admission to teacher education program"
+        },
+        {
+          "type": "course",
+          "code": "EDIS 5020"
         }
       ]
     },
@@ -8077,12 +9598,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EDIS 5050"
-        },
-        {
           "type": "program",
           "requirement": "admission to the teacher education program"
+        },
+        {
+          "type": "course",
+          "code": "EDIS 5050"
         }
       ]
     },
@@ -8110,12 +9631,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EDIS 5133"
-        },
-        {
           "type": "program",
           "requirement": "students in the graduate education program or the non graduate education program"
+        },
+        {
+          "type": "course",
+          "code": "EDIS 5133"
         }
       ]
     },
@@ -8123,18 +9644,22 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EDIS 5133"
-        },
-        {
           "type": "program",
           "requirement": "students in the graduate education program or the non graduate education program"
+        },
+        {
+          "type": "course",
+          "code": "EDIS 5133"
         }
       ]
     },
     "EDIS 5138": {
       "type": "AND",
       "children": [
+        {
+          "type": "program",
+          "requirement": "students in the graduate education program or the non graduate education program"
+        },
         {
           "type": "OR",
           "children": [
@@ -8155,10 +9680,6 @@
         {
           "type": "course",
           "code": "EDIS 5136"
-        },
-        {
-          "type": "program",
-          "requirement": "students in the graduate education program or the non graduate education program"
         }
       ]
     },
@@ -8223,8 +9744,17 @@
       "requirement": "teacher education program mt"
     },
     "EDIS 5400": {
-      "type": "program",
-      "requirement": "teacher education program mt"
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "teacher education program mt"
+        },
+        {
+          "type": "program",
+          "requirement": "admission to the teacher education"
+        }
+      ]
     },
     "EDIS 5401": {
       "type": "program",
@@ -8418,29 +9948,87 @@
       "type": "program",
       "requirement": "teacher education program mt"
     },
-    "EDIS 5882": {
+    "EDIS 5881": {
       "type": "program",
-      "requirement": "teacher education program mt"
+      "requirement": "admission to the teacher education program"
+    },
+    "EDIS 5882": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "teacher education program mt"
+        },
+        {
+          "type": "program",
+          "requirement": "admission to the teacher education program"
+        }
+      ]
     },
     "EDIS 5884": {
-      "type": "program",
-      "requirement": "teacher education program mt"
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "teacher education program mt"
+        },
+        {
+          "type": "program",
+          "requirement": "admission to the teacher education program"
+        }
+      ]
     },
     "EDIS 5885": {
-      "type": "program",
-      "requirement": "teacher education program mt"
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "teacher education program mt"
+        },
+        {
+          "type": "program",
+          "requirement": "admission to the teacher education program"
+        }
+      ]
     },
     "EDIS 5886": {
-      "type": "program",
-      "requirement": "teacher education program mt"
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "teacher education program mt"
+        },
+        {
+          "type": "program",
+          "requirement": "admission to the teacher education program"
+        }
+      ]
     },
     "EDIS 5887": {
-      "type": "program",
-      "requirement": "teacher education program mt"
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "teacher education program mt"
+        },
+        {
+          "type": "program",
+          "requirement": "admission to the teacher education program"
+        }
+      ]
     },
     "EDIS 5888": {
-      "type": "program",
-      "requirement": "teacher education program mt"
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "teacher education program mt"
+        },
+        {
+          "type": "program",
+          "requirement": "admission to the teacher education program"
+        }
+      ]
     },
     "EDIS 6200": {
       "type": "program",
@@ -8458,16 +10046,16 @@
       "type": "AND",
       "children": [
         {
+          "type": "program",
+          "requirement": "students in the graduate education program or the non graduate education program"
+        },
+        {
           "type": "course",
           "code": "EDIS 6710"
         },
         {
           "type": "course",
           "code": "EDIS 6720"
-        },
-        {
-          "type": "program",
-          "requirement": "students in the graduate education program or the non graduate education program"
         }
       ]
     },
@@ -8475,16 +10063,16 @@
       "type": "AND",
       "children": [
         {
+          "type": "program",
+          "requirement": "students in the graduate education program or the non graduate education program"
+        },
+        {
           "type": "course",
           "code": "EDIS 6710"
         },
         {
           "type": "course",
           "code": "EDIS 6720"
-        },
-        {
-          "type": "program",
-          "requirement": "students in the graduate education program or the non graduate education program"
         }
       ]
     },
@@ -8492,16 +10080,16 @@
       "type": "AND",
       "children": [
         {
+          "type": "program",
+          "requirement": "students in the graduate education program or the non graduate education program"
+        },
+        {
           "type": "course",
           "code": "EDIS 6710"
         },
         {
           "type": "course",
           "code": "EDIS 6720"
-        },
-        {
-          "type": "program",
-          "requirement": "students in the graduate education program or the non graduate education program"
         }
       ]
     },
@@ -8652,12 +10240,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EDLF 5301"
-        },
-        {
           "type": "program",
           "requirement": "students in the graduate education program or the non graduate education program"
+        },
+        {
+          "type": "course",
+          "code": "EDLF 5301"
         }
       ]
     },
@@ -8678,6 +10266,10 @@
         }
       ]
     },
+    "EDLF 4000": {
+      "type": "major",
+      "requirement": "ysi major"
+    },
     "EDLF 5301": {
       "type": "course",
       "code": "EDLF 8382"
@@ -8690,12 +10282,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EDLF 7812"
-        },
-        {
           "type": "program",
           "requirement": "students in the graduate education program or the non graduate education program"
+        },
+        {
+          "type": "course",
+          "code": "EDLF 7812"
         }
       ]
     },
@@ -8753,12 +10345,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EDLF 8385"
-        },
-        {
           "type": "program",
           "requirement": "students in the graduate education program or the non graduate education program"
+        },
+        {
+          "type": "course",
+          "code": "EDLF 8385"
         }
       ]
     },
@@ -8766,14 +10358,18 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "EDLF 8382"
-        },
-        {
           "type": "program",
           "requirement": "students in the graduate education program or the non graduate education program"
+        },
+        {
+          "type": "course",
+          "code": "EDLF 8382"
         }
       ]
+    },
+    "EDLF 8822": {
+      "type": "program",
+      "requirement": "program)"
     },
     "EDLF 8988": {
       "type": "program",
@@ -8891,12 +10487,30 @@
       "code": "ENGL 5100"
     },
     "ENGR 1010": {
-      "type": "year",
-      "requirement": "1st year"
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "1st year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        }
+      ]
     },
     "ENGR 1020": {
-      "type": "year",
-      "requirement": "1st year"
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "1st year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        }
+      ]
     },
     "ENGR 1410": {
       "type": "year",
@@ -8915,8 +10529,17 @@
       "code": "STS 2600"
     },
     "ENGR 4880": {
-      "type": "year",
-      "requirement": "4th year"
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        }
+      ]
     },
     "ENWR 1505": {
       "type": "year",
@@ -8961,12 +10584,30 @@
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "MATH 1310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1090"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 1320"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                }
+              ]
             }
           ]
         },
@@ -9123,12 +10764,30 @@
           "code": "MATH 1210"
         },
         {
-          "type": "course",
-          "code": "MATH 1310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1090"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "APMA 1090"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 1090"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1310"
+            }
+          ]
         }
       ]
     },
@@ -9174,28 +10833,90 @@
           "code": "MATH 1220"
         },
         {
-          "type": "course",
-          "code": "MATH 1310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1090"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MATH 1320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MATH 2310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "APMA 1090"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 1090"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1310"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "APMA 1110"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "APMA 2120"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
         }
       ]
     },
@@ -9707,12 +11428,16 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "good standing in the distinguished majors program"
+        },
+        {
           "type": "course",
           "code": "FREN 4998"
         },
         {
-          "type": "major",
-          "requirement": "good standing in the distinguished majors program"
+          "type": "course",
+          "code": "ALL 5000"
         }
       ]
     },
@@ -9822,6 +11547,10 @@
       "requirement": "Darden School of Business"
     },
     "GBUS 7808": {
+      "type": "school",
+      "requirement": "Darden School of Business"
+    },
+    "GBUS 7900": {
       "type": "school",
       "requirement": "Darden School of Business"
     },
@@ -10032,12 +11761,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "GDS 3010"
-        },
-        {
           "type": "major",
           "requirement": "the student must be a gds major in order to enroll"
+        },
+        {
+          "type": "course",
+          "code": "GDS 3010"
         }
       ]
     },
@@ -10095,8 +11824,17 @@
       "code": "GERM 2020"
     },
     "GERM 3010": {
-      "type": "course",
-      "code": "GERM 2020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "GERM 2020"
+        },
+        {
+          "type": "course",
+          "code": "GERM 3000"
+        }
+      ]
     },
     "GERM 3110": {
       "type": "course",
@@ -10172,12 +11910,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "GERM 4998"
-        },
-        {
           "type": "program",
           "requirement": "admission to the dmp, permission of undergraduate advisor"
+        },
+        {
+          "type": "course",
+          "code": "GERM 4998"
         }
       ]
     },
@@ -10568,6 +12306,19 @@
         {
           "type": "course",
           "code": "GNUR 8230"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "GNUR 8110"
+            },
+            {
+              "type": "course",
+              "code": "GNUR 8120"
+            }
+          ]
         }
       ]
     },
@@ -10582,6 +12333,10 @@
     "GNUR 8720": {
       "type": "program",
       "requirement": "graduate standing"
+    },
+    "GNUR 9600": {
+      "type": "program",
+      "requirement": "dnp program standing"
     },
     "GNUR 9710": {
       "type": "course",
@@ -10683,15 +12438,24 @@
       "code": "RELJ 1420"
     },
     "HEBR 2420": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "RELJ 2410"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "RELJ 2410"
+            },
+            {
+              "type": "course",
+              "code": "HEBR 2410"
+            }
+          ]
         },
         {
           "type": "course",
-          "code": "HEBR 2410"
+          "code": "RELJ 2410"
         }
       ]
     },
@@ -10865,6 +12629,10 @@
       "type": "program",
       "requirement": "member of the college science scholar program"
     },
+    "INST 3150": {
+      "type": "program",
+      "requirement": "open to students who are teaching caved courses, admission by instructor permission"
+    },
     "ISBU 3451": {
       "type": "course",
       "code": "ECON 201"
@@ -10894,8 +12662,26 @@
       "code": "ITAL 1010"
     },
     "ITAL 2010": {
-      "type": "course",
-      "code": "ITAL 1020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "ITAL 1020"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "ITAL 1020"
+            },
+            {
+              "type": "course",
+              "code": "ITAL 2020"
+            }
+          ]
+        }
+      ]
     },
     "ITAL 3010": {
       "type": "course",
@@ -10930,16 +12716,43 @@
       "requirement": "3rd year"
     },
     "JAPN 1020": {
-      "type": "course",
-      "code": "JAPN 1010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "JAPN 1010"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the japanese language program director prof"
+        }
+      ]
     },
     "JAPN 2010": {
-      "type": "course",
-      "code": "JAPN 1020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "JAPN 1020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the japanese language program director prof"
+        }
+      ]
     },
     "JAPN 2020": {
-      "type": "course",
-      "code": "JAPN 2010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "JAPN 2010"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the japanese language program director prof"
+        }
+      ]
     },
     "JAPN 2100": {
       "type": "course",
@@ -10950,16 +12763,43 @@
       "code": "JAPN 1010"
     },
     "JAPN 3010": {
-      "type": "course",
-      "code": "JAPN 2020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "JAPN 2020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the japanese language program director prof"
+        }
+      ]
     },
     "JAPN 3020": {
-      "type": "course",
-      "code": "JAPN 3010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "JAPN 3010"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the japanese language program director prof"
+        }
+      ]
     },
     "JAPN 3050": {
-      "type": "course",
-      "code": "JAPN 2020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "JAPN 2020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the japanese language program director prof"
+        }
+      ]
     },
     "JAPN 3300": {
       "type": "course",
@@ -11015,6 +12855,10 @@
         }
       ]
     },
+    "KINE 2000": {
+      "type": "major",
+      "requirement": "for all students interested in pursuing a major in kinesiology"
+    },
     "KINE 2410": {
       "type": "major",
       "requirement": "kinesiology major"
@@ -11028,46 +12872,85 @@
       "code": "KINE 3210"
     },
     "KINE 3410": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "AND",
+          "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "BIOL 3410"
+              "type": "AND",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "BIOL 3410"
+                },
+                {
+                  "type": "course",
+                  "code": "BIOL 3420"
+                }
+              ]
             },
+            {
+              "type": "AND",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "BIOL 2060"
+                },
+                {
+                  "type": "course",
+                  "code": "BIOL 2070"
+                }
+              ]
+            },
+            {
+              "type": "AND",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "NUIP 2060"
+                },
+                {
+                  "type": "course",
+                  "code": "NUIP 2070"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "course",
+          "code": "BIOL 3410"
+        },
+        {
+          "type": "OR",
+          "children": [
             {
               "type": "course",
               "code": "BIOL 3420"
-            }
-          ]
-        },
-        {
-          "type": "AND",
-          "children": [
+            },
             {
               "type": "course",
               "code": "BIOL 2060"
-            },
-            {
-              "type": "course",
-              "code": "BIOL 2070"
             }
           ]
         },
         {
-          "type": "AND",
+          "type": "OR",
           "children": [
             {
               "type": "course",
-              "code": "NUIP 2060"
+              "code": "BIOL 2070"
             },
             {
               "type": "course",
-              "code": "NUIP 2070"
+              "code": "NUIP 2060"
             }
           ]
+        },
+        {
+          "type": "course",
+          "code": "NUIP 2070"
         }
       ]
     },
@@ -11149,32 +13032,103 @@
       ]
     },
     "KOR 1020": {
-      "type": "course",
-      "code": "KOR 1010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "KOR 1010"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the korean language program director prof"
+        }
+      ]
+    },
+    "KOR 1060": {
+      "type": "program",
+      "requirement": "contact korean language program director prof"
     },
     "KOR 2010": {
-      "type": "course",
-      "code": "KOR 1020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "KOR 1020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the korean language program director prof"
+        }
+      ]
     },
     "KOR 2020": {
-      "type": "course",
-      "code": "KOR 2010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "KOR 2010"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the korean language program director prof"
+        }
+      ]
+    },
+    "KOR 2060": {
+      "type": "program",
+      "requirement": "contact the korean language program director prof"
     },
     "KOR 3010": {
-      "type": "course",
-      "code": "KOR 2020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "KOR 2020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the korean language program director prof"
+        }
+      ]
     },
     "KOR 3020": {
-      "type": "course",
-      "code": "KOR 3010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "KOR 3010"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the korean language program director prof"
+        }
+      ]
     },
     "KOR 4010": {
-      "type": "course",
-      "code": "KOR 3020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "KOR 3020"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the korean language program director prof"
+        }
+      ]
     },
     "KOR 4020": {
-      "type": "course",
-      "code": "KOR 4010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "KOR 4010"
+        },
+        {
+          "type": "program",
+          "requirement": "contact the korean language program director prof"
+        }
+      ]
     },
     "LAR 6010": {
       "type": "program",
@@ -11225,12 +13179,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAR 7010"
-        },
-        {
           "type": "program",
           "requirement": "graduate student in landscape architecture"
+        },
+        {
+          "type": "course",
+          "code": "LAR 7010"
         }
       ]
     },
@@ -11478,6 +13432,10 @@
         }
       ]
     },
+    "LAW 7074": {
+      "type": "year",
+      "requirement": "3rd year"
+    },
     "LAW 7082": {
       "type": "course",
       "code": "LAW 7083"
@@ -11537,12 +13495,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 7200"
-        },
-        {
           "type": "program",
           "requirement": "jd student"
+        },
+        {
+          "type": "course",
+          "code": "LAW 7200"
         }
       ]
     },
@@ -11567,6 +13525,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "program",
+          "requirement": "law jd student"
+        },
+        {
           "type": "course",
           "code": "LAW 6000"
         },
@@ -11577,10 +13539,6 @@
         {
           "type": "course",
           "code": "LAW 6007"
-        },
-        {
-          "type": "program",
-          "requirement": "law jd student"
         }
       ]
     },
@@ -11615,15 +13573,24 @@
       ]
     },
     "LAW 7737": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 6103"
+          "type": "program",
+          "requirement": "jd student"
         },
         {
-          "type": "course",
-          "code": "LAW 6109"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "LAW 6103"
+            },
+            {
+              "type": "course",
+              "code": "LAW 6109"
+            }
+          ]
         }
       ]
     },
@@ -11652,12 +13619,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 6006"
-        },
-        {
           "type": "program",
           "requirement": "students must be enrolled in the jd program"
+        },
+        {
+          "type": "course",
+          "code": "LAW 6006"
         }
       ]
     },
@@ -11665,12 +13632,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 6005"
-        },
-        {
           "type": "program",
           "requirement": "law jd student"
+        },
+        {
+          "type": "course",
+          "code": "LAW 6005"
         }
       ]
     },
@@ -11780,8 +13747,17 @@
       "requirement": "3rd year"
     },
     "LAW 8607": {
-      "type": "year",
-      "requirement": "3rd year"
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "3rd year"
+        },
+        {
+          "type": "year",
+          "requirement": "2nd year"
+        }
+      ]
     },
     "LAW 8608": {
       "type": "AND",
@@ -11834,12 +13810,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 7044"
-        },
-        {
           "type": "year",
           "requirement": "3rd year"
+        },
+        {
+          "type": "course",
+          "code": "LAW 7044"
         }
       ]
     },
@@ -11851,12 +13827,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 6001"
-        },
-        {
           "type": "year",
           "requirement": "3rd year"
+        },
+        {
+          "type": "course",
+          "code": "LAW 6001"
         }
       ]
     },
@@ -11864,12 +13840,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 6001"
-        },
-        {
           "type": "year",
           "requirement": "3rd year"
+        },
+        {
+          "type": "course",
+          "code": "LAW 6001"
         }
       ]
     },
@@ -11919,12 +13895,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 8608"
-        },
-        {
           "type": "program",
           "requirement": "jd program"
+        },
+        {
+          "type": "course",
+          "code": "LAW 8608"
         }
       ]
     },
@@ -11956,16 +13932,16 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 8616"
-        },
-        {
           "type": "year",
           "requirement": "2nd year"
         },
         {
           "type": "year",
           "requirement": "3rd year"
+        },
+        {
+          "type": "course",
+          "code": "LAW 8616"
         }
       ]
     },
@@ -11981,12 +13957,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 6104"
-        },
-        {
           "type": "program",
           "requirement": "students must be in the jd program"
+        },
+        {
+          "type": "course",
+          "code": "LAW 6104"
         }
       ]
     },
@@ -12007,12 +13983,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 8640"
-        },
-        {
           "type": "program",
           "requirement": "law jd student"
+        },
+        {
+          "type": "course",
+          "code": "LAW 8640"
         }
       ]
     },
@@ -12020,16 +13996,16 @@
       "type": "AND",
       "children": [
         {
+          "type": "program",
+          "requirement": "law jd student"
+        },
+        {
           "type": "course",
           "code": "LAW 6000"
         },
         {
           "type": "course",
           "code": "LAW 6003"
-        },
-        {
-          "type": "program",
-          "requirement": "law jd student"
         }
       ]
     },
@@ -12037,12 +14013,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 8617"
-        },
-        {
           "type": "program",
           "requirement": "must be a jd student"
+        },
+        {
+          "type": "course",
+          "code": "LAW 8617"
         }
       ]
     },
@@ -12109,6 +14085,19 @@
         }
       ]
     },
+    "LAW 9020": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "2nd year"
+        },
+        {
+          "type": "year",
+          "requirement": "3rd year"
+        }
+      ]
+    },
     "LAW 9034": {
       "type": "OR",
       "children": [
@@ -12155,12 +14144,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "LAW 6002"
-        },
-        {
           "type": "program",
           "requirement": "must be a jd student"
+        },
+        {
+          "type": "course",
+          "code": "LAW 6002"
         }
       ]
     },
@@ -12324,6 +14313,10 @@
       "type": "program",
       "requirement": "students pursuing the master's in public policy or a graduate certificate in public policy or public leadership"
     },
+    "LPPL 6745": {
+      "type": "program",
+      "requirement": "graduate student"
+    },
     "LPPL 7025": {
       "type": "AND",
       "children": [
@@ -12383,6 +14376,10 @@
       "type": "program",
       "requirement": "students pursuing the master's in public policy or a graduate certificate in public policy or public leadership"
     },
+    "LPPP 6250": {
+      "type": "program",
+      "requirement": "graduate student in public policy"
+    },
     "LPPP 6350": {
       "type": "program",
       "requirement": "students pursuing the master's in public policy or a graduate certificate in public policy or public leadership"
@@ -12417,32 +14414,108 @@
       "requirement": "aerospace engr major"
     },
     "MAE 2100": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "MATH 1320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                }
+              ]
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "APMA 1110"
+          "type": "OR",
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
     "MAE 2300": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "PHYS 1420"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "PHYS 1420"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1425"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1710"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "PHYS 1425"
-        },
-        {
-          "type": "course",
-          "code": "PHYS 1710"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "PHYS 1425"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1420"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 1710"
+            }
+          ]
         }
       ]
     },
@@ -12450,12 +14523,30 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "MAE 2300"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MAE 2300"
+            },
+            {
+              "type": "course",
+              "code": "CE 2300"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "CE 2300"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CE 2300"
+            },
+            {
+              "type": "course",
+              "code": "MAE 2300"
+            }
+          ]
         }
       ]
     },
@@ -12463,12 +14554,30 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "MAE 2300"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MAE 2300"
+            },
+            {
+              "type": "course",
+              "code": "CE 2300"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "CE 2300"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CE 2300"
+            },
+            {
+              "type": "course",
+              "code": "MAE 2300"
+            }
+          ]
         }
       ]
     },
@@ -12476,12 +14585,30 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "MAE 2320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MAE 2320"
+            },
+            {
+              "type": "course",
+              "code": "CE 2320"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MAE 2310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MAE 2310"
+            },
+            {
+              "type": "course",
+              "code": "CE 2310"
+            }
+          ]
         }
       ]
     },
@@ -12489,18 +14616,45 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "APMA 1110"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            },
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MATH 1320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            }
+          ]
         }
       ]
     },
     "MAE 3010": {
-      "type": "course",
-      "code": "MAE 2320"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "MAE 2320"
+        },
+        {
+          "type": "course",
+          "code": "CE 2320"
+        }
+      ]
     },
     "MAE 3130": {
       "type": "OR",
@@ -12544,6 +14698,18 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "aerospace engr major or 3rd or mechanical major"
+        },
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
           "type": "course",
           "code": "MAE 2100"
         },
@@ -12565,12 +14731,8 @@
           ]
         },
         {
-          "type": "major",
-          "requirement": "aerospace engr major or 3rd or mechanical engineering major"
-        },
-        {
-          "type": "year",
-          "requirement": "4th year"
+          "type": "course",
+          "code": "MAE 3210"
         }
       ]
     },
@@ -12595,12 +14757,30 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "MAE 2310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MAE 2310"
+            },
+            {
+              "type": "course",
+              "code": "CE 2310"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "CE 2310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CE 2310"
+            },
+            {
+              "type": "course",
+              "code": "MAE 2310"
+            }
+          ]
         }
       ]
     },
@@ -12629,15 +14809,37 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "mechanical & aerospace engr major"
+        },
+        {
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "MAE 2320"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MAE 2320"
+                },
+                {
+                  "type": "course",
+                  "code": "CE 2320"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "CE 2320"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "CE 2320"
+                },
+                {
+                  "type": "course",
+                  "code": "MAE 2320"
+                }
+              ]
             }
           ]
         },
@@ -12655,14 +14857,36 @@
           ]
         },
         {
-          "type": "major",
-          "requirement": "mechanical & aerospace engr major"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MAE 2320"
+            },
+            {
+              "type": "course",
+              "code": "CE 2320"
+            }
+          ]
+        },
+        {
+          "type": "course",
+          "code": "APMA 2130"
         }
       ]
     },
     "MAE 3730": {
-      "type": "course",
-      "code": "MAE 2320"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "MAE 2320"
+        },
+        {
+          "type": "course",
+          "code": "CE 2320"
+        }
+      ]
     },
     "MAE 3820": {
       "type": "OR",
@@ -12707,8 +14931,17 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "MAE 2320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MAE 2320"
+            },
+            {
+              "type": "course",
+              "code": "CE 2320"
+            }
+          ]
         },
         {
           "type": "OR",
@@ -12730,8 +14963,17 @@
       ]
     },
     "MAE 4270": {
-      "type": "year",
-      "requirement": "4th year"
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        }
+      ]
     },
     "MAE 4300": {
       "type": "OR",
@@ -12751,8 +14993,17 @@
       "requirement": "3rd or 4th year standing"
     },
     "MAE 4502": {
-      "type": "year",
-      "requirement": "4th year"
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        }
+      ]
     },
     "MAE 4503": {
       "type": "year",
@@ -12761,6 +15012,14 @@
     "MAE 4504": {
       "type": "year",
       "requirement": "3rd or 4th year standing"
+    },
+    "MAE 4511": {
+      "type": "year",
+      "requirement": "4th year standing"
+    },
+    "MAE 4512": {
+      "type": "year",
+      "requirement": "4th year standing"
     },
     "MAE 4605": {
       "type": "OR",
@@ -12776,8 +15035,17 @@
       ]
     },
     "MAE 4610": {
-      "type": "year",
-      "requirement": "4th year"
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        }
+      ]
     },
     "MAE 4620": {
       "type": "course",
@@ -12791,8 +15059,17 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "MAE 2320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MAE 2320"
+            },
+            {
+              "type": "course",
+              "code": "CE 2320"
+            }
+          ]
         },
         {
           "type": "course",
@@ -12804,8 +15081,17 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "MAE 2320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MAE 2320"
+            },
+            {
+              "type": "course",
+              "code": "CE 2320"
+            }
+          ]
         },
         {
           "type": "course",
@@ -12818,11 +15104,15 @@
       "children": [
         {
           "type": "major",
-          "requirement": "must be a aerospace engineering major"
+          "requirement": "must be a aerospace major"
         },
         {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
         }
       ]
     },
@@ -12831,12 +15121,29 @@
       "code": "MAE 4790"
     },
     "MAE 6080": {
-      "type": "course",
-      "code": "MAE 6020"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "MAE 6020"
+        },
+        {
+          "type": "course",
+          "code": "AM 6020"
+        },
+        {
+          "type": "course",
+          "code": "APMA 6020"
+        }
+      ]
     },
     "MAE 6100": {
       "type": "program",
       "requirement": "graduate standing"
+    },
+    "MAE 6250": {
+      "type": "school",
+      "requirement": "School of Engineering and Applied Science"
     },
     "MAE 6290": {
       "type": "OR",
@@ -12854,6 +15161,10 @@
     "MAE 6300": {
       "type": "course",
       "code": "CE 3210"
+    },
+    "MAE 6310": {
+      "type": "program",
+      "requirement": "graduate standing"
     },
     "MAE 6320": {
       "type": "course",
@@ -12879,6 +15190,14 @@
       "type": "AND",
       "children": [
         {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -12894,10 +15213,6 @@
               "code": "APMA 6020"
             }
           ]
-        },
-        {
-          "type": "school",
-          "requirement": "Graduate School of Arts & Sciences"
         }
       ]
     },
@@ -12918,16 +15233,34 @@
       "code": "MAE 6310"
     },
     "MAE 7660": {
-      "type": "course",
-      "code": "ECE 6851"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "ECE 6851"
+        },
+        {
+          "type": "course",
+          "code": "MAE 6610"
+        }
+      ]
     },
     "MAE 7720": {
       "type": "course",
       "code": "MAE 6720"
     },
     "MAE 8999": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "MATH 1220": {
       "type": "AND",
@@ -12937,30 +15270,48 @@
           "code": "MATH 1210"
         },
         {
-          "type": "course",
-          "code": "MATH 1320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            }
+          ]
         }
       ]
     },
     "MATH 1320": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "MATH 1310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1090"
+                }
+              ]
             },
             {
               "type": "course",
-              "code": "APMA 1090"
+              "code": "MATH 1220"
             }
           ]
         },
         {
           "type": "course",
-          "code": "MATH 1220"
+          "code": "APMA 1110"
         }
       ]
     },
@@ -12978,10 +15329,6 @@
       ]
     },
     "MATH 3000": {
-      "type": "course",
-      "code": "MATH 1320"
-    },
-    "MATH 3100": {
       "type": "OR",
       "children": [
         {
@@ -12991,6 +15338,59 @@
         {
           "type": "course",
           "code": "APMA 1110"
+        }
+      ]
+    },
+    "MATH 3100": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            }
+          ]
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -13008,31 +15408,93 @@
       ]
     },
     "MATH 3310": {
-      "type": "course",
-      "code": "MATH 1320"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "MATH 1320"
+        },
+        {
+          "type": "course",
+          "code": "APMA 1110"
+        }
+      ]
     },
     "MATH 3315": {
-      "type": "course",
-      "code": "MATH 2315"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "MATH 2315"
+        },
+        {
+          "type": "course",
+          "code": "APMA 2120"
+        },
+        {
+          "type": "course",
+          "code": "MATH 2310"
+        }
+      ]
     },
     "MATH 3340": {
-      "type": "course",
-      "code": "MATH 2310"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "MATH 2310"
+        },
+        {
+          "type": "course",
+          "code": "APMA 2120"
+        },
+        {
+          "type": "course",
+          "code": "MATH 2315"
+        }
+      ]
     },
     "MATH 3351": {
-      "type": "course",
-      "code": "MATH 1320"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "MATH 1320"
+        },
+        {
+          "type": "course",
+          "code": "APMA 1110"
+        }
+      ]
     },
     "MATH 3354": {
-      "type": "course",
-      "code": "MATH 1320"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "MATH 1320"
+        },
+        {
+          "type": "course",
+          "code": "APMA 1110"
+        }
+      ]
     },
     "MATH 4040": {
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "MATH 1320"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 1320"
+            },
+            {
+              "type": "course",
+              "code": "APMA 1110"
+            }
+          ]
         },
         {
           "type": "OR",
@@ -13187,6 +15649,10 @@
         }
       ]
     },
+    "MATH 4651": {
+      "type": "course",
+      "code": "MATH 3354"
+    },
     "MATH 4652": {
       "type": "AND",
       "children": [
@@ -13220,8 +15686,21 @@
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "MATH 2310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
             },
             {
               "type": "course",
@@ -13239,8 +15718,21 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "MATH 2310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
         },
         {
           "type": "course",
@@ -13299,8 +15791,21 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "MATH 2310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
         },
         {
           "type": "course",
@@ -13315,8 +15820,17 @@
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "MATH 1320"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                }
+              ]
             },
             {
               "type": "course",
@@ -13364,8 +15878,21 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "MATH 2310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
         },
         {
           "type": "course",
@@ -13572,12 +16099,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "MDST 2000"
-        },
-        {
           "type": "major",
           "requirement": "mdst major minor"
+        },
+        {
+          "type": "course",
+          "code": "MDST 2000"
         }
       ]
     },
@@ -13589,6 +16116,10 @@
       "type": "course",
       "code": "MDST 2000"
     },
+    "MDST 3407": {
+      "type": "major",
+      "requirement": "mdst major"
+    },
     "MDST 3410": {
       "type": "course",
       "code": "MDST 2000"
@@ -13596,6 +16127,10 @@
     "MDST 3500": {
       "type": "course",
       "code": "MDST 2000"
+    },
+    "MDST 3505": {
+      "type": "major",
+      "requirement": "mdst major"
     },
     "MDST 3600": {
       "type": "course",
@@ -13618,12 +16153,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "MDST 3000"
-        },
-        {
           "type": "major",
           "requirement": "must be in the distinguished major program in media studies"
+        },
+        {
+          "type": "course",
+          "code": "MDST 3000"
         }
       ]
     },
@@ -13932,29 +16467,138 @@
       "type": "OR",
       "children": [
         {
-          "type": "course",
-          "code": "APMA 2120"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MATH 2310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
         }
       ]
     },
     "MSE 3060": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "APMA 2120"
+          "type": "OR",
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                }
+              ]
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "MATH 2310"
-        },
-        {
-          "type": "course",
-          "code": "MATH 2315"
+          "type": "OR",
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
+            },
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -14032,6 +16676,14 @@
       "type": "AND",
       "children": [
         {
+          "type": "program",
+          "requirement": "restricted to 4th year mse majors"
+        },
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
           "type": "course",
           "code": "STS 4500"
         },
@@ -14063,14 +16715,6 @@
         {
           "type": "course",
           "code": "MSE 3101"
-        },
-        {
-          "type": "program",
-          "requirement": "restricted to 4th year mse majors"
-        },
-        {
-          "type": "year",
-          "requirement": "4th year"
         }
       ]
     },
@@ -14102,12 +16746,38 @@
           "code": "MSE 6320"
         },
         {
-          "type": "course",
-          "code": "APMA 6020"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 6020"
+            },
+            {
+              "type": "course",
+              "code": "AM 6020"
+            },
+            {
+              "type": "course",
+              "code": "CE 6720"
+            },
+            {
+              "type": "course",
+              "code": "MAE 6020"
+            }
+          ]
         },
         {
-          "type": "course",
-          "code": "CE 6720"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "CE 6720"
+            },
+            {
+              "type": "course",
+              "code": "APMA 6020"
+            }
+          ]
         }
       ]
     },
@@ -14116,12 +16786,30 @@
       "code": "MSE 6230"
     },
     "MSE 8970": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "MSE 9970": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "MUBD 2620": {
       "type": "course",
@@ -14135,9 +16823,37 @@
       "type": "course",
       "code": "MUBD 2630"
     },
+    "MUEN 3610": {
+      "type": "course",
+      "code": "MUEN 3600"
+    },
+    "MUEN 3620": {
+      "type": "course",
+      "code": "MUEN 3600"
+    },
+    "MUEN 3630": {
+      "type": "course",
+      "code": "MUEN 3600"
+    },
     "MUEN 3646": {
       "type": "course",
       "code": "MUEN 3645"
+    },
+    "MUEN 3650": {
+      "type": "course",
+      "code": "MUEN 3600"
+    },
+    "MUEN 3651": {
+      "type": "course",
+      "code": "MUEN 3600"
+    },
+    "MUEN 3670": {
+      "type": "course",
+      "code": "MUEN 3600"
+    },
+    "MUEN 3680": {
+      "type": "course",
+      "code": "MUEN 3600"
     },
     "MUEN 4690": {
       "type": "OR",
@@ -14152,17 +16868,130 @@
         }
       ]
     },
+    "MUPF 3110": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "may be repeated as often as desired, but no more than 16 performance credits may be applied toward the baccalaureate degree in the college, with an additional 4 available for distinguished majors"
+        },
+        {
+          "type": "school",
+          "requirement": "McIntire School of Commerce"
+        }
+      ]
+    },
+    "MUPF 3120": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "may be repeated as often as desired, but no more than 16 performance credits may be applied toward the baccalaureate degree in the college, with an additional 4 available for distinguished majors"
+        },
+        {
+          "type": "school",
+          "requirement": "McIntire School of Commerce"
+        }
+      ]
+    },
+    "MUPF 3140": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "may be repeated as often as desired, but no more than 16 performance credits may be applied toward the baccalaureate degree in the college, with an additional 4 available for distinguished majors"
+        },
+        {
+          "type": "school",
+          "requirement": "McIntire School of Commerce"
+        }
+      ]
+    },
+    "MUPF 3150": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "may be repeated as often as desired, but no more than 16 performance credits may be applied toward the baccalaureate degree in the college, with an additional 4 available for distinguished majors"
+        },
+        {
+          "type": "school",
+          "requirement": "McIntire School of Commerce"
+        }
+      ]
+    },
+    "MUPF 3160": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "may be repeated as often as desired, but no more than 16 performance credits may be applied toward the baccalaureate degree in the college, with an additional 4 available for distinguished majors"
+        },
+        {
+          "type": "school",
+          "requirement": "McIntire School of Commerce"
+        }
+      ]
+    },
+    "MUPF 3170": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "may be repeated as often as desired, but no more than 16 performance credits may be applied toward the baccalaureate degree in the college, with an additional 4 available for distinguished majors"
+        },
+        {
+          "type": "school",
+          "requirement": "McIntire School of Commerce"
+        }
+      ]
+    },
+    "MUPF 3180": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "may be repeated as often as desired, but no more than 16 performance credits may be applied toward the baccalaureate degree in the college, with an additional 4 available for distinguished majors"
+        },
+        {
+          "type": "school",
+          "requirement": "McIntire School of Commerce"
+        }
+      ]
+    },
+    "MUPF 3950": {
+      "type": "course",
+      "code": "MUSI 4950"
+    },
     "MUPF 3960": {
       "type": "course",
       "code": "MUPF 3950"
     },
     "MUPF 4930": {
-      "type": "major",
-      "requirement": "successful written application to the distinguished major program"
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "successful written application to the distinguished major program"
+        },
+        {
+          "type": "school",
+          "requirement": "McIntire School of Commerce"
+        }
+      ]
     },
     "MUPF 4940": {
-      "type": "major",
-      "requirement": "successful written application to the distinguished major program"
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "successful written application to the distinguished major program"
+        },
+        {
+          "type": "school",
+          "requirement": "McIntire School of Commerce"
+        }
+      ]
     },
     "MUPF 4950": {
       "type": "course",
@@ -14175,6 +17004,10 @@
     "MUPF 7930": {
       "type": "program",
       "requirement": "graduate student with permission of instructor"
+    },
+    "MUSI 3010": {
+      "type": "course",
+      "code": "MUSI 3310"
     },
     "MUSI 3020": {
       "type": "course",
@@ -14201,8 +17034,26 @@
       "code": "MUSI 3310"
     },
     "MUSI 4331": {
-      "type": "course",
-      "code": "MUSI 3320"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "MUSI 3320"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MUSI 3320"
+            },
+            {
+              "type": "course",
+              "code": "MUSI 3330"
+            }
+          ]
+        }
+      ]
     },
     "MUSI 4410": {
       "type": "course",
@@ -14264,6 +17115,27 @@
     "MUSI 4770": {
       "type": "course",
       "code": "MUSI 3310"
+    },
+    "MUSI 4950": {
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "MUPF 3950"
+        },
+        {
+          "type": "course",
+          "code": "MUPF 3960"
+        },
+        {
+          "type": "course",
+          "code": "MUPF 4950"
+        },
+        {
+          "type": "course",
+          "code": "MUPF 4960"
+        }
+      ]
     },
     "NASC 4200": {
       "type": "course",
@@ -14458,12 +17330,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "NURS 4950"
-        },
-        {
           "type": "school",
           "requirement": "School of Nursing"
+        },
+        {
+          "type": "course",
+          "code": "NURS 4950"
         }
       ]
     },
@@ -14622,6 +17494,10 @@
       "type": "course",
       "code": "PHS 7000"
     },
+    "PHS 8120": {
+      "type": "program",
+      "requirement": "good standing as graduate student in the relevant program, instructor permission"
+    },
     "PHS 8125": {
       "type": "OR",
       "children": [
@@ -14701,8 +17577,17 @@
       ]
     },
     "PHYS 1420": {
-      "type": "course",
-      "code": "MATH 1310"
+      "type": "OR",
+      "children": [
+        {
+          "type": "course",
+          "code": "MATH 1310"
+        },
+        {
+          "type": "course",
+          "code": "APMA 1090"
+        }
+      ]
     },
     "PHYS 1425": {
       "type": "OR",
@@ -14769,8 +17654,17 @@
       ]
     },
     "PHYS 2040": {
-      "type": "course",
-      "code": "PHYS 2020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "PHYS 2020"
+        },
+        {
+          "type": "course",
+          "code": "PHYS 2030"
+        }
+      ]
     },
     "PHYS 2415": {
       "type": "OR",
@@ -14786,15 +17680,24 @@
       ]
     },
     "PHYS 2419": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "PHYS 2415"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "PHYS 2415"
+            },
+            {
+              "type": "course",
+              "code": "PHYS 2410"
+            }
+          ]
         },
         {
           "type": "course",
-          "code": "PHYS 2410"
+          "code": "PHYS 1429"
         }
       ]
     },
@@ -14819,8 +17722,21 @@
           ]
         },
         {
-          "type": "course",
-          "code": "MATH 2310"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "MATH 2310"
+            },
+            {
+              "type": "course",
+              "code": "APMA 2120"
+            },
+            {
+              "type": "course",
+              "code": "MATH 2315"
+            }
+          ]
         }
       ]
     },
@@ -14992,16 +17908,55 @@
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "MATH 2310"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 2315"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "APMA 2120"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 2120"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2310"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 2315"
+                }
+              ]
             }
           ]
         },
@@ -15283,6 +18238,14 @@
       "type": "major",
       "requirement": "admission into the department's distinguished majors program"
     },
+    "PLAD 4990": {
+      "type": "program",
+      "requirement": "admission to politics honors program"
+    },
+    "PLAD 4999": {
+      "type": "program",
+      "requirement": "enrollment in the politics honors program"
+    },
     "PLAD 8320": {
       "type": "OR",
       "children": [
@@ -15300,12 +18263,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "PLAN 2110"
-        },
-        {
           "type": "major",
           "requirement": "urban & environmental planning major"
+        },
+        {
+          "type": "course",
+          "code": "PLAN 2110"
         }
       ]
     },
@@ -15426,6 +18389,10 @@
         }
       ]
     },
+    "PLCP 4990": {
+      "type": "program",
+      "requirement": "admission to politics honors program"
+    },
     "PLCP 5550": {
       "type": "course",
       "code": "PLAD 7100"
@@ -15544,8 +18511,17 @@
       "code": "PSHM 3010"
     },
     "PSHM 4052": {
-      "type": "course",
-      "code": "PSHM 3010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "admission to bphm or bis program"
+        },
+        {
+          "type": "course",
+          "code": "PSHM 3010"
+        }
+      ]
     },
     "PSHM 4200": {
       "type": "program",
@@ -15564,8 +18540,17 @@
       "code": "PSHM 3010"
     },
     "PSHM 4750": {
-      "type": "course",
-      "code": "PSHM 3010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "admission to bphm program"
+        },
+        {
+          "type": "course",
+          "code": "PSHM 3010"
+        }
+      ]
     },
     "PSHM 4800": {
       "type": "program",
@@ -15595,6 +18580,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "program",
+          "requirement": "admission to hsm graduate certificate"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -15606,12 +18595,12 @@
               "code": "PSHM 5020"
             }
           ]
-        },
-        {
-          "type": "program",
-          "requirement": "admission to hsm graduate certificate"
         }
       ]
+    },
+    "PSHM 5805": {
+      "type": "program",
+      "requirement": "admission to hsm graduate certificate"
     },
     "PSHP 2041": {
       "type": "course",
@@ -15620,6 +18609,10 @@
     "PSPS 6000": {
       "type": "program",
       "requirement": "admission to mps degree prog"
+    },
+    "PSPS 6050": {
+      "type": "program",
+      "requirement": "admission to mps degree program"
     },
     "PST 4850": {
       "type": "major",
@@ -15644,6 +18637,10 @@
     "PST 4999": {
       "type": "major",
       "requirement": "pst major"
+    },
+    "PSYC 2005": {
+      "type": "major",
+      "requirement": "for declaring a major or minor in psychology"
     },
     "PSYC 2200": {
       "type": "course",
@@ -15785,6 +18782,14 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "student must be a third or psychology, cognitive science, or neuroscience or behavioral neuroscience major"
+        },
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -15804,20 +18809,24 @@
               "code": "PSYC 3260"
             }
           ]
-        },
-        {
-          "type": "major",
-          "requirement": "student must be a third or psychology, cognitive science, or neuroscience or behavioral neuroscience major"
-        },
-        {
-          "type": "year",
-          "requirement": "4th year"
         }
       ]
     },
     "PSYC 4420": {
       "type": "AND",
       "children": [
+        {
+          "type": "program",
+          "requirement": "restricted to 3rd or 4th year psyc majors or cog sci majors or neurosci majors"
+        },
+        {
+          "type": "program",
+          "requirement": "restricted to 3rd or psyc majors or cog sci majors or neurosci majors"
+        },
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
         {
           "type": "OR",
           "children": [
@@ -15834,18 +18843,6 @@
               "code": "PSYC 3160"
             }
           ]
-        },
-        {
-          "type": "program",
-          "requirement": "restricted to 3rd or 4th year psyc majors or cog sci majors or neurosci majors"
-        },
-        {
-          "type": "program",
-          "requirement": "restricted to 3rd or psyc majors or cog sci majors or neurosci majors"
-        },
-        {
-          "type": "year",
-          "requirement": "4th year"
         }
       ]
     },
@@ -15859,6 +18856,19 @@
         {
           "type": "program",
           "requirement": "restricted to 3rd or psychology or behavioral neuroscience majors second majors"
+        },
+        {
+          "type": "year",
+          "requirement": "4th year"
+        }
+      ]
+    },
+    "PSYC 4603": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "third or psychology major"
         },
         {
           "type": "year",
@@ -16241,12 +19251,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "RELG 4800"
-        },
-        {
           "type": "major",
           "requirement": "selection by faculty for distinguished major program"
+        },
+        {
+          "type": "course",
+          "code": "RELG 4800"
         }
       ]
     },
@@ -16276,15 +19286,24 @@
       "code": "RELJ 1420"
     },
     "RELJ 2420": {
-      "type": "OR",
+      "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "RELJ 2410"
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "RELJ 2410"
+            },
+            {
+              "type": "course",
+              "code": "HEBR 2410"
+            }
+          ]
         },
         {
           "type": "course",
-          "code": "HEBR 2410"
+          "code": "RELJ 2410"
         }
       ]
     },
@@ -16343,8 +19362,26 @@
       "code": "RUSS 2020"
     },
     "RUSS 3030": {
-      "type": "course",
-      "code": "RUSS 1020"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "RUSS 1020"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "RUSS 1020"
+            },
+            {
+              "type": "course",
+              "code": "RUSS 2020"
+            }
+          ]
+        }
+      ]
     },
     "RUSS 3050": {
       "type": "course",
@@ -16435,12 +19472,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "SOC 3120"
-        },
-        {
           "type": "major",
           "requirement": "admission to the distinguished majors program in sociology"
+        },
+        {
+          "type": "course",
+          "code": "SOC 3120"
         }
       ]
     },
@@ -16464,12 +19501,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "SOC 3120"
-        },
-        {
           "type": "program",
           "requirement": "graduate standing"
+        },
+        {
+          "type": "course",
+          "code": "SOC 3120"
         }
       ]
     },
@@ -16477,12 +19514,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "SOC 5020"
-        },
-        {
           "type": "program",
           "requirement": "graduate standing"
+        },
+        {
+          "type": "course",
+          "code": "SOC 5020"
         }
       ]
     },
@@ -16630,6 +19667,10 @@
         {
           "type": "course",
           "code": "SPAN 3300"
+        },
+        {
+          "type": "year",
+          "requirement": "4th year"
         }
       ]
     },
@@ -16643,6 +19684,10 @@
         {
           "type": "course",
           "code": "SPAN 3300"
+        },
+        {
+          "type": "year",
+          "requirement": "4th year"
         }
       ]
     },
@@ -16650,12 +19695,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "SPAN 3300"
-        },
-        {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "course",
+          "code": "SPAN 3300"
         }
       ]
     },
@@ -16663,12 +19708,12 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "SPAN 3300"
-        },
-        {
           "type": "year",
           "requirement": "4th year"
+        },
+        {
+          "type": "course",
+          "code": "SPAN 3300"
         }
       ]
     },
@@ -16878,8 +19923,30 @@
       ]
     },
     "SPAN 4520": {
-      "type": "course",
-      "code": "SPAN 3010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "SPAN 3010"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "SPAN 3010"
+            },
+            {
+              "type": "course",
+              "code": "SPAN 3300"
+            }
+          ]
+        },
+        {
+          "type": "course",
+          "code": "SPAN 3430"
+        }
+      ]
     },
     "SPAN 4530": {
       "type": "AND",
@@ -17053,8 +20120,30 @@
       "code": "SPAN 3010"
     },
     "SPAN 4711": {
-      "type": "course",
-      "code": "SPAN 3010"
+      "type": "AND",
+      "children": [
+        {
+          "type": "course",
+          "code": "SPAN 3010"
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "SPAN 3010"
+            },
+            {
+              "type": "course",
+              "code": "SPAN 3300"
+            }
+          ]
+        },
+        {
+          "type": "course",
+          "code": "SPAN 3430"
+        }
+      ]
     },
     "SPAN 4712": {
       "type": "AND",
@@ -17173,6 +20262,10 @@
           "code": "APMA 3120"
         }
       ]
+    },
+    "STAT 4996": {
+      "type": "program",
+      "requirement": "restricted to statistics majors in their final year"
     },
     "STAT 5120": {
       "type": "AND",
@@ -17298,16 +20391,16 @@
       "type": "AND",
       "children": [
         {
-          "type": "course",
-          "code": "STAT 6120"
-        },
-        {
           "type": "program",
           "requirement": "graduate standing"
         },
         {
           "type": "program",
           "requirement": "graduate standing in statistics"
+        },
+        {
+          "type": "course",
+          "code": "STAT 6120"
         }
       ]
     },
@@ -17328,6 +20421,14 @@
       "type": "AND",
       "children": [
         {
+          "type": "program",
+          "requirement": "graduate standing"
+        },
+        {
+          "type": "program",
+          "requirement": "graduate standing in statistics"
+        },
+        {
           "type": "OR",
           "children": [
             {
@@ -17339,7 +20440,58 @@
               "code": "STAT 6190"
             }
           ]
+        }
+      ]
+    },
+    "STAT 6620": {
+      "type": "course",
+      "code": "STAT 6610"
+    },
+    "STAT 7100": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "graduate standing"
         },
+        {
+          "type": "program",
+          "requirement": "graduate standing in statistics"
+        },
+        {
+          "type": "course",
+          "code": "STAT 6190"
+        }
+      ]
+    },
+    "STAT 7200": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "program",
+          "requirement": "graduate standing"
+        },
+        {
+          "type": "program",
+          "requirement": "graduate standing in statistics"
+        },
+        {
+          "type": "course",
+          "code": "STAT 6190"
+        }
+      ]
+    },
+    "STAT 7520": {
+      "type": "course",
+      "code": "STAT 7200"
+    },
+    "STAT 7620": {
+      "type": "course",
+      "code": "STAT 7200"
+    },
+    "STAT 7995": {
+      "type": "AND",
+      "children": [
         {
           "type": "program",
           "requirement": "graduate standing"
@@ -17350,29 +20502,18 @@
         }
       ]
     },
-    "STAT 6620": {
-      "type": "course",
-      "code": "STAT 6610"
-    },
-    "STAT 7100": {
-      "type": "course",
-      "code": "STAT 6190"
-    },
-    "STAT 7200": {
-      "type": "course",
-      "code": "STAT 6190"
-    },
-    "STAT 7520": {
-      "type": "course",
-      "code": "STAT 7200"
-    },
-    "STAT 7620": {
-      "type": "course",
-      "code": "STAT 7200"
-    },
     "STS 2600": {
-      "type": "year",
-      "requirement": "4th year"
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        }
+      ]
     },
     "STS 3300": {
       "type": "course",
@@ -17397,6 +20538,14 @@
               "code": "STS 3000"
             }
           ]
+        },
+        {
+          "type": "year",
+          "requirement": "4th year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
         }
       ]
     },
@@ -17453,12 +20602,30 @@
           "type": "OR",
           "children": [
             {
-              "type": "course",
-              "code": "APMA 1110"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                },
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                }
+              ]
             },
             {
-              "type": "course",
-              "code": "MATH 1320"
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "MATH 1320"
+                },
+                {
+                  "type": "course",
+                  "code": "APMA 1110"
+                }
+              ]
             }
           ]
         },
@@ -17519,6 +20686,10 @@
       "type": "AND",
       "children": [
         {
+          "type": "major",
+          "requirement": "systems engr major"
+        },
+        {
           "type": "course",
           "code": "SYS 2001"
         },
@@ -17542,10 +20713,6 @@
               "code": "APMA 3110"
             }
           ]
-        },
-        {
-          "type": "major",
-          "requirement": "systems engr major"
         }
       ]
     },
@@ -17571,8 +20738,17 @@
       ]
     },
     "SYS 3055": {
-      "type": "year",
-      "requirement": "2nd year"
+      "type": "AND",
+      "children": [
+        {
+          "type": "year",
+          "requirement": "2nd year"
+        },
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        }
+      ]
     },
     "SYS 3060": {
       "type": "OR",
@@ -17619,12 +20795,24 @@
               "code": "APMA 3110"
             }
           ]
+        },
+        {
+          "type": "course",
+          "code": "APMA 3100"
+        },
+        {
+          "type": "course",
+          "code": "APMA 3120"
         }
       ]
     },
     "SYS 4021": {
       "type": "AND",
       "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
         {
           "type": "OR",
           "children": [
@@ -17682,6 +20870,23 @@
             {
               "type": "course",
               "code": "APMA 3110"
+            }
+          ]
+        },
+        {
+          "type": "OR",
+          "children": [
+            {
+              "type": "course",
+              "code": "APMA 3100"
+            },
+            {
+              "type": "course",
+              "code": "APMA 3110"
+            },
+            {
+              "type": "course",
+              "code": "MATH 3100"
             }
           ]
         }
@@ -17781,6 +20986,37 @@
               "code": "SYS 3062"
             }
           ]
+        },
+        {
+          "type": "count",
+          "count": 4,
+          "children": [
+            {
+              "type": "OR",
+              "children": [
+                {
+                  "type": "course",
+                  "code": "SYS 3021"
+                },
+                {
+                  "type": "course",
+                  "code": "SYS 3023"
+                },
+                {
+                  "type": "course",
+                  "code": "SYS 3034"
+                },
+                {
+                  "type": "course",
+                  "code": "SYS 3060"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "course",
+          "code": "SYS 3062"
         }
       ]
     },
@@ -17822,6 +21058,10 @@
         }
       ]
     },
+    "SYS 6016": {
+      "type": "course",
+      "code": "CS 6316"
+    },
     "SYS 6018": {
       "type": "OR",
       "children": [
@@ -17842,6 +21082,14 @@
     "SYS 6034": {
       "type": "course",
       "code": "SYS 6005"
+    },
+    "SYS 6041": {
+      "type": "school",
+      "requirement": "School of Engineering and Applied Science"
+    },
+    "SYS 6043": {
+      "type": "school",
+      "requirement": "School of Engineering and Applied Science"
     },
     "SYS 6044": {
       "type": "OR",
@@ -17952,8 +21200,17 @@
       ]
     },
     "SYS 7096": {
-      "type": "school",
-      "requirement": "Graduate School of Arts & Sciences"
+      "type": "AND",
+      "children": [
+        {
+          "type": "school",
+          "requirement": "School of Engineering and Applied Science"
+        },
+        {
+          "type": "school",
+          "requirement": "Graduate School of Arts & Sciences"
+        }
+      ]
     },
     "TBTN 8017": {
       "type": "course",
@@ -17983,6 +21240,10 @@
     "UD 8020": {
       "type": "course",
       "code": "UD 8010"
+    },
+    "UD 8030": {
+      "type": "program",
+      "requirement": "approval of graduate program director"
     },
     "UNST 1210": {
       "type": "program",
@@ -18066,9 +21327,22 @@
       "type": "year",
       "requirement": "2nd year"
     },
-    "WGS 4999": {
+    "WGS 4998": {
       "type": "major",
-      "requirement": "women, gender & sexuality major"
+      "requirement": "wgs major, wgs 2nd major"
+    },
+    "WGS 4999": {
+      "type": "AND",
+      "children": [
+        {
+          "type": "major",
+          "requirement": "women, gender & sexuality major"
+        },
+        {
+          "type": "major",
+          "requirement": "wgs major, 2nd major"
+        }
+      ]
     }
   },
   "courses_without_prerequisites": [
@@ -18178,7 +21452,6 @@
     "AMST 2559",
     "AMST 2660",
     "AMST 2753",
-    "AMST 3001",
     "AMST 3180",
     "AMST 3200",
     "AMST 3221",
@@ -18392,7 +21665,6 @@
     "ARAB 2070",
     "ARAB  216",
     "ARAB  226",
-    "ARAB  256",
     "ARAB 3019",
     "ARAB 3230",
     "ARAB 3430",
@@ -18514,7 +21786,6 @@
     "ARCH 8999",
     "ARCY 3993",
     "ARCY 4998",
-    "ARCY 4999",
     "ARH 1004",
     "ARH 1010",
     "ARH 1020",
@@ -18801,7 +22072,6 @@
     "BIMS 9999",
     "BIOC 5559",
     "BIOC 8012",
-    "BIOC 8014",
     "BIOC 8130",
     "BIOC 8131",
     "BIOC 8150",
@@ -18906,19 +22176,12 @@
     "BIOP 9995",
     "BIOP 9999",
     "BME 1501",
-    "BME 3080",
     "BME 3636",
     "BME 4370",
     "BME 4993",
-    "BME 6001",
-    "BME 6002",
     "BME 6003",
     "BME 6030",
     "BME 6056",
-    "BME 6060",
-    "BME 6310",
-    "BME 6311",
-    "BME 6550",
     "BME 8000T",
     "BME 8550",
     "BME 8995",
@@ -18933,7 +22196,6 @@
     "CASS 1010",
     "CASS 1011",
     "CE 1501",
-    "CE 2010",
     "CE 2020",
     "CE 2030",
     "CE 2110",
@@ -19001,20 +22263,14 @@
     "CHE 2595",
     "CHE 4442",
     "CHE 4995",
-    "CHE 5456",
     "CHE 5561",
     "CHE 5562",
     "CHE 6442",
-    "CHE 6445",
     "CHE 6447",
     "CHE 6448",
     "CHE 6450",
-    "CHE 6452",
     "CHE 6476",
-    "CHE 6561",
-    "CHE 6605",
     "CHE 6615",
-    "CHE 6665",
     "CHE 7993",
     "CHE 8000T",
     "CHE 8581",
@@ -19033,8 +22289,6 @@
     "CHEM 1411",
     "CHEM 1500",
     "CHEM 1559",
-    "CHEM 1810",
-    "CHEM 1811",
     "CHEM 2559",
     "CHEM 3130",
     "CHEM 3559",
@@ -19062,7 +22316,6 @@
     "CHEM 5380",
     "CHEM 5390",
     "CHEM 5410",
-    "CHEM 5430",
     "CHEM 5440",
     "CHEM 5450",
     "CHEM 5460",
@@ -19117,13 +22370,11 @@
     "CHEM 9999",
     "CHIN 1010",
     "CHIN 1016",
-    "CHIN 1060",
     "CHIN  116",
     "CHIN  126",
     "CHIN 1559",
     "CHIN 2030",
     "CHIN 2040",
-    "CHIN 2060",
     "CHIN  216",
     "CHIN  226",
     "CHIN 2559",
@@ -19270,7 +22521,6 @@
     "COGS 4559",
     "COLA 1500",
     "COMM 1559",
-    "COMM 1800",
     "COMM 2000",
     "COMM 2010",
     "COMM 2559",
@@ -19300,11 +22550,8 @@
     "COMM 4374",
     "COMM 4510",
     "COMM 4519",
-    "COMM 4520",
     "COMM 4529",
-    "COMM 4535",
     "COMM 4539",
-    "COMM 4560",
     "COMM 4579",
     "COMM 4589",
     "COMM 4624",
@@ -19340,8 +22587,6 @@
     "CREO 2559",
     "CS 1010",
     "CS 1110",
-    "CS 1111",
-    "CS 1112",
     "CS 1113",
     "CS 1511",
     "CS 2501",
@@ -19591,7 +22836,6 @@
     "ECE 1000T",
     "ECE 1501",
     "ECE 2066",
-    "ECE 2330",
     "ECE 2501",
     "ECE 2502",
     "ECE 2550",
@@ -19745,7 +22989,6 @@
     "EDHS 7225",
     "EDHS 7230",
     "EDHS 7270",
-    "EDHS 7291",
     "EDHS 7300",
     "EDHS 7630",
     "EDHS 7640",
@@ -19856,7 +23099,6 @@
     "EDIS 4884",
     "EDIS 4885",
     "EDIS 4886",
-    "EDIS 4887",
     "EDIS 4888",
     "EDIS 4993",
     "EDIS 4995",
@@ -19893,7 +23135,6 @@
     "EDIS 5871",
     "EDIS 5877",
     "EDIS 5878",
-    "EDIS 5881",
     "EDIS 5910",
     "EDIS 5993",
     "EDIS 6140",
@@ -19961,7 +23202,6 @@
     "EDLF 3701",
     "EDLF 3895",
     "EDLF 3896",
-    "EDLF 4000",
     "EDLF 4020",
     "EDLF 4080",
     "EDLF 4082",
@@ -20061,7 +23301,6 @@
     "EDLF 8665",
     "EDLF 8820",
     "EDLF 8821",
-    "EDLF 8822",
     "EDLF 8823",
     "EDLF 8824",
     "EDLF 8825",
@@ -20798,7 +24037,6 @@
     "GBUS 7888",
     "GBUS 7889",
     "GBUS 7899",
-    "GBUS 7900",
     "GBUS 7901",
     "GBUS 7905",
     "GBUS 7994",
@@ -21283,7 +24521,6 @@
     "GNUR 9027",
     "GNUR 9110",
     "GNUR 9559",
-    "GNUR 9600",
     "GNUR 9630",
     "GNUR 9890",
     "GNUR 9991",
@@ -21881,7 +25118,6 @@
     "INST 2559",
     "INST 2570",
     "INST 2993",
-    "INST 3150",
     "INST 3600",
     "INST 4200",
     "INST 4559",
@@ -22162,7 +25398,6 @@
     "JWST 5559",
     "JWST 8500",
     "KICH 1010",
-    "KINE 2000",
     "KINE 2200",
     "KINE 2420",
     "KINE 2850",
@@ -22265,9 +25500,7 @@
     "KLPA 1730",
     "KLPA 1735",
     "KOR 1010",
-    "KOR 1060",
     "KOR 1559",
-    "KOR 2060",
     "KOR 2559",
     "KOR 3015",
     "KOR 3559",
@@ -22430,7 +25663,6 @@
     "LAW 7067",
     "LAW 7069",
     "LAW 7070",
-    "LAW 7074",
     "LAW 7075",
     "LAW 7076",
     "LAW 7078",
@@ -22685,7 +25917,6 @@
     "LAW 9015",
     "LAW 9016",
     "LAW 9018",
-    "LAW 9020",
     "LAW 9021",
     "LAW 9023",
     "LAW 9024",
@@ -22894,7 +26125,6 @@
     "LPPL 3480",
     "LPPL 4225",
     "LPPL 5035",
-    "LPPL 6745",
     "LPPL 7410",
     "LPPP 2000",
     "LPPP 2050",
@@ -22919,7 +26149,6 @@
     "LPPP 5540",
     "LPPP 5559",
     "LPPP 5993",
-    "LPPP 6250",
     "LPPP 6500",
     "LPPP 6550",
     "LPPP 6559",
@@ -23014,8 +26243,6 @@
     "MAE 3503",
     "MAE 3504",
     "MAE 3720",
-    "MAE 4511",
-    "MAE 4512",
     "MAE 4513",
     "MAE 4514",
     "MAE 4720",
@@ -23026,10 +26253,8 @@
     "MAE 6210",
     "MAE 6230",
     "MAE 6240",
-    "MAE 6250",
     "MAE 6260",
     "MAE 6270",
-    "MAE 6310",
     "MAE 6555",
     "MAE 6592",
     "MAE 6594",
@@ -23075,7 +26300,6 @@
     "MATH 3559",
     "MATH 4220",
     "MATH 4559",
-    "MATH 4651",
     "MATH 4660",
     "MATH 4840",
     "MATH 4993",
@@ -23163,7 +26387,6 @@
     "MDST 3338",
     "MDST 3380",
     "MDST 3388",
-    "MDST 3407",
     "MDST 3409",
     "MDST 3430",
     "MDST 3490",
@@ -23171,7 +26394,6 @@
     "MDST 3502",
     "MDST 3503",
     "MDST 3504",
-    "MDST 3505",
     "MDST 3508",
     "MDST 3510",
     "MDST 3559",
@@ -23404,16 +26626,9 @@
     "MUEN 2690",
     "MUEN 3570",
     "MUEN 3600",
-    "MUEN 3610",
-    "MUEN 3620",
-    "MUEN 3630",
     "MUEN 3631",
     "MUEN 3645",
-    "MUEN 3650",
-    "MUEN 3651",
     "MUEN 3660",
-    "MUEN 3670",
-    "MUEN 3680",
     "MUEN 3690",
     "MUPF 2110",
     "MUPF 2111",
@@ -23433,14 +26648,6 @@
     "MUPF 2181",
     "MUPF 2210",
     "MUPF 2211",
-    "MUPF 3110",
-    "MUPF 3120",
-    "MUPF 3140",
-    "MUPF 3150",
-    "MUPF 3160",
-    "MUPF 3170",
-    "MUPF 3180",
-    "MUPF 3950",
     "MUSI 1001T",
     "MUSI 1002T",
     "MUSI 1003T",
@@ -23478,7 +26685,6 @@
     "MUSI 2570",
     "MUSI 2600",
     "MUSI 2993",
-    "MUSI 3010",
     "MUSI 3050",
     "MUSI 3060",
     "MUSI 3065",
@@ -23526,7 +26732,6 @@
     "MUSI 4723",
     "MUSI 4750",
     "MUSI 4760",
-    "MUSI 4950",
     "MUSI 4993",
     "MUSI 5810",
     "MUSI 7000",
@@ -23910,7 +27115,6 @@
     "PHS 7830",
     "PHS 7831",
     "PHS 7840",
-    "PHS 8120",
     "PHS 8880",
     "PHS 8881",
     "PHS 8900",
@@ -23998,8 +27202,6 @@
     "PLAD 4430",
     "PLAD 4500",
     "PLAD 4961",
-    "PLAD 4990",
-    "PLAD 4999",
     "PLAD 5500",
     "PLAD 5993",
     "PLAD 7045",
@@ -24190,7 +27392,6 @@
     "PLCP 4652",
     "PLCP 4810",
     "PLCP 4840",
-    "PLCP 4990",
     "PLCP 4999",
     "PLCP 5500",
     "PLCP 5610",
@@ -24359,7 +27560,6 @@
     "PSHM 5300",
     "PSHM 5330",
     "PSHM 5650",
-    "PSHM 5805",
     "PSHP 2040",
     "PSLP 5300",
     "PSLP 5310",
@@ -24391,7 +27591,6 @@
     "PSPS 6015",
     "PSPS 6030",
     "PSPS 6040",
-    "PSPS 6050",
     "PSPS 6980",
     "PSPS 6991",
     "PST 1559",
@@ -24409,7 +27608,6 @@
     "PSYC 1010",
     "PSYC 1020",
     "PSYC 1559",
-    "PSYC 2005",
     "PSYC 2150",
     "PSYC 2300",
     "PSYC 2410",
@@ -24450,7 +27648,6 @@
     "PSYC 4559",
     "PSYC 4580",
     "PSYC 4585",
-    "PSYC 4603",
     "PSYC 4606",
     "PSYC 4640",
     "PSYC 4645",
@@ -25258,7 +28455,6 @@
     "STAT 4630",
     "STAT 4800",
     "STAT 4993",
-    "STAT 4996",
     "STAT 5350",
     "STAT 5390",
     "STAT 5430",
@@ -25273,7 +28469,6 @@
     "STAT 6610",
     "STAT 7559",
     "STAT 7610",
-    "STAT 7995",
     "STAT 9120",
     "STAT 9998",
     "STAT 9999",
@@ -25320,15 +28515,12 @@
     "SYS 6003",
     "SYS 6007",
     "SYS 6009",
-    "SYS 6016",
     "SYS 6021",
     "SYS 6023",
     "SYS 6024",
     "SYS 6035",
     "SYS 6036",
-    "SYS 6041",
     "SYS 6042",
-    "SYS 6043",
     "SYS 6045",
     "SYS 6060",
     "SYS 6064",
@@ -25364,7 +28556,6 @@
     "TURK 3010",
     "UD 7500",
     "UD 8010",
-    "UD 8030",
     "UD 8611",
     "UD 8612",
     "UD 8614",
@@ -25437,7 +28628,6 @@
     "WGS 4820",
     "WGS 4840",
     "WGS 4900",
-    "WGS 4998",
     "WGS 5500",
     "WGS 5559",
     "WGS 7500",

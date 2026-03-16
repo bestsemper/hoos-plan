@@ -147,6 +147,7 @@ function fileToDataUrl(file: File): Promise<string> {
 export default function PlanBuilderPage() {
   const router = useRouter();
   const isMountedRef = useRef(true);
+  const newCourseInputRef = useRef<HTMLInputElement | null>(null);
   const [userId, setUserId] = useState('');
   const [optimisticPlans, setOptimisticPlans] = useState<PlanItem[]>([]);
   const [allCourses, setAllCourses] = useState<CourseOption[]>([]);
@@ -1140,10 +1141,17 @@ export default function PlanBuilderPage() {
                                   <div className="h-full px-3 bg-panel-bg-alt border border-panel-border-strong rounded-xl text-sm flex items-center justify-between gap-2">
                                     <div className="flex-1 h-full">
                                       <input
+                                        ref={newCourseInputRef}
                                         type="text"
                                         placeholder="Course Code"
                                         value={courseCode}
                                         onChange={(e) => handleCourseSearchChange(e.target.value)}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            void handleAddCourse(sem.id);
+                                          }
+                                        }}
                                         onFocus={() => setShowDropdown(true)}
                                         onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
                                         className="w-full h-full bg-transparent text-text-primary focus:outline-none"
@@ -1158,10 +1166,14 @@ export default function PlanBuilderPage() {
                                           <div
                                             key={course.code}
                                             className="px-3 py-2 rounded-lg hover:bg-hover-bg transition-colors cursor-pointer"
+                                            onMouseDown={(e) => e.preventDefault()}
                                             onClick={() => {
                                               setCourseCode(course.code);
                                               getCourseCreditsFromCSV(course.code).then((res) => setCredits(res));
                                               setShowDropdown(false);
+                                              requestAnimationFrame(() => {
+                                                newCourseInputRef.current?.focus();
+                                              });
                                             }}
                                           >
                                             <div className="text-sm font-medium text-text-primary">{course.code}</div>
