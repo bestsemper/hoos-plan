@@ -1,4 +1,8 @@
-# plan-your-future
+# hoos-plan
+
+Hoos' Plan is a UVA course planning website that helps students build semester-by-semester plans and check enrollment requirements (prerequisites, corequisites, and other restrictions) while they schedule classes.
+
+Live website: https://hooslist.vercel.app
 
 ### To-do:
 
