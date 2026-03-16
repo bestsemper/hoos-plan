@@ -1,5 +1,7 @@
 import json
 import re
+from collections import defaultdict
+from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, asdict
 import sys
@@ -20,6 +22,7 @@ PREREQ_PREFIX_PATTERN = r'(?:prerequisites?|prereqs?)(?:\s*[:\-]?)\s*'
 
 # Regex pattern for "N of the following" constraints
 COUNT_OF_PATTERN = r'(?:at\s+least\s+)?(\d+)\s+(?:of\s+(?:the\s+)?following|from\s+the\s+following|courses?\s+from)'
+MANUAL_EQUIVALENT_GROUPS_PATH = Path('data/manual_equivalent_groups.json')
 
 
 @dataclass
@@ -519,6 +522,155 @@ def extract_course_codes(text: str) -> List[str]:
     return [f"{dept} {num}" for dept, num in matches if dept not in INVALID_SUBJECT_CODES]
 
 
+def normalize_course_code(code: str) -> str:
+    """Normalize course codes to a consistent DEPT 1234 format."""
+    return re.sub(r'\s+', ' ', code.upper()).strip()
+
+
+def normalize_title_key(title: str) -> str:
+    """Normalize a title for loose equivalency grouping."""
+    normalized = re.sub(r'[^A-Z0-9]+', ' ', title.upper()).strip()
+    normalized = re.sub(r'\bI{1,3}V?\b', lambda match: {
+        'I': '1',
+        'II': '2',
+        'III': '3',
+        'IV': '4',
+        'V': '5',
+    }.get(match.group(0), match.group(0)), normalized)
+    return re.sub(r'\s+', ' ', normalized).strip()
+
+
+def build_equivalent_course_map(rows: List[Dict[str, str]]) -> Dict[str, List[str]]:
+    """Build a conservative course-equivalency map from catalog metadata."""
+    equivalents: Dict[str, set[str]] = defaultdict(set)
+    title_groups: Dict[str, List[str]] = defaultdict(list)
+
+    for row in rows:
+        course_code = normalize_course_code(row.get('course_code', ''))
+        title = row.get('title', '').strip()
+        description = row.get('description', '').strip()
+
+        if not course_code:
+            continue
+
+        if title:
+            title_key = normalize_title_key(title)
+            if title_key:
+                title_groups[title_key].append(course_code)
+
+        if description and 'CROSS-LIST' in description.upper():
+            cross_list_clauses = re.findall(r'cross[-\s]*listed(?:\s+as|\s+with)?\s+([^.;\n]+)', description, re.IGNORECASE)
+            for clause in cross_list_clauses:
+                for other_code in extract_course_codes(clause):
+                    other_code = normalize_course_code(other_code)
+                    if other_code and other_code != course_code:
+                        equivalents[course_code].add(other_code)
+                        equivalents[other_code].add(course_code)
+
+    for group_codes in title_groups.values():
+        unique_codes = sorted({normalize_course_code(code) for code in group_codes if code})
+        if len(unique_codes) < 2:
+            continue
+        for code in unique_codes:
+            equivalents[code].update(other for other in unique_codes if other != code)
+
+    for group in load_manual_equivalent_groups():
+        normalized_group = [normalize_course_code(code) for code in group]
+        for code in normalized_group:
+            equivalents[code].update(other for other in normalized_group if other != code)
+
+    return {
+        code: sorted(other for other in other_codes if other != code)
+        for code, other_codes in equivalents.items()
+        if other_codes
+    }
+
+
+def load_manual_equivalent_groups() -> List[List[str]]:
+    """Load curated equivalent-course groups from data/manual_equivalent_groups.json."""
+    if not MANUAL_EQUIVALENT_GROUPS_PATH.exists():
+        return []
+
+    try:
+        payload = json.loads(MANUAL_EQUIVALENT_GROUPS_PATH.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError):
+        return []
+
+    groups = payload.get('groups', []) if isinstance(payload, dict) else []
+    normalized_groups: List[List[str]] = []
+
+    for group in groups:
+        if not isinstance(group, list):
+            continue
+        normalized = [normalize_course_code(code) for code in group if isinstance(code, str) and code.strip()]
+        unique_codes = sorted(dict.fromkeys(normalized))
+        if len(unique_codes) >= 2:
+            normalized_groups.append(unique_codes)
+
+    return normalized_groups
+
+
+def extract_equivalent_allowed_courses(prereq_text: str) -> set[str]:
+    """Return course codes whose local clause explicitly allows an equivalent."""
+    upper_text = prereq_text.upper()
+    allowed_codes: set[str] = set()
+
+    for course_code in {normalize_course_code(code) for code in extract_course_codes(prereq_text)}:
+        course_pattern = re.compile(re.escape(course_code), re.IGNORECASE)
+        for match in course_pattern.finditer(upper_text):
+            clause_end_match = re.search(r'[.;\n\r]', upper_text[match.end():])
+            clause_end = match.end() + clause_end_match.start() if clause_end_match else min(len(upper_text), match.end() + 120)
+            clause_window = upper_text[match.end():clause_end]
+            if 'EQUIVALENT' in clause_window:
+                allowed_codes.add(course_code)
+                break
+
+    return allowed_codes
+
+
+def expand_equivalent_courses(node: Optional[Any], allowed_codes: set[str], equivalent_course_map: Dict[str, List[str]]) -> Optional[Any]:
+    """Expand course leaves with explicit equivalent-language into OR groups."""
+    if node is None:
+        return None
+
+    if isinstance(node, CourseNode):
+        course_code = normalize_course_code(node.code)
+        if course_code not in allowed_codes:
+            return node
+
+        equivalent_codes = equivalent_course_map.get(course_code, [])
+        if not equivalent_codes:
+            return node
+
+        return OperatorNode(
+            type='OR',
+            children=[CourseNode(type='course', code=course_code)] + [
+                CourseNode(type='course', code=equivalent_code)
+                for equivalent_code in equivalent_codes
+            ],
+        )
+
+    if isinstance(node, OperatorNode):
+        node.children = [
+            expanded
+            for child in node.children
+            for expanded in [expand_equivalent_courses(child, allowed_codes, equivalent_course_map)]
+            if expanded is not None
+        ]
+        return node
+
+    if isinstance(node, CountNode):
+        node.children = [
+            expanded
+            for child in node.children
+            for expanded in [expand_equivalent_courses(child, allowed_codes, equivalent_course_map)]
+            if expanded is not None
+        ]
+        return node
+
+    return node
+
+
 def extract_words_after_prefix(text: str) -> List[str]:
     """Extract all words that appear in prerequisite text after the prefix"""
     match = re.search(PREREQ_PREFIX_PATTERN, text, re.IGNORECASE)
@@ -544,6 +696,10 @@ def tokenize_prerequisite(text: str) -> List[str]:
 
     # Normalize for consistent matching and parsing.
     text = text.upper()
+
+    # Preserve explicit comma-plus-conjunction patterns before generic comma handling.
+    text = re.sub(r'\s*,\s*AND\b', ' AND ', text)
+    text = re.sub(r'\s*,\s*OR\b', ' OR ', text)
 
     # Treat comma-separated course lists as OR options.
     text = re.sub(r'\s*,\s*', ' OR ', text)
@@ -858,7 +1014,12 @@ def prune_self_reference(node: Optional[Any], owner_course_code: str) -> Optiona
     return node
 
 
-def process_course_prerequisite(course_code: str, description: str, enrollment_requirements: str) -> Optional[Any]:
+def process_course_prerequisite(
+    course_code: str,
+    description: str,
+    enrollment_requirements: str,
+    equivalent_course_map: Dict[str, List[str]],
+) -> Optional[Any]:
     """Process a single course and return its combined prerequisite tree."""
     non_course_requirements = extract_major_program_requirements(enrollment_requirements)
 
@@ -873,6 +1034,9 @@ def process_course_prerequisite(course_code: str, description: str, enrollment_r
             # Tokenize and parse
             tokens = tokenize_prerequisite(prereq_text)
             course_tree = parse_prerequisite_tree(tokens)
+            equivalent_allowed_courses = extract_equivalent_allowed_courses(prereq_text)
+            if equivalent_allowed_courses:
+                course_tree = expand_equivalent_courses(course_tree, equivalent_allowed_courses, equivalent_course_map)
             # Remove accidental self-references like "COURSE 1234 ..." from descriptions.
             course_tree = prune_self_reference(course_tree, course_code)
 
@@ -890,7 +1054,7 @@ def process_course_prerequisite(course_code: str, description: str, enrollment_r
     return OperatorNode(type='AND', children=combined_children)
 
 
-def process_course_row(row: Dict[str, str]) -> Tuple[str, Optional[Any], bool]:
+def process_course_row(row: Dict[str, str], equivalent_course_map: Dict[str, List[str]]) -> Tuple[str, Optional[Any], bool]:
     """Worker function to process a single course row"""
     course_code = row.get('course_code', '').strip()
     description = row.get('description', '').strip()
@@ -899,7 +1063,7 @@ def process_course_row(row: Dict[str, str]) -> Tuple[str, Optional[Any], bool]:
     if not course_code:
         return '', None, False
     
-    tree = process_course_prerequisite(course_code, description, enrollment_requirements)
+    tree = process_course_prerequisite(course_code, description, enrollment_requirements, equivalent_course_map)
     has_prereq = tree is not None
     
     return course_code, tree.to_dict() if tree and hasattr(tree, 'to_dict') else tree, has_prereq
@@ -961,7 +1125,8 @@ def main():
         print("Error: No course data found in JSON file")
         sys.exit(1)
     
-    # Process courses concurrently
+    equivalent_course_map = build_equivalent_course_map(rows)
+
     courses_with_prereqs = {}
     courses_without_prereqs = []
     
@@ -969,7 +1134,7 @@ def main():
 
     for row in rows:
         try:
-            course_code, tree, has_prereq = process_course_row(row)
+            course_code, tree, has_prereq = process_course_row(row, equivalent_course_map)
 
             if not course_code:
                 continue
