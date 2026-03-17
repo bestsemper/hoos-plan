@@ -309,11 +309,131 @@ function isDisplayedRequirementUnsatisfied(requirement: string, unmetRequirement
   });
 }
 
+function AddCourseInline({
+  semesterId,
+  allCourses,
+  onAddCourse,
+  onCancel,
+  onClearWarning,
+}: {
+  semesterId: string;
+  allCourses: CourseOption[];
+  onAddCourse: (semesterId: string, rawCourseCode: string, creditsText: string) => Promise<boolean>;
+  onCancel: () => void;
+  onClearWarning: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [courseCode, setCourseCode] = useState('');
+  const [credits, setCredits] = useState('3');
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const filteredCourses = useMemo(() => {
+    if (!courseCode) return [];
+
+    return allCourses
+      .filter((course) =>
+        course.code.toLowerCase().includes(courseCode.toLowerCase()) ||
+        (course.title ?? '').toLowerCase().includes(courseCode.toLowerCase())
+      )
+      .sort((a, b) => {
+        const lowerSearch = courseCode.toLowerCase();
+        const aStartsWith = a.code.toLowerCase().startsWith(lowerSearch);
+        const bStartsWith = b.code.toLowerCase().startsWith(lowerSearch);
+
+        if (aStartsWith && !bStartsWith) return -1;
+        if (!aStartsWith && bStartsWith) return 1;
+
+        return a.code.localeCompare(b.code);
+      });
+  }, [courseCode, allCourses]);
+
+  const submitCourse = async () => {
+    const didAdd = await onAddCourse(semesterId, courseCode, credits);
+    if (didAdd) {
+      setCourseCode('');
+      setCredits('3');
+      setShowDropdown(false);
+    }
+  };
+
+  return (
+    <div className="flex space-x-2 mt-2 relative h-[46px] items-stretch">
+      <div className="flex-1 relative h-full">
+        <div className="h-full px-3 bg-panel-bg-alt border border-panel-border-strong rounded-xl text-sm flex items-center justify-between gap-2">
+          <div className="flex-1 h-full">
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Course Code"
+              value={courseCode}
+              onChange={(e) => {
+                setCourseCode(e.target.value);
+                setShowDropdown(true);
+                onClearWarning();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  void submitCourse();
+                }
+              }}
+              onFocus={() => setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+              className="w-full h-full bg-transparent text-text-primary focus:outline-none"
+              autoFocus
+            />
+          </div>
+          <span className="text-gray-500 font-semibold whitespace-nowrap">{credits} cr</span>
+        </div>
+        {showDropdown && filteredCourses.length > 0 && (
+          <div className="absolute z-10 left-0 top-full w-full mt-1.5 bg-panel-bg border border-panel-border rounded-xl shadow-lg overflow-hidden">
+            <div className="max-h-48 overflow-y-auto p-1.5 space-y-0.5">
+              {filteredCourses.map((course) => (
+                <div
+                  key={course.code}
+                  className="px-3 py-2 rounded-lg hover:bg-hover-bg transition-colors cursor-pointer"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    setCourseCode(course.code);
+                    getCourseCreditsFromJSON(course.code).then((res: string) => setCredits(res));
+                    setShowDropdown(false);
+                    requestAnimationFrame(() => {
+                      inputRef.current?.focus();
+                    });
+                  }}
+                >
+                  <div className="text-sm font-medium text-text-primary">{course.code}</div>
+                  {course.title && (
+                    <div className="text-xs text-text-muted truncate">{course.title}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="ml-auto flex items-center justify-end space-x-1 px-1">
+        <button onClick={() => void submitCourse()} className="text-success-text hover:text-success-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <button
+          onClick={() => {
+            onClearWarning();
+            onCancel();
+          }}
+          className="text-danger-text hover:text-danger-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function PlanBuilderPage() {
   const router = useRouter();
   const isMountedRef = useRef(true);
   const lastPlanPrereqCheckKeyRef = useRef('');
-  const newCourseInputRef = useRef<HTMLInputElement | null>(null);
   const [userId, setUserId] = useState('');
   const [optimisticPlans, setOptimisticPlans] = useState<PlanItem[]>([]);
   const [allCourses, setAllCourses] = useState<CourseOption[]>([]);
@@ -326,9 +446,6 @@ export default function PlanBuilderPage() {
   const [creatingPlan, setCreatingPlan] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newCourseSem, setNewCourseSem] = useState<string | null>(null);
-  const [courseCode, setCourseCode] = useState('');
-  const [credits, setCredits] = useState('3');
-  const [showDropdown, setShowDropdown] = useState(false);
   const [selectedCourseInfo, setSelectedCourseInfo] = useState<CourseInfo | null>(null);
   const [loadingInfo, setLoadingInfo] = useState(false);
   const [selectedCourseMissingRequirements, setSelectedCourseMissingRequirements] = useState<RequirementMissing[]>([]);
@@ -418,7 +535,10 @@ export default function PlanBuilderPage() {
     storeSelectedPlanId(userId, selectedPlanId);
   }, [dataLoaded, selectedPlanId, userId]);
 
-  const activePlan = optimisticPlans.find((p) => p.id === selectedPlanId) || optimisticPlans[0];
+  const activePlan = useMemo(
+    () => optimisticPlans.find((p) => p.id === selectedPlanId) || optimisticPlans[0],
+    [optimisticPlans, selectedPlanId]
+  );
 
   // Check all existing courses in the plan for prerequisite violations
   useEffect(() => {
@@ -483,26 +603,6 @@ export default function PlanBuilderPage() {
     return Array.from(rows.values()).sort((a, b) => a.startYear - b.startYear);
   }, [activePlan]);
 
-  const filteredCourses = courseCode
-    ? allCourses
-        .filter((course) =>
-          course.code.toLowerCase().includes(courseCode.toLowerCase()) ||
-          (course.title ?? '').toLowerCase().includes(courseCode.toLowerCase())
-        )
-        .sort((a, b) => {
-          const lowerSearch = courseCode.toLowerCase();
-          const aStartsWith = a.code.toLowerCase().startsWith(lowerSearch);
-          const bStartsWith = b.code.toLowerCase().startsWith(lowerSearch);
-
-          // If one starts with search and the other doesn't, put the one that starts first
-          if (aStartsWith && !bStartsWith) return -1;
-          if (!aStartsWith && bStartsWith) return 1;
-
-          // Both start with search or neither does - sort alphabetically
-          return a.code.localeCompare(b.code);
-        })
-    : [];
-
   const handleGenerate = async () => {
     if (!userId) return;
     setLoading(true);
@@ -543,25 +643,18 @@ export default function PlanBuilderPage() {
     void loadData();
   };
 
-  const handleCourseSearchChange = (value: string) => {
-    setCourseCode(value);
-    setShowDropdown(true);
-    setPrereqWarning(null); // Clear any previous prerequisite warnings
+  const handleAddCourse = async (semesterId: string, rawCourseCode: string, creditsText: string): Promise<boolean> => {
+    if (!rawCourseCode || !activePlan) return false;
 
-    if (allCourses.some((course) => course.code === value)) {
-      getCourseCreditsFromJSON(value).then((res: string) => setCredits(res));
+    const code = rawCourseCode.toUpperCase();
+    const cr = Number.parseInt(creditsText, 10);
+    if (Number.isNaN(cr)) {
+      return false;
     }
-  };
-
-  const handleAddCourse = async (semesterId: string) => {
-    if (!courseCode || !activePlan) return;
-    
-    const code = courseCode.toUpperCase();
-    const cr = Number.parseInt(credits, 10);
 
     // Find the current semester to get termOrder
     const currentSem = activePlan.semesters.find((s) => s.id === semesterId);
-    if (!currentSem) return;
+    if (!currentSem) return false;
 
     // Check prerequisites
     const result = await checkCoursePrerequisites({
@@ -577,6 +670,7 @@ export default function PlanBuilderPage() {
       // Prerequisites are satisfied, proceed with adding course
       setPrereqWarning(null);
       addCourseOptimistically(semesterId, code, cr);
+      return true;
     } else if (result.hasNoPrerequisites && result.hasNoCorequisites && result.hasNoOtherRequirements && result.hasUnknownPrerequisites) {
       // No prerequisites found but not 1000-level - show soft warning
       setPrereqWarning({
@@ -584,6 +678,7 @@ export default function PlanBuilderPage() {
         message: `${code} might have enrollment requirements we don't have in our system (it's not a 1000-level course). It's been added anyway.`,
       });
       addCourseOptimistically(semesterId, code, cr);
+      return true;
     } else {
       setPrereqWarning({
         type: 'error',
@@ -596,7 +691,7 @@ export default function PlanBuilderPage() {
       });
       setShowPrereqConfirm(true);
       setPendingCourseAdd({ semesterId, courseCode: code, credits: cr });
-      return;
+      return false;
     }
   };
 
@@ -616,8 +711,6 @@ export default function PlanBuilderPage() {
     );
 
     setNewCourseSem(null);
-    setCourseCode('');
-    setCredits('3');
     setPrereqWarning(null);
 
     void addCourseToSemesterAsync(semesterId, code, cr);
@@ -1280,65 +1373,13 @@ export default function PlanBuilderPage() {
 
                             {newCourseSem === sem.id ? (
                               <>
-                              <div className="flex space-x-2 mt-2 relative h-[46px] items-stretch">
-                                <div className="flex-1 relative h-full">
-                                  <div className="h-full px-3 bg-panel-bg-alt border border-panel-border-strong rounded-xl text-sm flex items-center justify-between gap-2">
-                                    <div className="flex-1 h-full">
-                                      <input
-                                        ref={newCourseInputRef}
-                                        type="text"
-                                        placeholder="Course Code"
-                                        value={courseCode}
-                                        onChange={(e) => handleCourseSearchChange(e.target.value)}
-                                        onKeyDown={(e) => {
-                                          if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            void handleAddCourse(sem.id);
-                                          }
-                                        }}
-                                        onFocus={() => setShowDropdown(true)}
-                                        onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                                        className="w-full h-full bg-transparent text-text-primary focus:outline-none"
-                                      />
-                                    </div>
-                                    <span className="text-gray-500 font-semibold whitespace-nowrap">{credits} cr</span>
-                                  </div>
-                                  {showDropdown && filteredCourses.length > 0 && (
-                                    <div className="absolute z-10 left-0 top-full w-full mt-1.5 bg-panel-bg border border-panel-border rounded-xl shadow-lg overflow-hidden">
-                                      <div className="max-h-48 overflow-y-auto p-1.5 space-y-0.5">
-                                        {filteredCourses.map((course) => (
-                                          <div
-                                            key={course.code}
-                                            className="px-3 py-2 rounded-lg hover:bg-hover-bg transition-colors cursor-pointer"
-                                            onMouseDown={(e) => e.preventDefault()}
-                                            onClick={() => {
-                                              setCourseCode(course.code);
-                                              getCourseCreditsFromJSON(course.code).then((res: string) => setCredits(res));
-                                              setShowDropdown(false);
-                                              requestAnimationFrame(() => {
-                                                newCourseInputRef.current?.focus();
-                                              });
-                                            }}
-                                          >
-                                            <div className="text-sm font-medium text-text-primary">{course.code}</div>
-                                            {course.title && (
-                                              <div className="text-xs text-text-muted truncate">{course.title}</div>
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="ml-auto flex items-center justify-end space-x-1 px-1">
-                                  <button onClick={() => void handleAddCourse(sem.id)} className="text-success-text hover:text-success-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><polyline points="20 6 9 17 4 12"/></svg>
-                                  </button>
-                                  <button onClick={() => { setNewCourseSem(null); setPrereqWarning(null); }} className="text-danger-text hover:text-danger-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                                  </button>
-                                </div>
-                              </div>
+                              <AddCourseInline
+                                semesterId={sem.id}
+                                allCourses={allCourses}
+                                onAddCourse={handleAddCourse}
+                                onCancel={() => setNewCourseSem(null)}
+                                onClearWarning={() => setPrereqWarning(null)}
+                              />
 
                               {prereqWarning && (
                                 <div className={`mt-2 p-3 rounded-lg text-sm ${
