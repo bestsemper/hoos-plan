@@ -546,7 +546,7 @@ export async function createForumPost(title: string, body: string, attachedPlanI
   revalidatePath('/forum');
   revalidatePath('/forum/questions');
   revalidatePath(`/forum/${post.postNumber}`);
-  return { success: true };
+  return { success: true, postNumber: post.postNumber, title: post.title };
 }
 
 export async function deleteForumPost(postId: string) {

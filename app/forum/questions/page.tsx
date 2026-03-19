@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { CustomDropdown, CustomDropdownContent, CustomDropdownItem } from '../../components/CustomDropdown';
 import { createForumPost, getForumPageData } from '../../actions';
+import { getForumPostHref } from '../url';
 
 export default function ForumQuestionsPage() {
   const router = useRouter();
@@ -43,7 +44,12 @@ export default function ForumQuestionsPage() {
         return;
       }
 
-      router.push('/forum');
+      // Navigate to the newly created post
+      if (res?.postNumber && res?.title) {
+        router.push(getForumPostHref(res.postNumber, res.title));
+      } else {
+        router.push('/forum');
+      }
       router.refresh();
     });
   };
