@@ -140,7 +140,7 @@ export default function TreePage() {
                     onClick={() => handleSelectDepartment(dept)}
                     className={`block w-full text-left px-4 py-3 border-b border-panel-border last:border-b-0 hover:bg-hover-bg transition-colors ${
                       selectedDepartment?.mnemonic === dept.mnemonic
-                        ? "bg-uva-blue bg-opacity-10 text-uva-blue"
+                        ? "bg-badge-blue-bg text-badge-blue-text font-medium"
                         : "text-text-primary"
                     }`}
                   >

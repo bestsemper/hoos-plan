@@ -587,14 +587,14 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
       {/* Tree Container */}
       <div
         ref={svgContainerRef}
-        className="flex-1 overflow-auto"
+        className="flex-1 overflow-auto flex items-center justify-center"
         style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
       >
         <svg
           viewBox={`0 0 ${totalWidth} ${totalHeight}`}
           width={totalWidth}
           height={totalHeight}
-          style={{ display: "block", overflow: "visible", transform: `scale(${zoom})`, transformOrigin: '0 0', cursor: 'pointer' }}
+          style={{ display: "block", overflow: "visible", transform: `scale(${zoom})`, transformOrigin: '0 0', cursor: 'pointer', margin: 'auto' }}
         >
         <defs>
           {/* Arrowheads are now drawn manually for proper rotation along curved edges */}
