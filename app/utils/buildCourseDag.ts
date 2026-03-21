@@ -256,16 +256,31 @@ export function buildCourseDag(department: string): CourseDAG {
   // Step 4: Build edges between groups (avoiding duplicates)
   const edgeSet = new Set<string>();
   
+  // Helper function to extract course level (e.g., "CS 3100" -> 3)
+  const getCourseLevel = (courseId: string): number => {
+    const match = courseId.match(/(\d)(\d{3})/);
+    if (match) {
+      return parseInt(match[1]);
+    }
+    return 0;
+  };
+  
   relevantCourses.forEach(courseId => {
     const courseData = allCourses.get(courseId);
     if (!courseData) return;
     
     const courseGroup = courseToGroupRep.get(courseId)!;
+    const courseLevel = getCourseLevel(courseId);
     
     courseData.prereqs.forEach(prereq => {
       if (!relevantCourses.has(prereq)) return;
       
       const prereqGroup = courseToGroupRep.get(prereq)!;
+      const prereqLevel = getCourseLevel(prereq);
+      
+      // Skip if prerequisite has a higher level than the course (parsing error)
+      if (prereqLevel > courseLevel) return;
+      
       if (courseGroup !== prereqGroup) {
         const edgeKey = `${prereqGroup}->${courseGroup}`;
         if (!edgeSet.has(edgeKey)) {
@@ -276,7 +291,49 @@ export function buildCourseDag(department: string): CourseDAG {
     });
   });
   
-  // Step 5: Remove redundant edges
+  // Step 5: Resolve circular/bidirectional edges and asymmetric circular refs
+  // Helper to get numeric suffix from course code (e.g., "CS 3100" -> 3100)
+  const getCourseNumber = (courseId: string): number => {
+    const match = courseId.match(/\d+$/);
+    if (match) {
+      return parseInt(match[0]);
+    }
+    return 0;
+  };
+  
+  const edgesToRemove: [string, string][] = [];
+  
+  // Check for bidirectional edges
+  edges.forEach((children, parentId) => {
+    children.forEach(childId => {
+      const childEdges = edges.get(childId);
+      if (childEdges && childEdges.has(parentId)) {
+        // Bidirectional edge found: parentId <-> childId
+        // Keep only the edge from lower number to higher number
+        const parentNum = getCourseNumber(parentId);
+        const childNum = getCourseNumber(childId);
+        
+        if (parentNum > childNum) {
+          // parentId > childId, so we should have childId -> parentId instead
+          edgesToRemove.push([parentId, childId]);
+        } else if (parentNum < childNum) {
+          // parentId < childId, which is correct, remove the reverse
+          edgesToRemove.push([childId, parentId]);
+        } else {
+          // Same number, remove one arbitrarily (keep forward)
+          edgesToRemove.push([childId, parentId]);
+        }
+      }
+    });
+  });
+  
+  // Remove the identified edges
+  edgesToRemove.forEach(([parentId, childId]) => {
+    edges.get(parentId)?.delete(childId);
+  });
+  
+  // Step 5b: Remove redundant edges
+  // Step 6: Remove redundant edges
   const redundantEdges: [string, string][] = [];
   
   edges.forEach((children, parentId) => {
@@ -295,7 +352,7 @@ export function buildCourseDag(department: string): CourseDAG {
     edges.get(from)?.delete(to);
   });
   
-  // Step 6: Remove isolated nodes (nodes with no incoming or outgoing edges)
+  // Step 7: Remove isolated nodes (nodes with no incoming or outgoing edges)
   const nodesWithEdges = new Set<string>();
   
   // Add nodes that have outgoing edges

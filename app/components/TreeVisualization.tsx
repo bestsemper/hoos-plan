@@ -347,44 +347,97 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
       startNodeId: string,
       endNodeId: string
     ): Array<{ x: number; y: number }> {
-      const blockingNodes = findBlockingNodes(x1, y1, x2, y2, obstacles, startNodeId, endNodeId);
-
-      if (blockingNodes.length === 0) {
+      // Find the rows containing start and end nodes
+      let startRowIdx = -1;
+      let endRowIdx = -1;
+      
+      for (const [rowIdx, coursesAtRow] of levelRows) {
+        if (coursesAtRow.includes(startNodeId)) startRowIdx = rowIdx;
+        if (coursesAtRow.includes(endNodeId)) endRowIdx = rowIdx;
+      }
+      
+      if (startRowIdx === -1 || endRowIdx === -1 || startRowIdx === endRowIdx) {
+        // Same row or not found, go direct
         return [{ x: x1, y: y1 }, { x: x2, y: y2 }];
       }
-
-      // Calculate bulge amount based on blocking nodes
-      const midX = (x1 + x2) / 2;
-      const midY = (y1 + y2) / 2;
-
-      // Determine bulge direction: perpendicular to the line
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const len = Math.sqrt(dx * dx + dy * dy);
-      const perpX = -dy / len;
-      const perpY = dx / len;
-
-      // Calculate bulge amount from node positions
-      let bulgeDistance = 0;
-      for (const node of blockingNodes) {
-        const distToCenter = Math.sqrt(
-          (node.x - midX) * (node.x - midX) +
-            (node.y - midY) * (node.y - midY)
-        );
-        const nodeSize = Math.max(node.w, node.h) / 2;
-        bulgeDistance = Math.max(bulgeDistance, nodeSize + 40);
+      
+      // Get intermediate row indices
+      const minRow = Math.min(startRowIdx, endRowIdx);
+      const maxRow = Math.max(startRowIdx, endRowIdx);
+      const intermediateRows: number[] = [];
+      
+      for (let i = minRow + 1; i < maxRow; i++) {
+        intermediateRows.push(i);
       }
-
-      // Create control point for Bezier curve that bulges around obstacles
-      const cp1X = midX + perpX * bulgeDistance;
-      const cp1Y = midY + perpY * bulgeDistance;
-
-      // Return waypoints for multi-segment curve
-      return [
-        { x: x1, y: y1 },
-        { x: cp1X, y: cp1Y },
-        { x: x2, y: y2 },
-      ];
+      
+      // If no intermediate rows, just go direct
+      if (intermediateRows.length === 0) {
+        return [{ x: x1, y: y1 }, { x: x2, y: y2 }];
+      }
+      
+      // Build waypoints through gaps in intermediate rows
+      const waypoints: Array<{ x: number; y: number }> = [{ x: x1, y: y1 }];
+      
+      // Track the current gap X position to prefer continuous paths
+      let currentGapX = x1;
+      
+      // For each intermediate row, find the best gap and add top+bottom waypoints
+      for (const rowIdx of intermediateRows) {
+        const coursesAtRow = levelRows.get(rowIdx) || [];
+        
+        if (coursesAtRow.length === 0) continue;
+        
+        // Get positions within this row and sort by x coordinate
+        const nodePositions = coursesAtRow
+          .map(courseId => positionMap.get(courseId)?.x || 0)
+          .sort((a, b) => a - b);
+        
+        // Find gaps between nodes in this row
+        const gaps: number[] = [];
+        
+        // Gap before first node
+        gaps.push(nodePositions[0] - minNodeSpacing / 2);
+        
+        // Gaps between consecutive nodes
+        for (let i = 0; i < nodePositions.length - 1; i++) {
+          const midX = (nodePositions[i] + nodePositions[i + 1]) / 2;
+          gaps.push(midX);
+        }
+        
+        // Gap after last node
+        gaps.push(nodePositions[nodePositions.length - 1] + minNodeSpacing / 2);
+        
+        // Find closest gap to current gap position (for consistency across rows)
+        let bestGapX = gaps[0];
+        let bestDistance = Math.abs(gaps[0] - currentGapX);
+        
+        for (const gapX of gaps) {
+          const distance = Math.abs(gapX - currentGapX);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestGapX = gapX;
+          }
+        }
+        
+        // Update current gap position for next row
+        currentGapX = bestGapX;
+        
+        // Get the Y position of this row (use first course in row as reference)
+        const firstCourseInRow = coursesAtRow[0];
+        const rowY = positionMap.get(firstCourseInRow)?.y || 0;
+        
+        // Add waypoints at top and bottom of the gap in this row
+        const topOfGap = rowY - nodeH / 2 - 5; // Small padding above row
+        const bottomOfGap = rowY + nodeH / 2 + 5; // Small padding below row
+        
+        waypoints.push({ x: bestGapX, y: topOfGap });
+        waypoints.push({ x: bestGapX, y: bottomOfGap });
+      }
+      
+      // Add end point
+      waypoints.push({ x: x2, y: y2 });
+      
+      return waypoints;
     }
 
     // Build obstacles list
@@ -528,49 +581,71 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
             return `${x},${y} ${leftX},${leftY} ${rightX},${rightY}`;
           };
 
-          if (edge.waypoints.length === 2) {
-            // Direct path, use smooth Bezier curve with better control points
-            const x1 = edge.waypoints[0].x;
-            const y1 = edge.waypoints[0].y;
-            const x2 = edge.waypoints[1].x;
-            const y2 = edge.waypoints[1].y;
-            // Smoother control points that ease in and out
-            const cp1Y = y1 + (y2 - y1) * 0.3;
-            const cp2Y = y1 + (y2 - y1) * 0.7;
-            const pathData = `M ${x1} ${y1} C ${x1} ${cp1Y}, ${x2} ${cp2Y}, ${x2} ${y2}`;
-            // Vertical arrowheads
-            const angle = Math.PI / 2;
-
-            return (
-              <g key={`edge-${idx}`}>
-                <path
-                  d={pathData}
-                  fill="none"
-                  stroke={displayColor}
-                  strokeWidth={isConnectedToHovered ? strokeWidth * 2 : strokeWidth}
-                  opacity={isConnectedToHovered ? 1 : 0.7}
-                />
-                <polygon
-                  points={createArrowhead(x2, y2, angle, arrowMarkerSize)}
-                  fill={displayColor}
-                  opacity={isConnectedToHovered ? 1 : 0.7}
-                />
-              </g>
-            );
+          // Multi-waypoint path through gaps - create smooth Bezier segments with no bulge
+          const waypoints = edge.waypoints;
+          const numPoints = waypoints.length;
+          const p_prev = waypoints[numPoints - 2];
+          const p_end = waypoints[numPoints - 1];
+          
+          // Get control points of the last segment to compute angle
+          let cp_prevX, cp_prevY, cp_endX, cp_endY;
+          if (numPoints === 2) {
+            cp_prevX = waypoints[0].x;
+            cp_prevY = waypoints[0].y + (p_end.y - waypoints[0].y) * 0.3;
+            cp_endX = p_end.x;
+            cp_endY = waypoints[0].y + (p_end.y - waypoints[0].y) * 0.7;
+          } else {
+            cp_prevX = p_prev.x * 0.7 + p_end.x * 0.3;
+            cp_prevY = p_prev.y * 0.7 + p_end.y * 0.3;
+            cp_endX = p_prev.x * 0.3 + p_end.x * 0.7;
+            cp_endY = p_prev.y * 0.3 + p_end.y * 0.7;
           }
-
-          // Path with bulge around obstacles
-          const x1 = edge.waypoints[0].x;
-          const y1 = edge.waypoints[0].y;
-          const cpX = edge.waypoints[1].x;
-          const cpY = edge.waypoints[1].y;
-          const x2 = edge.waypoints[2].x;
-          const y2 = edge.waypoints[2].y;
-
-          // Use cubic Bezier curves with smooth transitions
-          const pathData = `M ${x1} ${y1} C ${x1} ${(y1 + cpY) * 0.5}, ${cpX} ${(y1 + cpY) * 0.5}, ${cpX} ${cpY} C ${cpX} ${(cpY + y2) * 0.5}, ${x2} ${(cpY + y2) * 0.5}, ${x2} ${y2}`;
-          // Vertical arrowheads
-          const angle = Math.PI / 2;
+          
+          const t = 0.95;
+          const coef1 = 3 * Math.pow(1 - t, 2);
+          const coef2 = 6 * (1 - t) * t;
+          const coef3 = 3 * Math.pow(t, 2);
+          const dx = coef1 * (cp_prevX - p_prev.x) + coef2 * (cp_endX - cp_prevX) + coef3 * (p_end.x - cp_endX);
+          const dy = coef1 * (cp_prevY - p_prev.y) + coef2 * (cp_endY - cp_prevY) + coef3 * (p_end.y - cp_endY);
+          const angle = Math.atan2(dy, dx);
+          
+          // Calculate where the line stops (before the node) but arrow stays at node
+          const lineStopOffsetDist = arrowMarkerSize * 1.5;
+          const lineStopX = p_end.x - Math.cos(angle) * lineStopOffsetDist;
+          const lineStopY = p_end.y - Math.sin(angle) * lineStopOffsetDist;
+          
+          // Build path string with smooth Bezier curves, ending before the node
+          let pathData = `M ${waypoints[0].x} ${waypoints[0].y}`;
+          
+          // For 2 waypoints, use simple curve
+          if (numPoints === 2) {
+            const x1 = waypoints[0].x;
+            const y1 = waypoints[0].y;
+            const cp1Y = y1 + (lineStopY - y1) * 0.3;
+            const cp2Y = y1 + (lineStopY - y1) * 0.7;
+            pathData = `M ${x1} ${y1} C ${x1} ${cp1Y}, ${lineStopX} ${cp2Y}, ${lineStopX} ${lineStopY}`;
+          } else {
+            // For multiple waypoints, create smooth connecting segments without bulge
+            // Connect all waypoints except the last, then curve to line stop point
+            for (let i = 1; i < numPoints - 1; i++) {
+              const p0 = waypoints[i - 1];
+              const p1 = waypoints[i];
+              
+              const cp0X = p0.x * 0.7 + p1.x * 0.3;
+              const cp0Y = p0.y * 0.7 + p1.y * 0.3;
+              const cp1X = p0.x * 0.3 + p1.x * 0.7;
+              const cp1Y = p0.y * 0.3 + p1.y * 0.7;
+              
+              pathData += ` C ${cp0X} ${cp0Y}, ${cp1X} ${cp1Y}, ${p1.x} ${p1.y}`;
+            }
+            
+            // Final segment to line stop point (not all the way to node)
+            const cp0X = p_prev.x * 0.7 + lineStopX * 0.3;
+            const cp0Y = p_prev.y * 0.7 + lineStopY * 0.3;
+            const cp1X = p_prev.x * 0.3 + lineStopX * 0.7;
+            const cp1Y = p_prev.y * 0.3 + lineStopY * 0.7;
+            pathData += ` C ${cp0X} ${cp0Y}, ${cp1X} ${cp1Y}, ${lineStopX} ${lineStopY}`;
+          }
 
           return (
             <g key={`edge-${idx}`}>
@@ -582,7 +657,7 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
                 opacity={isConnectedToHovered ? 1 : 0.7}
               />
               <polygon
-                points={createArrowhead(x2, y2, angle, arrowMarkerSize)}
+                points={createArrowhead(p_end.x, p_end.y, angle, isConnectedToHovered ? arrowMarkerSize * 1.5 : arrowMarkerSize)}
                 fill={displayColor}
                 opacity={isConnectedToHovered ? 1 : 0.7}
               />
