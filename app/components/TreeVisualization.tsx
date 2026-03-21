@@ -587,7 +587,7 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200 relative">
+    <div className="w-full h-full flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200 absolute inset-0 overflow-hidden min-w-0 min-h-0">
       <div className="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur px-3 py-1.5 rounded-full border border-blue-200 shadow-sm pointer-events-none">
         <p className="text-xs text-blue-800 font-medium">Scroll to zoom • Click & Drag to pan</p>
       </div>
@@ -602,8 +602,8 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
           style={{
             minWidth: '100%',
             minHeight: '100%',
-            width: 'max-content',
-            height: 'max-content',
+            width: `${totalWidth * zoom}px`,
+            height: `${totalHeight * zoom}px`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -612,8 +612,8 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
         >
           <svg
             viewBox={`0 0 ${totalWidth} ${totalHeight}`}
-            width={totalWidth * zoom}
-            height={totalHeight * zoom}
+            width="100%"
+            height="100%"
             style={{ display: "block", overflow: "visible", cursor: 'pointer' }}
           >
           <defs>
