@@ -196,44 +196,42 @@ export default function ForumPage() {
         </div>
       </div>
 
-      <div className="bg-panel-bg border border-panel-border rounded-xl overflow-hidden">
+      <div className="space-y-4">
         {filteredPosts.map((post) => {
           return (
-            <article key={post.id} className="px-4 py-4 border-b border-panel-border last:border-b-0">
-              <div className="grid grid-cols-[88px_minmax(0,1fr)] gap-4 items-start">
-                <div className="text-right text-sm text-text-secondary space-y-1 pt-0.5">
-                  <p><span className="font-semibold text-text-primary mr-1">{post.voteCount}</span> votes</p>
-                  <p><span className="font-semibold text-text-primary mr-1">{post.answers.length}</span> replies</p>
-                  <p><span className="font-semibold text-text-primary mr-1">{post.viewCount}</span> views</p>
-                </div>
-                <div className="min-w-0">
-                  <Link
-                    href={getForumPostHref(post.postNumber, post.title)}
-                    className="min-w-0 block text-left cursor-pointer"
-                  >
-                    <h2 className="text-lg font-semibold mb-1 text-uva-blue hover:underline break-words leading-snug">
-                      {post.title}
-                    </h2>
-                    <p className="text-sm text-text-secondary mb-2 break-words line-clamp-2 leading-snug">
-                      {post.body}
-                    </p>
-                  </Link>
-                  <div className="flex items-center justify-between gap-3 mt-1">
-                    <div>
-                      {post.attachedPlan && (
-                        <Link
-                          href={`/plan/${post.attachedPlan.id}`}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-input-disabled text-xs font-semibold text-text-secondary hover:bg-hover-bg transition-colors"
-                        >
-                          <span className="uppercase tracking-wide text-[10px]">Attached Plan</span>
-                          <span className="text-text-primary">{post.attachedPlan.title}</span>
-                        </Link>
-                      )}
-                    </div>
-                    <p className="text-xs text-text-tertiary whitespace-nowrap">
-                      <Link href={`/profile/${post.authorComputingId}`} className="text-uva-blue font-semibold hover:underline">{post.authorDisplayName}</Link> asked {formatRelativeTime(post.createdAt)}
-                    </p>
+            <article key={post.id} className="bg-panel-bg border border-panel-border p-5 rounded-xl flex gap-4">
+              <div className="text-sm text-text-secondary space-y-2 w-24 shrink-0">
+                <p><span className="font-semibold text-text-primary">{post.voteCount}</span> votes</p>
+                <p><span className="font-semibold text-text-primary">{post.answers.length}</span> replies</p>
+                <p><span className="font-semibold text-text-primary">{post.viewCount}</span> views</p>
+              </div>
+              <div className="flex-1 min-w-0">
+                <Link
+                  href={getForumPostHref(post.postNumber, post.title)}
+                  className="min-w-0 block text-left cursor-pointer"
+                >
+                  <h2 className="text-base font-semibold mb-1 text-uva-blue hover:underline break-words">
+                    {post.title}
+                  </h2>
+                  <p className="text-sm text-text-secondary mb-3 break-words line-clamp-2">
+                    {post.body}
+                  </p>
+                </Link>
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    {post.attachedPlan && (
+                      <Link
+                        href={`/plan/${post.attachedPlan.id}`}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-input-disabled text-xs font-semibold text-text-secondary hover:bg-hover-bg transition-colors"
+                      >
+                        <span className="uppercase tracking-wide text-[10px]">Attached Plan</span>
+                        <span className="text-text-primary">{post.attachedPlan.title}</span>
+                      </Link>
+                    )}
                   </div>
+                  <p className="text-xs text-text-tertiary whitespace-nowrap">
+                    <Link href={`/profile/${post.authorComputingId}`} className="text-uva-blue font-semibold hover:underline">{post.authorDisplayName}</Link> asked {formatRelativeTime(post.createdAt)}
+                  </p>
                 </div>
               </div>
             </article>
