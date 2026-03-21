@@ -760,24 +760,54 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
             return `${x},${y} ${leftX},${leftY} ${rightX},${rightY}`;
           };
 
-          // Multi-waypoint path through gaps - create smooth Bezier segments with no bulge
+          // Multi-waypoint path through gaps - create smooth Bezier segments with perfect continuity
           const waypoints = edge.waypoints;
           const numPoints = waypoints.length;
           const p_prev = waypoints[numPoints - 2];
           const p_end = waypoints[numPoints - 1];
           
+          // Helper to calculate control points that never point upward (pass horizontal line test)
+          const calculateControlPoints = (p0: { x: number; y: number }, p1: { x: number; y: number }, p2?: { x: number; y: number } | null, p_1?: { x: number; y: number } | null) => {
+            // For curves that pass the horizontal line test, ensure all points are monotonic in y
+            // Keep horizontal offset minimal to avoid overshooting the bundled edge
+            
+            const dx = p1.x - p0.x;
+            const dy = p1.y - p0.y;
+            
+            // Very conservative tension - much smaller than before to prevent overshoot
+            const tension = Math.max(0, Math.min(0.15 * dy, dy * 0.2)); // Reduced from 0.25
+            
+            // First control point - minimal horizontal offset, mostly vertical
+            const cp0x = p0.x; // Reduced from 0.15
+            const cp0y = p0.y + tension;
+            
+            // Second control point - minimal horizontal offset, mostly vertical
+            const cp1x = p1.x; // Reduced from 0.15
+            const cp1y = p1.y - tension;
+            
+            // Ensure monotonicity: cp0_y <= cp1_y
+            if (cp0y > cp1y) {
+              const midY = (p0.y + p1.y) / 2;
+              return { cp0x, cp0y: midY * 0.75 + p0.y * 0.25, cp1x, cp1y: p1.y * 0.75 + midY * 0.25 };
+            }
+            
+            return { cp0x, cp0y, cp1x, cp1y };
+          };
+          
           // Get control points of the last segment to compute angle
           let cp_prevX, cp_prevY, cp_endX, cp_endY;
           if (numPoints === 2) {
-            cp_prevX = waypoints[0].x;
-            cp_prevY = waypoints[0].y + (p_end.y - waypoints[0].y) * 0.3;
-            cp_endX = p_end.x;
-            cp_endY = waypoints[0].y + (p_end.y - waypoints[0].y) * 0.7;
+            const controls = calculateControlPoints(waypoints[0], p_end);
+            cp_prevX = controls.cp0x;
+            cp_prevY = controls.cp0y;
+            cp_endX = controls.cp1x;
+            cp_endY = controls.cp1y;
           } else {
-            cp_prevX = p_prev.x * 0.7 + p_end.x * 0.3;
-            cp_prevY = p_prev.y * 0.7 + p_end.y * 0.3;
-            cp_endX = p_prev.x * 0.3 + p_end.x * 0.7;
-            cp_endY = p_prev.y * 0.3 + p_end.y * 0.7;
+            const controls = calculateControlPoints(p_prev, p_end, null, waypoints[numPoints - 3]);
+            cp_prevX = controls.cp0x;
+            cp_prevY = controls.cp0y;
+            cp_endX = controls.cp1x;
+            cp_endY = controls.cp1y;
           }
           
           const t = 0.95;
@@ -798,32 +828,25 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
           
           // For 2 waypoints, use simple curve
           if (numPoints === 2) {
-            const x1 = waypoints[0].x;
-            const y1 = waypoints[0].y;
-            const cp1Y = y1 + (lineStopY - y1) * 0.3;
-            const cp2Y = y1 + (lineStopY - y1) * 0.7;
-            pathData = `M ${x1} ${y1} C ${x1} ${cp1Y}, ${lineStopX} ${cp2Y}, ${lineStopX} ${lineStopY}`;
+            const controls = calculateControlPoints(waypoints[0], { x: lineStopX, y: lineStopY });
+            pathData = `M ${waypoints[0].x} ${waypoints[0].y} C ${controls.cp0x} ${controls.cp0y}, ${controls.cp1x} ${controls.cp1y}, ${lineStopX} ${lineStopY}`;
           } else {
-            // For multiple waypoints, create smooth connecting segments without bulge
+            // For multiple waypoints, create smooth connecting segments with perfect continuity
             // Connect all waypoints except the last, then curve to line stop point
             for (let i = 1; i < numPoints - 1; i++) {
               const p0 = waypoints[i - 1];
               const p1 = waypoints[i];
+              const p_prev = i > 1 ? waypoints[i - 2] : null;
+              const p_next = i < numPoints - 2 ? waypoints[i + 1] : null;
               
-              const cp0X = p0.x * 0.7 + p1.x * 0.3;
-              const cp0Y = p0.y * 0.7 + p1.y * 0.3;
-              const cp1X = p0.x * 0.3 + p1.x * 0.7;
-              const cp1Y = p0.y * 0.3 + p1.y * 0.7;
+              const controls = calculateControlPoints(p0, p1, p_next, p_prev);
               
-              pathData += ` C ${cp0X} ${cp0Y}, ${cp1X} ${cp1Y}, ${p1.x} ${p1.y}`;
+              pathData += ` C ${controls.cp0x} ${controls.cp0y}, ${controls.cp1x} ${controls.cp1y}, ${p1.x} ${p1.y}`;
             }
             
             // Final segment to line stop point (not all the way to node)
-            const cp0X = p_prev.x * 0.7 + lineStopX * 0.3;
-            const cp0Y = p_prev.y * 0.7 + lineStopY * 0.3;
-            const cp1X = p_prev.x * 0.3 + lineStopX * 0.7;
-            const cp1Y = p_prev.y * 0.3 + lineStopY * 0.7;
-            pathData += ` C ${cp0X} ${cp0Y}, ${cp1X} ${cp1Y}, ${lineStopX} ${lineStopY}`;
+            const controls = calculateControlPoints(p_prev, { x: lineStopX, y: lineStopY }, null, waypoints[numPoints - 3]);
+            pathData += ` C ${controls.cp0x} ${controls.cp0y}, ${controls.cp1x} ${controls.cp1y}, ${lineStopX} ${lineStopY}`;
           }
 
           return (
