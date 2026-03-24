@@ -353,7 +353,7 @@ export default function ForumPage() {
 
                 <div className="min-w-0">
                   <div className="flex items-start justify-between gap-3 mb-2">
-                    <h2 className="text-base font-semibold text-uva-blue break-words">
+                    <h2 className="text-base font-semibold text-heading break-words">
                       {post.title}
                       <span className="ml-2 font-medium text-text-secondary">by {post.authorDisplayName}</span>
                     </h2>
