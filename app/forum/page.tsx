@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '@/app/components/Icon';
+import { CustomDropdown, CustomDropdownContent, CustomDropdownItem } from '@/app/components/CustomDropdown';
 import { getForumPageData, voteOnForumPost } from '../actions';
 import { useAttachedPlanModal } from './AttachedPlanModalProvider';
 import { getForumPostHref } from './url';
@@ -60,6 +61,7 @@ export default function ForumPage() {
   const [isVoting, setIsVoting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'recent' | 'upvoted'>('recent');
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
 
   const [search, setSearch] = useState('');
   const [appliedSearch, setAppliedSearch] = useState('');
@@ -218,18 +220,13 @@ export default function ForumPage() {
             }}
           >
             <span className="sr-only">Search the forum</span>
-            <svg
+            <Icon
+              name="search"
+              color="currentColor"
+              width={16}
+              height={16}
               className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fillRule="evenodd"
-                d="M8.5 3a5.5 5.5 0 014.396 8.804l3.65 3.65a.75.75 0 11-1.06 1.06l-3.65-3.65A5.5 5.5 0 118.5 3zm0 1.5a4 4 0 100 8 4 4 0 000-8z"
-                clipRule="evenodd"
-              />
-            </svg>
+            />
             <input
               type="text"
               value={search}
@@ -273,18 +270,43 @@ export default function ForumPage() {
       </div>
 
       <div className="mb-4 flex items-center justify-end">
-        <label className="inline-flex items-center gap-2 text-sm text-text-secondary">
-          <span>Sort by</span>
-          <select
-            value={sortBy}
-            onChange={(event) => setSortBy(event.target.value as 'recent' | 'upvoted')}
-            className="h-9 px-3 border border-panel-border rounded-lg bg-input-bg text-text-primary outline-none focus:border-uva-blue/40"
-            aria-label="Sort forum posts"
+        <div className="text-sm">
+          <CustomDropdown
+            isOpen={isSortDropdownOpen}
+            onOpenChange={setIsSortDropdownOpen}
+            align="right"
+            trigger={
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 px-3 py-2 border border-panel-border rounded-xl bg-input-bg text-text-primary cursor-pointer hover:border-panel-border-strong transition-colors"
+              >
+                <span>Sort: {sortBy === 'recent' ? 'Most Recent' : 'Highest Upvoted'}</span>
+                <Icon name="chevron-down" color="currentColor" width={16} height={16} className={`w-4 h-4 text-text-secondary transition-transform duration-200 ${isSortDropdownOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+              </button>
+            }
           >
-            <option value="recent">Most Recent</option>
-            <option value="upvoted">Highest Upvoted</option>
-          </select>
-        </label>
+            <CustomDropdownContent className="w-48">
+              <CustomDropdownItem
+                selected={sortBy === 'recent'}
+                onClick={() => {
+                  setSortBy('recent');
+                  setIsSortDropdownOpen(false);
+                }}
+              >
+                Most Recent
+              </CustomDropdownItem>
+              <CustomDropdownItem
+                selected={sortBy === 'upvoted'}
+                onClick={() => {
+                  setSortBy('upvoted');
+                  setIsSortDropdownOpen(false);
+                }}
+              >
+                Highest Upvoted
+              </CustomDropdownItem>
+            </CustomDropdownContent>
+          </CustomDropdown>
+        </div>
       </div>
 
       {error && (
