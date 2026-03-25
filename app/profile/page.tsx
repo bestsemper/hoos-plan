@@ -4,6 +4,7 @@ import ThemeToggle from './ThemeToggle';
 import EditProfileForm from './EditProfileForm';
 import EditCompletedCourses from './EditCompletedCourses';
 import { PrismaClient } from '@prisma/client';
+import { Icon } from '../components/Icon';
 
 const prisma = new PrismaClient();
 
@@ -84,13 +85,13 @@ export default async function Profile() {
            <h2 className="text-xl font-bold mb-5 text-heading">Badges</h2>
           <div className="flex gap-3 flex-wrap">
             <div className="bg-badge-orange-bg text-uva-orange px-3 py-2 rounded-lg flex items-center gap-2 text-sm font-bold border border-uva-orange/30">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Early Adopter                                                                  
+              <Icon name="star" color="currentColor" width={16} height={16} className="w-4 h-4" /> Early Adopter                                                                  
             </div>
-            <div className="bg-uva-blue text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm font-bold border border-uva-blue/40 dark:border-blue-200/70">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> Active Participant
+            <div className="bg-badge-blue-bg text-badge-blue-text px-3 py-2 rounded-lg flex items-center gap-2 text-sm font-bold border border-uva-blue/20">
+              <Icon name="activity" color="currentColor" width={16} height={16} className="w-4 h-4" /> Active Participant
             </div>
             <div className="bg-panel-bg-alt text-gray-500 px-3 py-2 rounded-lg text-sm border border-panel-border-strong border-dashed flex items-center gap-2 font-semibold cursor-pointer hover:border-uva-orange hover:text-uva-orange transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Earn more badges                     
+              <Icon name="plus" color="currentColor" width={16} height={16} className="w-4 h-4" /> Earn more badges                     
             </div>
           </div>
         </div>

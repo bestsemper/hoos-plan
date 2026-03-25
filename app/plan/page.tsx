@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import type { RequirementMissing } from '../utils/prerequisiteChecker';
+import { Icon } from '../components/Icon';
 import { default as ConfirmModal } from '../components/ConfirmModal';
 import { CustomDropdown, CustomDropdownContent, CustomDropdownItem } from '../components/CustomDropdown';
 import {
@@ -452,7 +453,7 @@ function AddCourseInline({
       </div>
       <div className="ml-auto flex items-center justify-end space-x-1 px-1">
         <button onClick={() => void submitCourse()} className="text-success-text hover:text-success-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><polyline points="20 6 9 17 4 12"/></svg>
+          <Icon name="check" color="currentColor" width={20} height={20} className="w-5 h-5" />
         </button>
         <button
           onClick={() => {
@@ -461,7 +462,7 @@ function AddCourseInline({
           }}
           className="text-danger-text hover:text-danger-text-hover p-2 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center transition-all hover:scale-110"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <Icon name="x" color="currentColor" width={20} height={20} className="w-5 h-5" />
         </button>
       </div>
     </div>
@@ -1238,9 +1239,7 @@ export default function PlanBuilderPage() {
                   className="w-full px-4 py-2.5 border border-panel-border rounded-xl bg-input-bg text-text-primary text-left cursor-pointer flex items-center justify-between transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none hover:border-panel-border-strong"
                 >
                   <span className="truncate text-sm font-medium">{selectedPlanLabel}</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 ml-2 shrink-0 text-text-secondary transition-transform duration-200 ${isPlanDropdownOpen ? 'rotate-180' : ''}`}>
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
+                  <Icon name="chevron-down" color="currentColor" width={16} height={16} className={`w-4 h-4 ml-2 shrink-0 text-text-secondary transition-transform duration-200 ${isPlanDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
               }
             >
@@ -1276,7 +1275,7 @@ export default function PlanBuilderPage() {
                 className="inline-flex items-center justify-center w-10 h-10 rounded-full text-text-primary hover:bg-hover-bg transition-colors cursor-pointer"
                 aria-label="More plan actions"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4.5 h-4.5"><circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" /></svg>
+                <Icon name="dots-vertical" color="currentColor" width={18} height={18} className="w-4.5 h-4.5" />
               </button>
 
               {isMoreMenuOpen && (
@@ -1290,7 +1289,7 @@ export default function PlanBuilderPage() {
                     disabled={creatingPlan}
                     className="w-full px-3 py-2 rounded-lg text-left text-sm text-text-primary hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2.5"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-text-secondary"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <Icon name="plus" color="currentColor" width={15} height={15} className="shrink-0 text-text-secondary" />
                     {creatingPlan ? 'Creating...' : 'New Plan'}
                   </button>
                   <button
@@ -1302,7 +1301,7 @@ export default function PlanBuilderPage() {
                     disabled={!activePlan || updatingYear}
                     className="w-full px-3 py-2 rounded-lg text-left text-sm text-text-primary hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2.5"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-text-secondary"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <Icon name="calendar" color="currentColor" width={15} height={15} className="shrink-0 text-text-secondary" />
                     {updatingYear ? 'Adding Year...' : 'Add Year'}
                   </button>
                   <button
@@ -1314,7 +1313,7 @@ export default function PlanBuilderPage() {
                     disabled={!activePlan}
                     className="w-full px-3 py-2 rounded-lg text-left text-sm text-text-primary hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2.5"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-text-secondary"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <Icon name="edit" color="currentColor" width={15} height={15} className="shrink-0 text-text-secondary" />
                     Rename Plan
                   </button>
                   <button
@@ -1329,7 +1328,7 @@ export default function PlanBuilderPage() {
                     }}
                     className="w-full px-3 py-2 rounded-lg text-left text-sm text-text-primary hover:bg-hover-bg transition-colors cursor-pointer flex items-center gap-2.5"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-text-secondary"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="17 3 21 3 21 7"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    <Icon name="external-link" color="currentColor" width={15} height={15} className="shrink-0 text-text-secondary" />
                     Import Plan
                   </button>
                   <div className="my-1 border-t border-panel-border" />
@@ -1342,7 +1341,7 @@ export default function PlanBuilderPage() {
                     disabled={!activePlan || deletingPlan}
                     className="w-full px-3 py-2 rounded-lg text-left text-sm text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2.5"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                    <Icon name="trash" color="currentColor" width={15} height={15} className="shrink-0" />
                     {deletingPlan ? 'Deleting...' : 'Delete Plan'}
                   </button>
                 </div>
@@ -1388,7 +1387,7 @@ export default function PlanBuilderPage() {
                         className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-panel-border-strong text-text-secondary hover:bg-hover-bg transition-colors cursor-pointer"
                         aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} school year ${row.startYear}-${row.startYear + 1}`}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 transition-transform ${isCollapsed ? '' : 'rotate-180'}`}><path d="m6 9 6 6 6-6" /></svg>
+                        <Icon name="chevron-down" color="currentColor" width={16} height={16} className={`w-4 h-4 transition-transform ${isCollapsed ? '' : 'rotate-180'}`} />
                       </button>
                       <div className="leading-tight">
                         <p className="text-[11px] uppercase tracking-[0.08em] text-text-tertiary">School Year</p>
@@ -1435,9 +1434,7 @@ export default function PlanBuilderPage() {
                               {sem.termName} {sem.year}
                               {semestersProblematicCourses.has(sem.id) && (
                                 <HoverTooltip message={`Courses with unsatisfied requirements\n${Array.from(semestersProblematicCourses.get(sem.id)?.keys() || []).map((courseCode) => `- ${courseCode}`).join('\n')}`}>
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-yellow-500 cursor-help hover:text-yellow-600 transition-colors" aria-label="Contains course(s) with unsatisfied prerequisites">
-                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05l-8.47-14.14a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-                                  </svg>
+                                  <Icon name="alert-triangle" color="currentColor" width={20} height={20} className="w-5 h-5 text-yellow-500 cursor-help hover:text-yellow-600 transition-colors" aria-label="Contains course(s) with unsatisfied prerequisites" />
                                 </HoverTooltip>
                               )}
                             </h3>
@@ -1452,7 +1449,7 @@ export default function PlanBuilderPage() {
                                 className="inline-flex items-center justify-center w-7 h-7 rounded-full text-text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                 aria-label={`Delete ${sem.termName} ${sem.year}`}
                               >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                                <Icon name="trash" color="currentColor" width={14} height={14} className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </div>
@@ -1471,11 +1468,7 @@ export default function PlanBuilderPage() {
                                       {course.courseCode}
                                       {isProblematic && (
                                         <HoverTooltip message={tooltipMessage}>
-                                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-yellow-500 flex-shrink-0 cursor-help hover:text-yellow-600 transition-colors">
-                                            <circle cx="12" cy="12" r="10"/>
-                                            <line x1="12" y1="8" x2="12" y2="12"/>
-                                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                                          </svg>
+                                          <Icon name="alert-triangle" color="currentColor" width={16} height={16} className="w-4 h-4 text-yellow-500 flex-shrink-0 cursor-help hover:text-yellow-600 transition-colors" />
                                         </HoverTooltip>
                                       )}
                                     </span>
@@ -1524,7 +1517,7 @@ export default function PlanBuilderPage() {
                                       </span>
                                     )}
                                     <button onClick={(e) => { e.stopPropagation(); void handleRemoveCourse(course.id); }} className="absolute right-0 text-danger-text hover:text-danger-text-hover opacity-0 translate-x-1 group-hover:opacity-100 p-2 cursor-pointer flex items-center justify-center transition-all duration-200 hover:scale-110">
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                      <Icon name="x" color="currentColor" width={16} height={16} className="w-4 h-4" />
                                     </button>
                                   </div>
                                 </div>
@@ -1551,7 +1544,7 @@ export default function PlanBuilderPage() {
                                 }`}>
                                   {prereqWarning.type === 'error' && (
                                     <div className="flex items-start gap-2">
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 mt-0.5 flex-shrink-0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05l-8.47-14.14a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                      <Icon name="alert-triangle" color="currentColor" width={16} height={16} className="w-4 h-4 mt-0.5 flex-shrink-0" />
                                       <div>
                                         <p className="font-semibold">{prereqWarning.message}</p>
                                         {prereqWarning.detailedRequirements && prereqWarning.detailedRequirements.length > 0 && (
@@ -1578,13 +1571,13 @@ export default function PlanBuilderPage() {
                                   )}
                                   {prereqWarning.type === 'info' && (
                                     <div className="flex items-start gap-2">
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                      <Icon name="help-circle" color="currentColor" width={16} height={16} className="w-4 h-4 mt-0.5 flex-shrink-0" />
                                       <p>{prereqWarning.message}</p>
                                     </div>
                                   )}
                                   {prereqWarning.type === 'warning' && (
                                     <div className="flex items-start gap-2">
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 mt-0.5 flex-shrink-0"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3l-8.47-14.14a2 2 0 0 0-3.42 0Z"/></svg>
+                                      <Icon name="alert-triangle" color="currentColor" width={16} height={16} className="w-4 h-4 mt-0.5 flex-shrink-0" />
                                       <p>{prereqWarning.message}</p>
                                     </div>
                                   )}
@@ -1593,7 +1586,7 @@ export default function PlanBuilderPage() {
                               </>
                             ) : (
                               <button onClick={() => { setNewCourseSem(sem.id); setPrereqWarning(null); }} className="mt-2 text-sm font-semibold text-gray-500 hover:text-uva-orange hover:border-uva-orange hover:bg-hover-bg hover:text-uva-orange hover:border-uva-orange w-full text-center px-3 border border-dashed border-panel-border-strong rounded-xl transition-all cursor-pointer disabled:cursor-not-allowed h-[46px] flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 mr-1"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Course
+                                <Icon name="plus" color="currentColor" width={16} height={16} className="w-4 h-4 mr-1" /> Add Course
                               </button>
                             )}
                           </div>
@@ -1615,7 +1608,7 @@ export default function PlanBuilderPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-xl text-heading">Import Plan</h2>
               <button onClick={() => setIsImportAuditOpen(false)} className="text-text-muted hover:text-text-secondary cursor-pointer" aria-label="Close import plan">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <Icon name="x" color="currentColor" width={20} height={20} />
               </button>
             </div>
 
@@ -1669,7 +1662,7 @@ export default function PlanBuilderPage() {
                       className="w-full px-4 py-2.5 border border-panel-border rounded-xl bg-input-bg text-text-primary text-left cursor-pointer flex items-center justify-between hover:border-panel-border-strong transition-colors"
                     >
                       <span className="truncate text-sm font-medium">{importPlanLabel}</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 text-text-secondary transition-transform duration-200 ${isImportPlanDropdownOpen ? 'rotate-180' : ''}`}><path d="m6 9 6 6 6-6" /></svg>
+                      <Icon name="chevron-down" color="currentColor" width={16} height={16} className={`w-4 h-4 text-text-secondary transition-transform duration-200 ${isImportPlanDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
                   }
                 >
@@ -1722,7 +1715,7 @@ export default function PlanBuilderPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-xl text-heading">Rename Plan</h2>
               <button onClick={() => setIsRenamePlanOpen(false)} className="text-text-muted hover:text-text-secondary cursor-pointer" aria-label="Close rename plan">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <Icon name="x" color="currentColor" width={20} height={20} />
               </button>
             </div>
 
@@ -1817,7 +1810,7 @@ export default function PlanBuilderPage() {
       {loadingInfo && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-panel-bg p-6 rounded-2xl flex items-center space-x-3">
-            <svg className="animate-spin h-5 w-5 text-uva-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <Icon name="loader" color="currentColor" width={20} height={20} className="animate-spin h-5 w-5 text-uva-blue" />
             <span className="font-medium text-text-primary">Loading course info...</span>
           </div>
         </div>
@@ -1834,7 +1827,7 @@ export default function PlanBuilderPage() {
                 )}
               </div>
               <button onClick={() => { setSelectedCourseInfo(null); setSelectedCourseMissingRequirements([]); }} className="text-text-muted hover:text-text-secondary cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <Icon name="x" color="currentColor" width={24} height={24} />
               </button>
             </div>
 

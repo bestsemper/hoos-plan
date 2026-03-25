@@ -1,6 +1,7 @@
 import { getUserProfile } from '../../actions';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { Icon } from '../../components/Icon';
 
 export default async function UserProfilePage({ params }: { params: Promise<{ computingId: string }> }) {
   const { computingId } = await params;
@@ -20,9 +21,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ co
   return (
     <div className="max-w-5xl mx-auto py-4 md:py-8">
       <Link href="/forum" className="inline-flex items-center gap-1.5 text-sm font-semibold text-uva-blue hover:text-uva-orange transition-colors mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-          <path d="m15 18-6-6 6-6" />
-        </svg>
+        <Icon name="arrow-left" color="currentColor" width={16} height={16} className="w-4 h-4" aria-hidden="true" />
         Back to Forum
       </Link>
 
@@ -59,7 +58,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ co
           <h2 className="text-xl font-bold mb-5 text-heading">Badges</h2>
           <div className="flex gap-3 flex-wrap">
             <div className="bg-badge-orange-bg text-uva-orange px-3 py-2 rounded-lg flex items-center gap-2 text-sm font-bold border border-uva-orange/30">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Participant
+              <Icon name="star" color="currentColor" width={16} height={16} className="w-4 h-4" /> Participant
             </div>
           </div>
         </div>

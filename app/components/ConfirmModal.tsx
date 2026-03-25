@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "./Icon";
+
 type ConfirmModalProps = {
   isOpen: boolean;
   title: string;
@@ -38,16 +40,16 @@ export default function ConfirmModal({
           className="absolute top-5 right-5 text-text-primary/80 hover:text-text-primary transition-colors cursor-pointer"
           aria-label="Close"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <Icon name="x" color="currentColor" width={22} height={22} />
         </button>
 
         {/* Centered icon */}
         <div className="flex justify-center mb-4">
           <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${isDanger ? 'bg-red-500/10' : 'bg-uva-blue/10'}`}>
             {isDanger ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              <Icon name="trash" color="currentColor" width={22} height={22} className="text-red-500" />
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-uva-blue"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <Icon name="help-circle" color="currentColor" width={22} height={22} className="text-uva-blue" />
             )}
           </div>
         </div>

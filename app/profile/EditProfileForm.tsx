@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateCurrentUserProfile } from '../actions';
 import CustomSelect from '../components/CustomSelect';
+import { Icon } from '../components/Icon';
 import { getDefaultGraduationYearForStanding, getDefaultStandingForGraduationYear } from '../utils/academicYear';
 import { PROFILE_SCHOOL_OPTIONS, PROFILE_MAJOR_OPTIONS, PROFILE_ADDITIONAL_PROGRAMS, MAJOR_TO_SCHOOL_MAP } from './profileOptions';
 
@@ -163,7 +164,7 @@ export default function EditProfileForm({
       <button
         type="button"
         onClick={() => setIsEditing(true)}
-        className="w-full sm:w-auto bg-uva-blue/90 text-white px-5 py-2.5 rounded-xl hover:bg-uva-blue font-bold transition-colors cursor-pointer dark:bg-uva-blue dark:hover:bg-uva-blue/90 dark:border dark:border-white/45"
+        className="w-full sm:w-auto bg-uva-blue/90 border border-panel-border-strong text-white px-5 py-2.5 rounded-xl hover:bg-uva-blue font-bold transition-colors cursor-pointer"
       >
         Edit Profile
       </button>
@@ -185,10 +186,7 @@ export default function EditProfileForm({
               className="text-text-tertiary hover:text-text-primary transition-colors cursor-pointer"
               aria-label="Close"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
+              <Icon name="x" color="currentColor" width={24} height={24} className="w-6 h-6" />
             </button>
           </div>
 

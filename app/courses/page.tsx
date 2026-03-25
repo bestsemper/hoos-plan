@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
+import { Icon } from '../components/Icon';
 import { CustomDropdown, CustomDropdownContent, CustomDropdownItem } from '../components/CustomDropdown';
 import { getCourseInfoFromJSON } from '../actions';
 
@@ -167,21 +168,7 @@ export default function CoursesPage() {
             <CourseDescriptionContent courseInfo={selectedCourseInfo} />
           ) : (
             <div className="bg-panel-bg p-6 rounded-xl border border-panel-border text-center py-12">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-12 h-12 mx-auto mb-4 text-text-muted opacity-50"
-              >
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-              </svg>
+            <Icon name="book" color="currentColor" width={48} height={48} className="w-12 h-12 mx-auto mb-4 text-text-muted opacity-50" />
               <p className="text-text-secondary">Search for a course to view its details</p>
             </div>
           )}
@@ -239,21 +226,7 @@ function CourseDescriptionContent({
   if (!courseInfo) {
     return (
       <div className="bg-panel-bg p-6 rounded-xl border border-panel-border text-center py-12">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="48"
-          height="48"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="w-12 h-12 mx-auto mb-4 text-text-muted opacity-50"
-        >
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-        </svg>
+        <Icon name="book" color="currentColor" width={48} height={48} className="w-12 h-12 mx-auto mb-4 text-text-muted opacity-50" />
         <p className="text-text-secondary">Search for a course to view its details</p>
       </div>
     );

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { mockLogin, mockSignUp } from '../actions';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
+import { Icon } from '../components/Icon';
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +72,7 @@ export default function LoginPage() {
           <div className="flex justify-between items-center mb-2">
             <h1 className="text-3xl font-bold text-heading">{isSignUp ? 'Create Account' : 'Sign In'}</h1>
             <span className="bg-badge-orange-bg text-uva-orange border border-uva-orange/60 px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <Icon name="lock" color="currentColor" width={12} height={12} />
               NetBadge
             </span>
           </div>
@@ -83,7 +84,7 @@ export default function LoginPage() {
         <form className="space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2" role="alert">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <Icon name="alert-circle" color="currentColor" width={16} height={16} />
               <span>{error}</span>
             </div>
           )}
@@ -137,7 +138,7 @@ export default function LoginPage() {
               className="w-full bg-uva-blue text-white px-5 py-3 rounded-xl hover:bg-uva-blue-dark font-bold transition-colors cursor-pointer flex justify-center items-center gap-2"
             >
               {isSignUp ? 'Create Account' : 'Log In'}
-              {!isSignUp && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>}
+              {!isSignUp && <Icon name="arrow-right" color="currentColor" width={16} height={16} />}
             </button>
             
             <div className="relative flex items-center justify-center py-2">
