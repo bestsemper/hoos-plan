@@ -35,6 +35,12 @@ const forumPostDetailInclude = {
   answers: {
     orderBy: { createdAt: 'asc' as const },
     include: {
+      attachedPlan: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
       author: {
         select: {
           id: true,
@@ -576,7 +582,7 @@ export async function deleteForumPost(postId: string) {
   return { success: true };
 }
 
-export async function addForumReply(postId: string, body: string, parentReplyId?: string) {
+export async function addForumReply(postId: string, body: string, parentReplyId?: string, attachedPlanId?: string) {
   const user = await getCurrentUser();
   if (!user) {
     return { error: 'You must be logged in to reply.' };
@@ -601,12 +607,59 @@ export async function addForumReply(postId: string, body: string, parentReplyId?
     validatedParentReplyId = parentReply.id;
   }
 
+  let validatedPlanId: string | null = null;
+  let planSnapshot: any = null;
+  
+  if (attachedPlanId && attachedPlanId.trim() !== '') {
+    const plan = await prisma.plan.findFirst({
+      where: {
+        id: attachedPlanId,
+        userId: user.id,
+      },
+      select: {
+        id: true,
+        title: true,
+        semesters: {
+          orderBy: { termOrder: 'asc' },
+          select: {
+            id: true,
+            termName: true,
+            termOrder: true,
+            year: true,
+            courses: {
+              orderBy: { courseCode: 'asc' },
+              select: {
+                id: true,
+                courseCode: true,
+                creditsMin: true,
+                creditsMax: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!plan) {
+      return { error: 'Selected plan does not exist.' };
+    }
+
+    validatedPlanId = plan.id;
+    // Capture a snapshot of the plan at the time of posting
+    planSnapshot = {
+      title: plan.title,
+      semesters: plan.semesters,
+    };
+  }
+
   const createdAnswer = await prisma.forumAnswer.create({
     data: {
       postId,
       authorId: user.id,
       parentId: validatedParentReplyId,
       body: trimmedBody,
+      attachedPlanId: validatedPlanId,
+      planSnapshot: planSnapshot,
     },
   });
 
@@ -818,6 +871,7 @@ export async function getForumPageData() {
         id: answer.id,
         parentId: answer.parentId,
         body: answer.body,
+        attachedPlan: answer.attachedPlan,
         isDeleted: Boolean(answer.deletedAt),
         canDelete: currentUser?.id === answer.authorId && !answer.deletedAt,
         createdAt: answer.createdAt.toISOString(),
@@ -979,6 +1033,7 @@ export async function getForumPostPageData(postNumber: number) {
         id: answer.id,
         parentId: answer.parentId,
         body: answer.body,
+        attachedPlan: answer.attachedPlan,
         isDeleted: Boolean(answer.deletedAt),
         canDelete: currentUser?.id === answer.authorId && !answer.deletedAt,
         createdAt: answer.createdAt.toISOString(),
@@ -1866,7 +1921,6 @@ export async function getAllPossibleCoursesFromJSON(): Promise<{ code: string; t
     return [];
   }
 }
-
 export async function getCourseInfoFromJSON(courseCode: string) {
   try {
     const normalizedCode = normalizeCourseCode(courseCode);
