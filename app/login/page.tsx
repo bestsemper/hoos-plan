@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { mockLogin, mockSignUp } from '../actions';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
+import { Icon } from '../components/Icon';
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);

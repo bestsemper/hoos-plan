@@ -728,7 +728,7 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
   return (
     <div className="w-full h-full flex flex-col bg-panel-bg absolute inset-0 overflow-hidden min-w-0 min-h-0">
       {/* Search Bar - Left Side */}
-      <div className="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur p-0.5 rounded-xl border border-panel-border shadow-sm w-80">
+      <div className="absolute top-4 left-4 z-10 bg-panel-bg/90 backdrop-blur p-0.5 rounded-xl border border-panel-border shadow-sm w-80">
         <div
           ref={courseSearchContainerRef}
           className="relative"
@@ -781,44 +781,44 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
       </div>
 
       {/* Zoom Controls - Right Side */}
-      <div className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur p-0.5 rounded-xl border border-panel-border shadow-sm flex items-center">
-        <div className="flex bg-white rounded-lg overflow-hidden">
+      <div className="absolute top-4 right-4 z-10 bg-panel-bg/90 backdrop-blur p-0.5 rounded-xl border border-panel-border shadow-sm flex items-center">
+        <div className="flex bg-panel-bg-alt rounded-lg overflow-hidden">
           <button 
             onClick={() => handleZoom(0.2)} 
-            className="p-2.5 text-uva-blue cursor-pointer"
+            className="p-2 text-text-primary hover:bg-white/10 dark:hover:bg-white/5 cursor-pointer transition-colors"
             title="Zoom In"
           >
             <Icon 
               name="zoom-in"
               color="currentColor"
-              width={20}
-              height={20}
+              width={18}
+              height={18}
             />
           </button>
           <div className="w-px bg-panel-border"></div>
           <button 
             onClick={() => handleZoom(-0.2)} 
-            className="p-2.5 text-uva-blue cursor-pointer"
+            className="p-2 text-text-primary hover:bg-white/10 dark:hover:bg-white/5 cursor-pointer transition-colors"
             title="Zoom Out"
           >
             <Icon 
               name="zoom-out"
               color="currentColor"
-              width={20}
-              height={20}
+              width={18}
+              height={18}
             />
           </button>
           <div className="w-px bg-panel-border"></div>
           <button 
             onClick={() => setZoom(1)} 
-            className="p-2.5 text-uva-blue cursor-pointer"
+            className="p-2 text-text-primary hover:bg-white/10 dark:hover:bg-white/5 cursor-pointer transition-colors"
             title="Reset Zoom"
           >
             <Icon 
               name="home"
               color="currentColor"
-              width={20}
-              height={20}
+              width={18}
+              height={18}
             />
           </button>
         </div>
