@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useState, useTransition } from 'react';
+import { Icon } from '@/app/components/Icon';
 import { default as ConfirmModal } from '../../../components/ConfirmModal';
 import { CustomDropdown, CustomDropdownContent, CustomDropdownItem } from '../../../components/CustomDropdown';
 import { useAttachedPlanModal } from '../../AttachedPlanModalProvider';
@@ -424,9 +425,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                       : 'border-panel-border text-text-secondary hover:bg-hover-bg'
                   }`}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-                    <path d="m18 15-6-6-6 6" />
-                  </svg>
+                  <Icon name="chevron-up" color="currentColor" width={16} height={16} className="w-4 h-4" aria-hidden="true" />
                 </button>
 
                 <span className="min-w-8 text-center text-sm font-bold text-text-primary">{answer.voteScore}</span>
@@ -442,9 +441,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                       : 'border-panel-border text-text-secondary hover:bg-hover-bg'
                   }`}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
+                  <Icon name="chevron-down" color="currentColor" width={16} height={16} className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
 
@@ -533,9 +530,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
   return (
     <div className="max-w-5xl mx-auto py-8">
       <Link href="/forum" className="inline-flex items-center gap-1.5 text-sm font-semibold text-uva-blue hover:text-uva-orange transition-colors mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-          <path d="m15 18-6-6 6-6" />
-        </svg>
+        <Icon name="arrow-left" color="currentColor" width={16} height={16} className="w-4 h-4" aria-hidden="true" />
         <span>Back to Forum</span>
       </Link>
 
@@ -580,9 +575,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                           : 'border-panel-border text-text-secondary hover:bg-hover-bg'
                       }`}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-                        <path d="m18 15-6-6-6 6" />
-                      </svg>
+                      <Icon name="chevron-up" color="currentColor" width={16} height={16} className="w-4 h-4" aria-hidden="true" />
                     </button>
 
                     <span className="min-w-8 text-center text-base font-bold text-text-primary">{post.voteScore}</span>
@@ -598,9 +591,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                           : 'border-panel-border text-text-secondary hover:bg-hover-bg'
                       }`}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
+                      <Icon name="chevron-down" color="currentColor" width={16} height={16} className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -643,21 +634,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                       className="inline-flex items-center gap-2 px-3 py-2 border border-panel-border rounded-xl bg-input-bg text-text-primary cursor-pointer hover:border-panel-border-strong transition-colors"
                     >
                       <span>Sort: {replySortLabel}</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className={`w-4 h-4 text-text-secondary transition-transform duration-200 ${isSortDropdownOpen ? 'rotate-180' : ''}`}
-                        aria-hidden="true"
-                      >
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
+                      <Icon name="chevron-down" color="currentColor" width={16} height={16} className={`w-4 h-4 text-text-secondary transition-transform duration-200 ${isSortDropdownOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
                     </button>
                   }
                 >

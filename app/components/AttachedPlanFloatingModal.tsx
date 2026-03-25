@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { Icon } from './Icon';
 
 export type AttachedPlanView = {
   id: string;
@@ -110,7 +111,7 @@ export default function AttachedPlanFloatingModal({
             className="text-text-secondary hover:text-text-primary cursor-pointer"
             aria-label="Close attached plan"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+            <Icon name="x" color="currentColor" width={20} height={20} className="w-5 h-5" />
           </button>
         </div>
 

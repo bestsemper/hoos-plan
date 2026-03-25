@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Icon } from '@/app/components/Icon';
 import { getForumPageData, voteOnForumPost } from '../actions';
 import { useAttachedPlanModal } from './AttachedPlanModalProvider';
 import { getForumPostHref } from './url';
@@ -327,9 +328,7 @@ export default function ForumPage() {
                         : 'border-panel-border text-text-secondary hover:bg-hover-bg'
                     }`}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-                      <path d="m18 15-6-6-6 6" />
-                    </svg>
+                    <Icon name="chevron-up" color="currentColor" width={16} height={16} className="w-4 h-4" aria-hidden="true" />
                   </button>
 
                   <span className="min-w-8 text-center text-sm font-bold text-text-primary">{post.voteScore}</span>
@@ -345,9 +344,7 @@ export default function ForumPage() {
                         : 'border-panel-border text-text-secondary hover:bg-hover-bg'
                     }`}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
+                    <Icon name="chevron-down" color="currentColor" width={16} height={16} className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
 

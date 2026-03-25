@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { TreeVisualization } from "@/app/components/TreeVisualization";
+import { Icon } from "@/app/components/Icon";
 import { getCurrentUser } from "@/app/actions";
 
 interface DepartmentInfo {
@@ -109,10 +110,12 @@ export default function TreePage() {
               className="w-5 h-5 text-text-tertiary hover:text-text-secondary transition-colors cursor-help"
               aria-label="Information about the prerequisite tree"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 16v-4M12 8h.01" />
-              </svg>
+              <Icon 
+                name="info"
+                color="currentColor"
+                width={20}
+                height={20}
+              />
             </button>
             <div className="absolute left-0 top-full w-48 p-2 bg-panel-bg border border-panel-border rounded-lg text-xs text-text-secondary shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-50">
               This tree displays only courses that have prerequisites or are prerequisites for other courses.
@@ -121,18 +124,13 @@ export default function TreePage() {
         </div>
         <div className="relative flex-1 max-w-xs">
           <span className="sr-only">Search departments</span>
-          <svg
+          <Icon
+            name="search"
+            color="currentColor"
+            width={16}
+            height={16}
             className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M8.5 3a5.5 5.5 0 014.396 8.804l3.65 3.65a.75.75 0 11-1.06 1.06l-3.65-3.65A5.5 5.5 0 118.5 3zm0 1.5a4 4 0 100 8 4 4 0 000-8z"
-              clipRule="evenodd"
-            />
-          </svg>
+          />
           <input
             ref={searchInputRef}
             type="text"
@@ -180,9 +178,7 @@ export default function TreePage() {
         </div>
       ) : (
         <div className="bg-panel-bg border border-panel-border rounded-xl p-12 text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12 mx-auto mb-4 text-text-muted opacity-50">
-            <path d="M12 2v20M2 12h20"/>
-          </svg>
+          <Icon name="grid" color="currentColor" width={48} height={48} className="w-12 h-12 mx-auto mb-4 text-text-muted opacity-50" alt="No" />
           <p className="text-lg font-medium text-heading mb-2">No Department Selected</p>
           <p className="text-sm text-text-secondary">Select a department from the search bar to view its prerequisite tree</p>
         </div>

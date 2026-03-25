@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Icon } from './Icon';
 
 export type SelectOption = {
   value: string;
@@ -85,21 +86,14 @@ export default function CustomSelect({
         <span className={selectedOption ? 'truncate' : 'truncate text-text-tertiary'}>
           {selectedOption?.label ?? placeholder}
         </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <Icon
+          name="chevron-down"
+          color="currentColor"
+          width={16}
+          height={16}
           className={`w-4 h-4 shrink-0 text-text-secondary transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           aria-hidden="true"
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        />
       </button>
 
       {isOpen && !disabled && (
@@ -142,21 +136,14 @@ export default function CustomSelect({
               >
                 <span className="truncate">{option.label}</span>
                 {value === option.value && (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <Icon
+                    name="check"
+                    color="currentColor"
+                    width={14}
+                    height={14}
                     className="w-3.5 h-3.5 shrink-0 text-uva-blue"
                     aria-hidden="true"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
+                  />
                 )}
               </button>
             ))}

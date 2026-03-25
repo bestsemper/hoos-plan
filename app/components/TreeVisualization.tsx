@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
+import { Icon } from "./Icon";
 
 interface TreeVisualizationProps {
   department: string;
@@ -733,18 +734,13 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
           className="relative"
           onMouseDown={(e) => e.stopPropagation()}
         >
-          <svg
+          <Icon
+            name="search"
+            color="currentColor"
+            width={16}
+            height={16}
             className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M8.5 3a5.5 5.5 0 014.396 8.804l3.65 3.65a.75.75 0 11-1.06 1.06l-3.65-3.65A5.5 5.5 0 118.5 3zm0 1.5a4 4 0 100 8 4 4 0 000-8z"
-              clipRule="evenodd"
-            />
-          </svg>
+          />
           <input
             type="text"
             placeholder="Search courses in tree"
@@ -792,7 +788,12 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
             className="p-2.5 text-uva-blue cursor-pointer"
             title="Zoom In"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            <Icon 
+              name="zoom-in"
+              color="currentColor"
+              width={20}
+              height={20}
+            />
           </button>
           <div className="w-px bg-panel-border"></div>
           <button 
@@ -800,7 +801,12 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
             className="p-2.5 text-uva-blue cursor-pointer"
             title="Zoom Out"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            <Icon 
+              name="zoom-out"
+              color="currentColor"
+              width={20}
+              height={20}
+            />
           </button>
           <div className="w-px bg-panel-border"></div>
           <button 
@@ -808,7 +814,12 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
             className="p-2.5 text-uva-blue cursor-pointer"
             title="Reset Zoom"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <Icon 
+              name="home"
+              color="currentColor"
+              width={20}
+              height={20}
+            />
           </button>
         </div>
       </div>
