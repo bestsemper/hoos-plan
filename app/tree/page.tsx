@@ -101,7 +101,24 @@ export default function TreePage() {
   return (
     <div className="w-full h-full pt-0 flex flex-col min-w-0">
       <div className="mb-6 flex items-center justify-between gap-3 border-b border-panel-border pb-4 w-full min-w-0">
-        <h1 className="text-3xl font-bold text-heading">Prerequisite Tree</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-heading">Prerequisite Tree</h1>
+          <div className="group relative flex-shrink-0">
+            <button
+              type="button"
+              className="w-5 h-5 text-text-tertiary hover:text-text-secondary transition-colors cursor-help"
+              aria-label="Information about the prerequisite tree"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4M12 8h.01" />
+              </svg>
+            </button>
+            <div className="absolute left-0 top-full w-48 p-2 bg-panel-bg border border-panel-border rounded-lg text-xs text-text-secondary shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-50">
+              This tree displays only courses that have prerequisites or are prerequisites for other courses.
+            </div>
+          </div>
+        </div>
         <div className="relative flex-1 max-w-xs">
           <span className="sr-only">Search departments</span>
           <svg

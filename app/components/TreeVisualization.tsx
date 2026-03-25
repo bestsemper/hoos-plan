@@ -1081,7 +1081,7 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
           <div className="font-bold mb-2 text-sm text-uva-blue">
             {clickedNodeId || hoveredNodeId}
           </div>
-          <div className="text-xs mb-2 text-uva-blue italic">
+          <div className="text-xs mb-3 text-text-secondary italic max-h-20 overflow-y-auto">
             {dagData?.nodes.find(n => n.id === (clickedNodeId || hoveredNodeId))?.title || dagData?.nodes.find(n => n.id === (clickedNodeId || hoveredNodeId))?.label}
           </div>
           
@@ -1102,7 +1102,7 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
           
           <div>
             <div className="font-semibold text-uva-blue mb-1">
-              Postrequisites:
+              Required for:
             </div>
             <div className="pl-2 text-text-muted">
               {(edgesMap?.get((clickedNodeId || hoveredNodeId)!) as Set<string> | undefined)?.size === 0 ? (
