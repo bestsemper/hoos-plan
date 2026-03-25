@@ -358,206 +358,40 @@ export function loadPrerequisiteTree(department?: string): DepartmentTree {
   };
 }
 
-// Mapping of department mnemonics to full names
-const departmentNames: { [key: string]: string } = {
-  AAS: "African-American & African",
-  ACCT: "Accounting",
-  AIRS: "Air Science",
-  ALAR: "Arch & Landscape Arch",
-  AMST: "American Studies",
-  ANTH: "Anthropology",
-  APMA: "Applied Mathematics",
-  ARAB: "Arabic",
-  ARAD: "Arts Administration",
-  ARAH: "History of Art & Architecture",
-  ARCH: "Architecture",
-  ARCY: "Archaeology",
-  ARH: "Architectural History",
-  ARTH: "History of Art",
-  ARTS: "Studio Art",
-  ASL: "American Sign Language",
-  ASTR: "Astronomy",
-  BIMS: "Biomedical Sciences",
-  BIOC: "Biochemistry",
-  BIOL: "Biology",
-  BIOP: "Biophysics",
-  BME: "Biomedical Engineering",
-  BUS: "Business",
-  CASS: "College Art Scholars Seminar",
-  CE: "Civil Engineering",
-  CELL: "Cell Biology",
-  CGBM: "Commerce General Business",
-  CHE: "Chemical Engineering",
-  CHEM: "Chemistry",
-  CHIN: "Chinese",
-  CHRK: "Cherokee Language and Culture",
-  CHTR: "Chinese in Translation",
-  CJ: "Criminal Justice",
-  CLAS: "Classics",
-  COBI: "Computational Biology",
-  COGS: "Cognitive Science",
-  COMM: "Commerce",
-  CPE: "Computer Engineering",
-  CREO: "Creole",
-  CS: "Computer Science",
-  DANC: "Dance",
-  DEM: "Democracy Initiative",
-  DH: "Digital Humanities",
-  DRAM: "Drama",
-  DS: "Data Science",
-  EALC: "East Asian Lang, Lit & Culture",
-  EAST: "East Asian Studies",
-  EBUS: "Engineering Business",
-  ECE: "Electrical & Computer Engr",
-  ECON: "Economics",
-  EDHS: "Human Services",
-  EDIS: "Curriculum, Inst & Spec Ed",
-  EDLF: "Leadership, Foundations & Pol",
-  EDNC: "Education Non-Credit",
-  EGMT: "Engagement",
-  ENCW: "Creative Writing",
-  ENGL: "English Literature",
-  ENGR: "Engineering",
-  ENTP: "Entrepreneurship",
-  ENVH: "Environmental Humanities",
-  ENWR: "English Writing",
-  ESL: "English as a Second Language",
-  ETP: "Enviro Thought & Practice",
-  EURS: "European Studies",
-  EVAT: "Atmospheric Sciences",
-  EVEC: "Ecology",
-  EVGE: "Geosciences",
-  EVHY: "Hydrology",
-  EVSC: "Environmental Sciences",
-  FREN: "French",
-  GBAC: "Grad Business Analytics Comm.",
-  GBUS: "Graduate Business",
-  GCCS: "Global Commerce in Culture/Soc",
-  GCNL: "Clinical Nurse Leader",
-  GCOM: "Graduate Commerce",
-  GDS: "Global Development Studies",
-  GERM: "German",
-  GETR: "German in Translation",
-  GNUR: "Graduate Nursing",
-  GREE: "Greek",
-  GSGS: "GS-Global Studies",
-  GSSJ: "GS-Security and Justice",
-  GSVS: "GS-Environments & Sustainabil",
-  HBIO: "Human Biology",
-  HEBR: "Hebrew",
-  HHE: "Health, Humanities & Ethics",
-  HIAF: "African History",
-  HIEA: "East Asian History",
-  HIEU: "European History",
-  HILA: "Latin American History",
-  HIME: "Middle Eastern History",
-  HIND: "Hindi",
-  HISA: "South Asian History",
-  HIST: "General History",
-  HIUS: "United States History",
-  HR: "Human Resources",
-  HSCI: "College Science Seminar",
-  IMP: "Interdisciplinary Thesis",
-  INST: "Interdisciplinary Studies",
-  ISBU: "IS-Business",
-  ISHU: "IS-Humanities",
-  ISIN: "IS-Code of Inquiry",
-  ISLS: "IS-Liberal Studies Seminar",
-  ISSS: "IS-Social Sciences",
-  IT: "Informational Technology",
-  ITAL: "Italian",
-  ITTR: "Italian in Translation",
-  JAPN: "Japanese",
-  JPTR: "Japanese in Translation",
-  JWST: "Jewish Studies",
-  KICH: "Maya K'iche'",
-  KINE: "Kinesiology",
-  KLPA: "Lifetime Physical Activity",
-  KOR: "Korean",
-  LAR: "Landscape Architecture",
-  LASE: "Liberal Arts Seminar",
-  LAST: "Latin American Studies",
-  LATI: "Latin",
-  LAW: "Law",
-  LING: "Linguistics",
-  LNGS: "General Linguistics",
-  LPPA: "Public Policy - Analysis",
-  LPPL: "Public Policy - Leadership",
-  LPPP: "Public Policy - Policy",
-  LPPS: "Public Policy - Substance",
-  MAE: "Mechanical & Aero Engr",
-  MATH: "Mathematics",
-  MDST: "Media Studies",
-  MED: "Medicine",
-  MESA: "Middle Eastern & South Asian",
-  MEST: "Middle Eastern Studies",
-  MICR: "Microbiology",
-  MISC: "Military Science",
-  MSE: "Materials Science & Engr",
-  MSP: "Medieval Studies",
-  MUBD: "Music-Marching Band",
-  MUEN: "Music-Ensembles",
-  MUPF: "Music-Private Instruction",
-  MUSI: "Music",
-  NASC: "Naval Science",
-  NCBM: "NC-Business & Management",
-  NCPR: "NC-Professional Review",
-  NESC: "Neuroscience",
-  NUCO: "Nursing Core",
-  NUIP: "Nursing Interprofessional",
-  NURS: "Nursing",
-  PATH: "Pathology",
-  PC: "Procurement & Contracts Mgmt",
-  PERS: "Persian",
-  PETR: "Persian in Translation",
-  PHAR: "Pharmacology",
-  PHIL: "Philosophy",
-  PHS: "Public Health Sciences",
-  PHY: "Physiology",
-  PHYS: "Physics",
-  PLAC: "Planning Application",
-  PLAD: "Departmental Seminar",
-  PLAN: "Urban & Environ Planning",
-  PLAP: "American Politics",
-  PLCP: "Comparative Politics",
-  PLIR: "International Relations",
-  PLPT: "Political Theory",
-  POL: "Polish",
-  PORT: "Portuguese",
-  POTR: "Portuguese in Translation",
-  PPL: "Politic Phil, Policy & Law",
-  PSHM: "PS-Health Sciences Management",
-  PSLP: "PS-Leadership Program",
-  PSPA: "PS-Public Administration",
-  PSPM: "PS-Project Management",
-  PSPS: "Prof Studies - Public Safety",
-  PST: "Political & Social Thought",
-  PSYC: "Psychology",
-  RELA: "African Religions",
-  RELB: "Buddhism",
-  RELC: "Christianity",
-  RELG: "General Religion",
-  RELH: "Hinduism",
-  RELI: "Islam",
-  RELJ: "Judaism",
-  RELS: "Religion-Special Topic",
-  RUSS: "Russian",
-  RUTR: "Russian in Translation",
-  SANS: "Sanskrit",
-  SARC: "Architecture School",
-  SATR: "South Asian Lit in Trans",
-  SEC: "Cyber Security Analysis",
-  SLAV: "Slavic",
-  SLFK: "Slavic Folklore & Oral Lit",
-  SLTR: "Slavic in Translation",
-  SOC: "Sociology",
-  SPAN: "Spanish",
-  STAT: "Statistics",
-  STS: "Science, Tech & Society",
-  SWAH: "Swahili",
-  SYS: "Systems & Information Engr",
-  TURK: "Turkish",
+type SubjectEntry = {
+  subject?: string;
+  label?: string;
 };
+
+type AcademicOptionsData = {
+  subjects?: SubjectEntry[];
+};
+
+function getDepartmentNamesFromSubjects(): Map<string, string> {
+  try {
+    const dataPath = path.join(process.cwd(), 'data', 'uva_academic_options.json');
+    const data = JSON.parse(fs.readFileSync(dataPath, 'utf-8')) as AcademicOptionsData;
+    const subjectEntries = data.subjects || [];
+    const subjectNameMap = new Map<string, string>();
+
+    subjectEntries.forEach((entry) => {
+      const mnemonic = (entry.subject || '').trim();
+      if (!mnemonic) return;
+
+      const label = (entry.label || '').trim();
+      const normalizedPrefix = `${mnemonic} - `;
+      const fullName = label.startsWith(normalizedPrefix)
+        ? label.slice(normalizedPrefix.length).trim()
+        : mnemonic;
+
+      subjectNameMap.set(mnemonic, fullName || mnemonic);
+    });
+
+    return subjectNameMap;
+  } catch {
+    return new Map<string, string>();
+  }
+}
 
 export interface DepartmentInfo {
   mnemonic: string;
@@ -570,6 +404,7 @@ export function getAvailableDepartments(): DepartmentInfo[] {
   const data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
   const prerequisiteTrees = data.prerequisite_trees;
   const departments = new Set<string>();
+  const departmentNames = getDepartmentNamesFromSubjects();
 
   Object.keys(prerequisiteTrees).forEach((course) => {
     const dept = getDepartment(course);
@@ -580,7 +415,7 @@ export function getAvailableDepartments(): DepartmentInfo[] {
     .sort()
     .map((mnemonic) => ({
       mnemonic,
-      fullName: departmentNames[mnemonic] || mnemonic,
+      fullName: departmentNames.get(mnemonic) || mnemonic,
     }));
 }
 

@@ -28,12 +28,15 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
   const [clickedNodeId, setClickedNodeId] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [isPanning, setIsPanning] = useState(false);
+  const [courseSearchText, setCourseSearchText] = useState("");
+  const [showCourseSearchDropdown, setShowCourseSearchDropdown] = useState(false);
   const [isDark, setIsDark] = useState(false);
   // Use refs for panning state to avoid rebinding event listeners
   const isPanningRef = useRef(false);
   const panStartRef = useRef<{ x: number; y: number; scrollX: number; scrollY: number } | null>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+  const courseSearchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!department) return;
@@ -43,6 +46,8 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
       setError(null);
       setDagData(null); // Reset data while loading new department
       setClickedNodeId(null); // Clear any clicked node when changing departments
+      setCourseSearchText("");
+      setShowCourseSearchDropdown(false);
       try {
         const res = await fetch(`/api/tree?department=${department}`);
         if (!res.ok) {
@@ -97,6 +102,20 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
 
     return () => {
       observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!courseSearchContainerRef.current) return;
+      if (!courseSearchContainerRef.current.contains(event.target as Node)) {
+        setShowCourseSearchDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -581,6 +600,62 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
     });
   };
 
+  const filteredCourseMatches = useMemo(() => {
+    const query = courseSearchText.trim().toLowerCase();
+    if (!query || !dagData) return [];
+
+    return dagData.nodes
+      .filter((node) => {
+        const id = node.id.toLowerCase();
+        const label = node.label.toLowerCase();
+        const title = (node.title || '').toLowerCase();
+        return id.includes(query) || label.includes(query) || title.includes(query);
+      })
+      .sort((a, b) => {
+        const aId = a.id.toLowerCase();
+        const bId = b.id.toLowerCase();
+        const aTitle = (a.title || '').toLowerCase();
+        const bTitle = (b.title || '').toLowerCase();
+
+        const aStartsId = aId.startsWith(query);
+        const bStartsId = bId.startsWith(query);
+        if (aStartsId !== bStartsId) return aStartsId ? -1 : 1;
+
+        const aStartsTitle = aTitle.startsWith(query);
+        const bStartsTitle = bTitle.startsWith(query);
+        if (aStartsTitle !== bStartsTitle) return aStartsTitle ? -1 : 1;
+
+        return a.id.localeCompare(b.id);
+      });
+  }, [courseSearchText, dagData]);
+
+  const focusNodeInViewport = (nodeId: string) => {
+    const container = svgContainerRef.current;
+    if (!container || !layout) return;
+
+    const node = layout.nodes.find((n) => n.id === nodeId);
+    if (!node) return;
+
+    const xRatio = layout.totalWidth > 0 ? node.x / layout.totalWidth : 0.5;
+    const yRatio = layout.totalHeight > 0 ? node.y / layout.totalHeight : 0.5;
+    const targetLeft = xRatio * container.scrollWidth - container.clientWidth / 2;
+    const targetTop = yRatio * container.scrollHeight - container.clientHeight / 2;
+
+    container.scrollTo({
+      left: Math.max(0, targetLeft),
+      top: Math.max(0, targetTop),
+      behavior: 'smooth',
+    });
+  };
+
+  const handleSelectCourseFromSearch = (nodeId: string) => {
+    setClickedNodeId(nodeId);
+    setHoveredNodeId(null);
+    setHoverPos({ x: 0, y: 0 });
+    setShowCourseSearchDropdown(false);
+    setTimeout(() => focusNodeInViewport(nodeId), 0);
+  };
+
   useEffect(() => {
     const container = svgContainerRef.current;
     if (!container) return;
@@ -645,8 +720,70 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
     return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
   };
 
+  const visibleSearchMatches = filteredCourseMatches.slice(0, 25);
+  const showSearchPanel = showCourseSearchDropdown && courseSearchText.trim().length > 0;
+
   return (
     <div className="w-full h-full flex flex-col bg-panel-bg absolute inset-0 overflow-hidden min-w-0 min-h-0">
+      {/* Search Bar - Left Side */}
+      <div className="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur p-0.5 rounded-xl border border-panel-border shadow-sm w-80">
+        <div
+          ref={courseSearchContainerRef}
+          className="relative"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <svg
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M8.5 3a5.5 5.5 0 014.396 8.804l3.65 3.65a.75.75 0 11-1.06 1.06l-3.65-3.65A5.5 5.5 0 118.5 3zm0 1.5a4 4 0 100 8 4 4 0 000-8z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search courses in tree"
+            value={courseSearchText}
+            onChange={(e) => {
+              setCourseSearchText(e.target.value);
+              setShowCourseSearchDropdown(true);
+            }}
+            onFocus={() => setShowCourseSearchDropdown(true)}
+            className="w-full h-[40px] pl-10 pr-4 rounded-lg bg-input-bg text-text-primary outline-none"
+          />
+
+          {showSearchPanel && (
+            <div className="absolute left-0 right-0 mt-2 z-30 rounded-xl border border-panel-border bg-panel-bg shadow-lg overflow-hidden">
+              <div className="max-h-64 overflow-y-auto">
+                {visibleSearchMatches.length > 0 ? (
+                  visibleSearchMatches.map((course) => (
+                    <button
+                      key={course.id}
+                      onClick={() => handleSelectCourseFromSearch(course.id)}
+                      className={`block w-full text-left px-4 py-3 border-b border-panel-border last:border-b-0 hover:bg-hover-bg transition-colors ${
+                        clickedNodeId === course.id
+                          ? 'bg-badge-blue-bg text-badge-blue-text font-medium'
+                          : 'text-text-primary'
+                      }`}
+                    >
+                      <p className="text-sm font-semibold line-clamp-1">{course.label}</p>
+                      <p className="text-xs text-text-secondary mt-0.5 line-clamp-1">{course.title || course.id}</p>
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-4 py-3 text-sm text-text-secondary">No matching courses found</div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Zoom Controls - Right Side */}
       <div className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur p-0.5 rounded-xl border border-panel-border shadow-sm flex items-center">
         <div className="flex bg-white rounded-lg overflow-hidden">
           <button 
@@ -938,34 +1075,20 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
       {(hoveredNodeId || clickedNodeId) && hoverPos && (
         <div
           ref={popupRef}
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            background: "white",
-            border: `2px solid ${clickedNodeId ? "#1e40af" : "#0284c7"}`,
-            borderRadius: "8px",
-            padding: "12px",
-            fontSize: "12px",
-            zIndex: 1000,
-            minWidth: "200px",
-            maxWidth: "250px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-            pointerEvents: "auto",
-          }}
+          className="fixed bottom-5 right-5 z-[1000] min-w-[200px] max-w-[250px] bg-white border-2 border-uva-blue rounded-lg p-3 text-xs shadow-lg pointer-events-auto"
         >
-          <div style={{ fontWeight: "bold", marginBottom: "8px", color: "#1e40af", fontSize: "14px" }}>
+          <div className="font-bold mb-2 text-sm text-uva-blue">
             {clickedNodeId || hoveredNodeId}
           </div>
-          <div style={{ fontSize: "11px", marginBottom: "8px", color: "#0c4a6e", fontStyle: "italic" }}>
+          <div className="text-xs mb-2 text-uva-blue italic">
             {dagData?.nodes.find(n => n.id === (clickedNodeId || hoveredNodeId))?.title || dagData?.nodes.find(n => n.id === (clickedNodeId || hoveredNodeId))?.label}
           </div>
           
-          <div style={{ marginBottom: "8px" }}>
-            <div style={{ fontWeight: "600", color: "#0c4a6e", marginBottom: "4px" }}>
+          <div className="mb-2">
+            <div className="font-semibold text-uva-blue mb-1">
               Prerequisites:
             </div>
-            <div style={{ paddingLeft: "8px", color: "#475569" }}>
+            <div className="pl-2 text-text-muted">
               {(reverseEdgesMap?.get((clickedNodeId || hoveredNodeId)!) as Set<string> | undefined)?.size === 0 ? (
                 <span>None</span>
               ) : (
@@ -977,10 +1100,10 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({ department
           </div>
           
           <div>
-            <div style={{ fontWeight: "600", color: "#0c4a6e", marginBottom: "4px" }}>
+            <div className="font-semibold text-uva-blue mb-1">
               Postrequisites:
             </div>
-            <div style={{ paddingLeft: "8px", color: "#475569" }}>
+            <div className="pl-2 text-text-muted">
               {(edgesMap?.get((clickedNodeId || hoveredNodeId)!) as Set<string> | undefined)?.size === 0 ? (
                 <span>None</span>
               ) : (
