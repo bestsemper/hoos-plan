@@ -20,6 +20,7 @@ type ForumAnswerItem = {
   id: string;
   parentId: string | null;
   body: string;
+  attachedPlan: { id: string; title: string } | null;
   isDeleted: boolean;
   canDelete: boolean;
   createdAt: string;
@@ -76,6 +77,10 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
   const [isPending, startTransition] = useTransition();
   const [postData, setPostData] = useState<ForumPostPageData | null>(null);
   const [replyDraft, setReplyDraft] = useState('');
+  const [attachedPlanId, setAttachedPlanId] = useState('');
+  const [inlineAttachedPlanId, setInlineAttachedPlanId] = useState('');
+  const [isPlanDropdownOpen, setIsPlanDropdownOpen] = useState(false);
+  const [isInlinePlanDropdownOpen, setIsInlinePlanDropdownOpen] = useState(false);
   const [replySort, setReplySort] = useState<'newest' | 'oldest' | 'popular'>('newest');
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -116,6 +121,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
     id: `temp-reply-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     parentId,
     body,
+    attachedPlan: null,
     isDeleted: false,
     canDelete: true,
     createdAt: new Date().toISOString(),
@@ -148,9 +154,10 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
       };
     });
     setReplyDraft('');
+    setAttachedPlanId('');
 
     startTransition(async () => {
-      const res = await addForumReply(postData.post.id, trimmed);
+      const res = await addForumReply(postData.post.id, trimmed, undefined, attachedPlanId || undefined);
       if (res?.error) {
         setPostData((prev) => {
           if (!prev) return prev;
@@ -192,10 +199,11 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
       };
     });
     setInlineReplyDraft('');
+    setInlineAttachedPlanId('');
     setActiveReplyEditorId(null);
 
     (async () => {
-      const res = await addForumReply(postData.post.id, trimmed, parentReplyId);
+      const res = await addForumReply(postData.post.id, trimmed, parentReplyId, inlineAttachedPlanId || undefined);
       if (res?.error) {
         setPostData((prev) => {
           if (!prev) return prev;
@@ -366,6 +374,11 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
     openPlanModal(postData.post.attachedPlan.id, (message) => setError(message));
   };
 
+  const handleOpenReplyAttachedPlan = (planId: string) => {
+    setError(null);
+    openPlanModal(planId, (message) => setError(message));
+  };
+
   if (!postData) {
     return (
       <div className="max-w-5xl mx-auto py-8 animate-pulse">
@@ -460,6 +473,23 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                 ) : (
                   <p className="text-text-primary whitespace-pre-wrap leading-relaxed">{answer.body}</p>
                 )}
+                {!answer.isDeleted && answer.attachedPlan && (
+                  <div className="mt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (answer.attachedPlan) {
+                          handleOpenReplyAttachedPlan(answer.attachedPlan.id);
+                        }
+                      }}
+                      disabled={isPending}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-panel-border-strong text-xs font-semibold text-text-secondary bg-panel-bg-alt hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="uppercase tracking-wide text-[10px]">Attached Plan</span>
+                      <span className="text-text-primary">{answer.attachedPlan.title}</span>
+                    </button>
+                  </div>
+                )}
                 <div className="mt-3 flex items-center justify-end gap-2">
                   {answer.canDelete && (
                     <button
@@ -476,6 +506,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                     onClick={() => {
                       setActiveReplyEditorId(answer.id);
                       setInlineReplyDraft('');
+                      setInlineAttachedPlanId('');
                     }}
                     disabled={!canPost || isPending || answer.isDeleted}
                     className="px-3 py-1.5 rounded-xl border border-panel-border-strong text-text-primary hover:bg-hover-bg text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -494,12 +525,55 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                       className="w-full p-2.5 border border-panel-border rounded-lg bg-input-bg text-text-primary outline-none"
                       disabled={!canPost || isPending}
                     />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CustomDropdown
+                        isOpen={isInlinePlanDropdownOpen}
+                        onOpenChange={setIsInlinePlanDropdownOpen}
+                        trigger={
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-2 px-2 py-1 border border-panel-border rounded-lg bg-input-bg text-text-primary cursor-pointer hover:border-panel-border-strong transition-colors text-xs font-semibold"
+                            disabled={!canPost || isPending}
+                          >
+                            <span>{inlineAttachedPlanId ? postData.plans.find(p => p.id === inlineAttachedPlanId)?.title || 'Plan' : 'Attach plan'}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">
+                              <path d="m6 9 6 6 6-6" />
+                            </svg>
+                          </button>
+                        }
+                      >
+                        <CustomDropdownContent className="w-48 max-h-64 overflow-y-auto">
+                          <CustomDropdownItem
+                            selected={!inlineAttachedPlanId}
+                            onClick={() => {
+                              setInlineAttachedPlanId('');
+                              setIsInlinePlanDropdownOpen(false);
+                            }}
+                          >
+                            No plan attached
+                          </CustomDropdownItem>
+                          {postData.plans.map((plan) => (
+                            <CustomDropdownItem
+                              key={plan.id}
+                              selected={inlineAttachedPlanId === plan.id}
+                              onClick={() => {
+                                setInlineAttachedPlanId(plan.id);
+                                setIsInlinePlanDropdownOpen(false);
+                              }}
+                            >
+                              {plan.title}
+                            </CustomDropdownItem>
+                          ))}
+                        </CustomDropdownContent>
+                      </CustomDropdown>
+                    </div>
                     <div className="flex justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => {
                           setActiveReplyEditorId(null);
                           setInlineReplyDraft('');
+                          setInlineAttachedPlanId('');
                         }}
                         disabled={isPending}
                         className="px-3 py-1.5 border border-panel-border-strong rounded-xl text-xs font-semibold text-text-primary hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -680,7 +754,48 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                 className="w-full p-3 border border-panel-border rounded-xl bg-input-bg text-text-primary outline-none"
                 disabled={!canPost || isPending}
               />
-              <div className="mt-2 flex justify-end">
+              <div className="mt-3 flex items-center justify-between gap-3 flex-wrap">
+                <CustomDropdown
+                  isOpen={isPlanDropdownOpen}
+                  onOpenChange={setIsPlanDropdownOpen}
+                  trigger={
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2.5 px-3.5 py-2 border border-panel-border-strong rounded-xl bg-panel-bg-alt text-text-primary cursor-pointer hover:bg-hover-bg hover:border-panel-border-strong transition-colors text-sm font-semibold"
+                      disabled={!canPost || isPending}
+                    >
+                      <span className="text-xs uppercase tracking-wide text-text-tertiary">Plan</span>
+                      <span>{attachedPlanId ? postData.plans.find((p) => p.id === attachedPlanId)?.title || 'Attach plan' : 'Attach plan snapshot'}</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+                  }
+                >
+                  <CustomDropdownContent className="w-64 max-h-64 overflow-y-auto">
+                    <CustomDropdownItem
+                      selected={!attachedPlanId}
+                      onClick={() => {
+                        setAttachedPlanId('');
+                        setIsPlanDropdownOpen(false);
+                      }}
+                    >
+                      No plan attached
+                    </CustomDropdownItem>
+                    {postData.plans.map((plan) => (
+                      <CustomDropdownItem
+                        key={plan.id}
+                        selected={attachedPlanId === plan.id}
+                        onClick={() => {
+                          setAttachedPlanId(plan.id);
+                          setIsPlanDropdownOpen(false);
+                        }}
+                      >
+                        Attach: {plan.title}
+                      </CustomDropdownItem>
+                    ))}
+                  </CustomDropdownContent>
+                </CustomDropdown>
                 <button
                   type="button"
                   onClick={handleReply}

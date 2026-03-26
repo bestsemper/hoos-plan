@@ -52,15 +52,16 @@ model GoalProfile {
 }
 
 model Plan {
-  id          String      @id @default(cuid())
-  userId      String
-  title       String
-  isPublished Boolean     @default(false)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  forumPosts  ForumPost[]
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  semesters   Semester[]
+  id            String      @id @default(cuid())
+  userId        String
+  title         String
+  isPublished   Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  forumPosts    ForumPost[]
+  forumAnswers  ForumAnswer[]
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semesters     Semester[]
 }
 
 model Semester {
@@ -120,19 +121,22 @@ model ForumPostView {
 }
 
 model ForumAnswer {
-  id        String    @id @default(cuid())
-  postId    String
-  authorId  String
-  parentId  String?
-  body      String
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  parent    ForumAnswer?  @relation("ForumAnswerReplies", fields: [parentId], references: [id], onDelete: SetNull)
-  replies   ForumAnswer[] @relation("ForumAnswerReplies")
-  votes     Vote[]
+  id             String    @id @default(cuid())
+  postId         String
+  authorId       String
+  parentId       String?
+  body           String
+  attachedPlanId String?
+  planSnapshot   Json?     // Snapshot of attached plan at time of posting
+  deletedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  author         User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  post           ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent         ForumAnswer?  @relation("ForumAnswerReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies        ForumAnswer[] @relation("ForumAnswerReplies")
+  votes          Vote[]
+  attachedPlan   Plan?     @relation(fields: [attachedPlanId], references: [id])
 
   @@index([postId, parentId])
 }
