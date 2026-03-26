@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { TreeVisualization } from "@/app/components/TreeVisualization";
-import { Icon } from "@/app/components/Icon";
-import { getCurrentUser } from "@/app/actions";
+import { TreeVisualization } from "./TreeVisualization";
+import { Icon } from "../components/Icon";
+import { getCurrentUser } from "../actions";
 
 interface DepartmentInfo {
   mnemonic: string;
   fullName: string;
 }
 
-export default function TreePage() {
+export default function PrerequisitesPage() {
   const [departments, setDepartments] = useState<DepartmentInfo[]>([]);
   const [selectedDepartment, setSelectedDepartment] = useState<DepartmentInfo | null>(null);
   const [searchText, setSearchText] = useState("");
@@ -118,7 +118,7 @@ export default function TreePage() {
               />
             </button>
             <div className="absolute left-0 top-full w-48 p-2 bg-panel-bg border border-panel-border rounded-lg text-xs text-text-secondary shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-50">
-              This tree displays only courses that have prerequisites or are prerequisites for other courses.
+              This tree only displays courses that have prerequisites or are prerequisites for other courses.
             </div>
           </div>
         </div>

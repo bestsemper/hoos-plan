@@ -35,7 +35,7 @@ export default function Sidebar({ user }: { user: { computingId: string, display
       icon: <Icon name="search" color="currentColor" width={18} height={18} />,
     },
     {
-      href: "/tree",
+      href: "/prerequisites",
       label: "Prerequisites",
       icon: <Icon name="prerequisites" color="currentColor" width={18} height={18} />,
     },

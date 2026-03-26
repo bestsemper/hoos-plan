@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import { Icon } from "./Icon";
+import { Icon } from "../components/Icon";
 
 interface TreeVisualizationProps {
   department: string;
