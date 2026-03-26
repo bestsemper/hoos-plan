@@ -477,7 +477,11 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                   <div className="mt-2">
                     <button
                       type="button"
-                      onClick={() => handleOpenReplyAttachedPlan(answer.attachedPlan.id)}
+                      onClick={() => {
+                        if (answer.attachedPlan) {
+                          handleOpenReplyAttachedPlan(answer.attachedPlan.id);
+                        }
+                      }}
                       disabled={isPending}
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-panel-border-strong text-xs font-semibold text-text-secondary bg-panel-bg-alt hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >

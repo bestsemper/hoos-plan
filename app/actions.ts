@@ -827,6 +827,12 @@ export async function getForumPageData() {
       answers: {
         orderBy: { createdAt: 'asc' },
         include: {
+          attachedPlan: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
           author: {
             select: {
               id: true,
