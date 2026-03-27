@@ -32,6 +32,20 @@ type AttachedPlanFloatingModalProps = {
 
 const DEFAULT_WIDTH = 900;
 const DEFAULT_HEIGHT = 640;
+const MIN_WIDTH = 360;
+const MIN_HEIGHT = 280;
+
+type ResizeDirection = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
+
+type ResizeState = {
+  direction: ResizeDirection;
+  startX: number;
+  startY: number;
+  startWidth: number;
+  startHeight: number;
+  startLeft: number;
+  startTop: number;
+};
 
 export default function AttachedPlanFloatingModal({
   isOpen,
@@ -41,15 +55,26 @@ export default function AttachedPlanFloatingModal({
   initialPosition,
   zIndex = 50,
 }: AttachedPlanFloatingModalProps) {
+  const [size, setSize] = useState(() => {
+    if (typeof window === 'undefined') {
+      return { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT };
+    }
+    return {
+      width: Math.min(DEFAULT_WIDTH, window.innerWidth - 32),
+      height: Math.min(DEFAULT_HEIGHT, window.innerHeight - 32),
+    };
+  });
   const [position, setPosition] = useState(initialPosition ?? { x: 120, y: 80 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [resizeState, setResizeState] = useState<ResizeState | null>(null);
 
   useEffect(() => {
     if (!isOpen || typeof window === 'undefined' || initialPosition) return;
 
     const width = Math.min(DEFAULT_WIDTH, window.innerWidth - 32);
     const height = Math.min(DEFAULT_HEIGHT, window.innerHeight - 32);
+    setSize({ width, height });
     setPosition({
       x: Math.max(16, Math.round((window.innerWidth - width) / 2)),
       y: Math.max(16, Math.round((window.innerHeight - height) / 2)),
@@ -78,6 +103,83 @@ export default function AttachedPlanFloatingModal({
     };
   }, [isDragging, dragOffset]);
 
+  useEffect(() => {
+    if (!resizeState || typeof window === 'undefined') return;
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const dx = event.clientX - resizeState.startX;
+      const dy = event.clientY - resizeState.startY;
+      const maxWidth = window.innerWidth - 16;
+      const maxHeight = window.innerHeight - 16;
+
+      let nextWidth = resizeState.startWidth;
+      let nextHeight = resizeState.startHeight;
+      let nextLeft = resizeState.startLeft;
+      let nextTop = resizeState.startTop;
+
+      if (resizeState.direction.includes('e')) {
+        nextWidth = Math.max(MIN_WIDTH, Math.min(maxWidth, resizeState.startWidth + dx));
+      }
+
+      if (resizeState.direction.includes('s')) {
+        nextHeight = Math.max(MIN_HEIGHT, Math.min(maxHeight, resizeState.startHeight + dy));
+      }
+
+      if (resizeState.direction.includes('w')) {
+        const maxDeltaLeft = resizeState.startWidth - MIN_WIDTH;
+        const constrainedDeltaLeft = Math.max(-resizeState.startLeft + 8, Math.min(dx, maxDeltaLeft));
+        nextLeft = resizeState.startLeft + constrainedDeltaLeft;
+        nextWidth = resizeState.startWidth - constrainedDeltaLeft;
+      }
+
+      if (resizeState.direction.includes('n')) {
+        const maxDeltaTop = resizeState.startHeight - MIN_HEIGHT;
+        const constrainedDeltaTop = Math.max(-resizeState.startTop + 8, Math.min(dy, maxDeltaTop));
+        nextTop = resizeState.startTop + constrainedDeltaTop;
+        nextHeight = resizeState.startHeight - constrainedDeltaTop;
+      }
+
+      setSize({
+        width: Math.min(nextWidth, maxWidth),
+        height: Math.min(nextHeight, maxHeight),
+      });
+      setPosition({ x: nextLeft, y: nextTop });
+    };
+
+    const handleMouseUp = () => {
+      setResizeState(null);
+    };
+
+    document.body.style.cursor = `${resizeState.direction}-resize`;
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.body.style.cursor = '';
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [resizeState]);
+
+  const startResize = (direction: ResizeDirection, event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+
+    const modal = event.currentTarget.parentElement as HTMLDivElement;
+    const rect = modal.getBoundingClientRect();
+
+    setResizeState({
+      direction,
+      startX: event.clientX,
+      startY: event.clientY,
+      startWidth: rect.width,
+      startHeight: rect.height,
+      startLeft: rect.left,
+      startTop: rect.top,
+    });
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -85,14 +187,23 @@ export default function AttachedPlanFloatingModal({
       <div
         role="dialog"
         aria-modal="false"
-        className={`pointer-events-auto fixed rounded-2xl border border-panel-border bg-panel-bg shadow-2xl overflow-hidden resize both min-w-[360px] min-h-[280px] max-w-[95vw] max-h-[90vh] flex flex-col ${isDragging ? 'select-none' : ''}`}
+        className={`pointer-events-auto fixed rounded-2xl border border-panel-border bg-panel-bg shadow-2xl overflow-hidden min-w-[360px] min-h-[280px] max-w-[95vw] max-h-[90vh] flex flex-col ${isDragging ? 'select-none' : ''}`}
         style={{
           left: position.x,
           top: position.y,
-          width: `min(${DEFAULT_WIDTH}px, calc(100vw - 32px))`,
-          height: `min(${DEFAULT_HEIGHT}px, calc(100vh - 32px))`,
+          width: size.width,
+          height: size.height,
         }}
       >
+        <div className="absolute top-0 left-2 right-2 h-2 cursor-n-resize z-20" onMouseDown={(event) => startResize('n', event)} />
+        <div className="absolute bottom-0 left-2 right-2 h-2 cursor-s-resize z-20" onMouseDown={(event) => startResize('s', event)} />
+        <div className="absolute left-0 top-2 bottom-2 w-2 cursor-w-resize z-20" onMouseDown={(event) => startResize('w', event)} />
+        <div className="absolute right-0 top-2 bottom-2 w-2 cursor-e-resize z-20" onMouseDown={(event) => startResize('e', event)} />
+        <div className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize z-20" onMouseDown={(event) => startResize('nw', event)} />
+        <div className="absolute top-0 right-0 w-3 h-3 cursor-ne-resize z-20" onMouseDown={(event) => startResize('ne', event)} />
+        <div className="absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize z-20" onMouseDown={(event) => startResize('sw', event)} />
+        <div className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize z-20" onMouseDown={(event) => startResize('se', event)} />
+
         <div
           onMouseDown={(event) => {
             const target = event.target as HTMLElement;
@@ -104,11 +215,30 @@ export default function AttachedPlanFloatingModal({
           }}
           className="h-12 px-4 border-b border-panel-border flex items-center justify-between cursor-move bg-panel-bg-alt"
         >
-          <h3 className="text-base font-bold text-heading">Attached Plan</h3>
+          <div className="flex items-center">
+            <h3 className="text-base font-bold text-heading">Attached Plan</h3>
+            <div className="group relative flex-shrink-0">
+              <button
+                type="button"
+                className="w-5 h-5 text-text-tertiary hover:text-text-secondary transition-colors cursor-help"
+                aria-label="Information about the attached plan modal"
+              >
+                <Icon 
+                  name="info"
+                  color="currentColor"
+                  width={16}
+                  height={16}
+                />
+              </button>
+              <div className="absolute left-0 top-full w-56 p-2 bg-panel-bg border border-panel-border rounded-lg text-xs text-text-secondary shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-50">
+                Use this modal in the Plan Builder to view and compare attached plans side-by-side with your own.
+              </div>
+            </div>
+          </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-text-secondary hover:text-text-primary cursor-pointer"
+            className="w-8 h-8 flex items-center justify-center text-text-secondary hover:text-text-primary cursor-pointer"
             aria-label="Close attached plan"
           >
             <Icon name="x" color="currentColor" width={20} height={20} className="w-5 h-5" />
