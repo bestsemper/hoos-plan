@@ -483,7 +483,7 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                         }
                       }}
                       disabled={isPending}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-panel-border-strong text-xs font-semibold text-text-secondary bg-panel-bg-alt hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-panel-border-strong text-xs font-semibold text-text-secondary bg-panel-bg-alt hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="uppercase tracking-wide text-[10px]">Attached Plan</span>
                       <span className="text-text-primary">{answer.attachedPlan.title}</span>
@@ -669,16 +669,13 @@ export default function ForumPostPage({ params }: { params: Promise<{ postNumber
                 </div>
 
                 <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-4">
-                    <span className="inline-flex items-center px-2 py-1 rounded border border-panel-border-strong text-xs font-semibold text-text-secondary bg-panel-bg-alt">
-                      Advice
-                    </span>
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
                     {post.attachedPlan && (
                       <button
                         type="button"
                         onClick={handleOpenAttachedPlan}
                         disabled={isPending}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded border border-panel-border-strong text-xs font-semibold text-text-secondary bg-panel-bg-alt hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-panel-border-strong text-xs font-semibold text-text-secondary bg-panel-bg-alt hover:bg-hover-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                           <span className="uppercase tracking-wide text-[10px]">Attached Plan</span>
                           <span className="text-text-primary">{post.attachedPlan.title}</span>
