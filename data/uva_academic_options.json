@@ -1,14 +1,14 @@
 {
   "metadata": {
-    "generated_at": "2026-05-05T04:04:10.454707+00:00",
+    "generated_at": "2026-06-01T07:35:59.909694+00:00",
     "source_url": "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_Main",
     "institution": "University of Virginia",
-    "term": "1262",
-    "term_descr": "2026 Spring",
+    "term": "1266",
+    "term_descr": "2026 Summer",
     "career": "",
-    "school_count": 15,
+    "school_count": 14,
     "major_count": 341,
-    "department_count": 84,
+    "department_count": 73,
     "subject_count": 202,
     "majors_source": "audit_requirements.csv"
   },
@@ -74,11 +74,6 @@
       "institution": "University of Virginia"
     },
     {
-      "code": "LAW",
-      "name": "School of Law",
-      "institution": "University of Virginia"
-    },
-    {
       "code": "MED",
       "name": "School of Medicine",
       "institution": "University of Virginia"
@@ -93,16 +88,6 @@
     {
       "code": "AAS",
       "name": "African-American & African Std",
-      "institution": "University of Virginia"
-    },
-    {
-      "code": "AIRS",
-      "name": "Air Science",
-      "institution": "University of Virginia"
-    },
-    {
-      "code": "ASL",
-      "name": "American Sign Language",
       "institution": "University of Virginia"
     },
     {
@@ -196,16 +181,6 @@
       "institution": "University of Virginia"
     },
     {
-      "code": "COGS",
-      "name": "Cognitive Science",
-      "institution": "University of Virginia"
-    },
-    {
-      "code": "CGAS",
-      "name": "College & Graduate Arts & Sci",
-      "institution": "University of Virginia"
-    },
-    {
       "code": "CS",
       "name": "Computer Science",
       "institution": "University of Virginia"
@@ -253,11 +228,6 @@
     {
       "code": "GBUSD",
       "name": "Dean of Graduate Business",
-      "institution": "University of Virginia"
-    },
-    {
-      "code": "LAWD",
-      "name": "Dean of Law",
       "institution": "University of Virginia"
     },
     {
@@ -351,18 +321,8 @@
       "institution": "University of Virginia"
     },
     {
-      "code": "JWST",
-      "name": "Jewish Studies",
-      "institution": "University of Virginia"
-    },
-    {
       "code": "EDKI",
       "name": "Kinesiology",
-      "institution": "University of Virginia"
-    },
-    {
-      "code": "LAR",
-      "name": "Landscape Architecture",
       "institution": "University of Virginia"
     },
     {
@@ -401,18 +361,8 @@
       "institution": "University of Virginia"
     },
     {
-      "code": "MISC",
-      "name": "Military Science",
-      "institution": "University of Virginia"
-    },
-    {
       "code": "MUSI",
       "name": "Music",
-      "institution": "University of Virginia"
-    },
-    {
-      "code": "NASC",
-      "name": "Naval Science",
       "institution": "University of Virginia"
     },
     {
@@ -443,11 +393,6 @@
     {
       "code": "PHY",
       "name": "Physiology",
-      "institution": "University of Virginia"
-    },
-    {
-      "code": "PST",
-      "name": "Political & Social Thought",
       "institution": "University of Virginia"
     },
     {
@@ -498,11 +443,6 @@
     {
       "code": "SIE",
       "name": "Systems and Information Engine",
-      "institution": "University of Virginia"
-    },
-    {
-      "code": "PLAN",
-      "name": "Urban & Environmental Planning",
       "institution": "University of Virginia"
     },
     {
@@ -1636,22 +1576,22 @@
       "code": "FORAFF-BA",
       "name": "Foreign Affairs (BA)",
       "displayName": "Foreign Affairs (BA)",
-      "schoolCode": "PROV",
-      "schoolName": "Executive VP & Provost"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "FORAFF-MA",
       "name": "Foreign Affairs (MA)",
       "displayName": "Foreign Affairs (MA)",
-      "schoolCode": "PROV",
-      "schoolName": "Executive VP & Provost"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "FORAFF-PHD",
       "name": "Foreign Affairs (PhD)",
       "displayName": "Foreign Affairs (PhD)",
-      "schoolCode": "PROV",
-      "schoolName": "Executive VP & Provost"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "FRENCH-BA",
@@ -1755,29 +1695,29 @@
       "code": "GOVFOR-BA",
       "name": "Government - Foreign Affairs (BA)",
       "displayName": "Government - Foreign Affairs (BA)",
-      "schoolCode": "PROV",
-      "schoolName": "Executive VP & Provost"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "CRMJGR-CRT",
       "name": "Graduate Criminal Justice Education",
       "displayName": "Graduate Criminal Justice Education",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "GBUS",
+      "schoolName": "Darden Grad School of Business"
     },
     {
       "code": "HSMGT-BPS",
       "name": "Health Sciences Management (BPS)",
       "displayName": "Health Sciences Management (BPS)",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "MDS",
+      "schoolName": "Medical School - BIMS/PHS"
     },
     {
       "code": "HSMGT-CRT",
       "name": "Health Sciences Management (Cert)",
       "displayName": "Health Sciences Management (Cert)",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "MDS",
+      "schoolName": "Medical School - BIMS/PHS"
     },
     {
       "code": "BIOETH-MIN",
@@ -1972,22 +1912,22 @@
       "code": "LAW-JD",
       "name": "Law (JD)",
       "displayName": "Law (JD)",
-      "schoolCode": "LAW",
-      "schoolName": "School of Law"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "LAW-LLM",
       "name": "Law (LLM)",
       "displayName": "Law (LLM)",
-      "schoolCode": "LAW",
-      "schoolName": "School of Law"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "LAW-SJD",
       "name": "Law (SJD)",
       "displayName": "Law (SJD)",
-      "schoolCode": "LAW",
-      "schoolName": "School of Law"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "LEADER-CRT",
@@ -2294,8 +2234,8 @@
       "code": "NEURO-PHD",
       "name": "Neuroscience (PhD)",
       "displayName": "Neuroscience (PhD)",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "MDS",
+      "schoolName": "Medical School - BIMS/PHS"
     },
     {
       "code": "NURS-BSN",
@@ -2350,8 +2290,8 @@
       "code": "PHARM-PHD",
       "name": "Pharmacology (PhD)",
       "displayName": "Pharmacology (PhD)",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "MDS",
+      "schoolName": "Medical School - BIMS/PHS"
     },
     {
       "code": "PHIL-BA",
@@ -2483,36 +2423,36 @@
       "code": "PUBAD-CRT",
       "name": "Public Administration (Cert)",
       "displayName": "Public Administration (Cert)",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "LEAD",
+      "schoolName": "Batten Leadership & Public Pol"
     },
     {
       "code": "PBLHLT-CRT",
       "name": "Public Health (Cert)",
       "displayName": "Public Health (Cert)",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "LEAD",
+      "schoolName": "Batten Leadership & Public Pol"
     },
     {
       "code": "PUBHLT-MPH",
       "name": "Public Health (MPH)",
       "displayName": "Public Health (MPH)",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "LEAD",
+      "schoolName": "Batten Leadership & Public Pol"
     },
     {
       "code": "PUBHUM-MIN",
       "name": "Public Humanities in Place",
       "displayName": "Public Humanities in Place",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "LEAD",
+      "schoolName": "Batten Leadership & Public Pol"
     },
     {
       "code": "PBLEAD-CRT",
       "name": "Public Leadership (Cert)",
       "displayName": "Public Leadership (Cert)",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "LEAD",
+      "schoolName": "Batten Leadership & Public Pol"
     },
     {
       "code": "PUBPOL-CRT",
@@ -2546,8 +2486,8 @@
       "code": "PBWTRH-MIN",
       "name": "Public Writing and Rhetoric (Mn)",
       "displayName": "Public Writing and Rhetoric (Mn)",
-      "schoolCode": "CGAS",
-      "schoolName": "College & Graduate Arts & Sci"
+      "schoolCode": "LEAD",
+      "schoolName": "Batten Leadership & Public Pol"
     },
     {
       "code": "QNTANA-MED",
@@ -2623,8 +2563,8 @@
       "code": "SCITEC-MIN",
       "name": "Science and Technology Policy (Min)",
       "displayName": "Science and Technology Policy (Min)",
-      "schoolCode": "PROV",
-      "schoolName": "Executive VP & Provost"
+      "schoolCode": "MDS",
+      "schoolName": "Medical School - BIMS/PHS"
     },
     {
       "code": "STS-MIN",
@@ -2847,36 +2787,36 @@
       "code": "PLAN-BUEP",
       "name": "Urban and Environmental Planning (BUEP)",
       "displayName": "Urban and Environmental Planning (BUEP)",
-      "schoolCode": "ARCH",
-      "schoolName": "School of Architecture"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "URBAN-MIN",
       "name": "Urban and Environmental Planning (Min)",
       "displayName": "Urban and Environmental Planning (Min)",
-      "schoolCode": "ARCH",
-      "schoolName": "School of Architecture"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "PLAN-MUEP",
       "name": "Urban and Environmental Planning (MUEP)",
       "displayName": "Urban and Environmental Planning (MUEP)",
-      "schoolCode": "ARCH",
-      "schoolName": "School of Architecture"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "URBAN-CRT",
       "name": "Urban Design (Cert)",
       "displayName": "Urban Design (Cert)",
-      "schoolCode": "ARCH",
-      "schoolName": "School of Architecture"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "URBAN-MUD",
       "name": "Urban Design (MUD)",
       "displayName": "Urban Design (MUD)",
-      "schoolCode": "ARCH",
-      "schoolName": "School of Architecture"
+      "schoolCode": null,
+      "schoolName": null
     },
     {
       "code": "INSWAG-BA",
@@ -2909,11 +2849,6 @@
     {
       "code": "BUSN",
       "name": "Graduate Business",
-      "institution": "University of Virginia"
-    },
-    {
-      "code": "LAW",
-      "name": "Law",
       "institution": "University of Virginia"
     },
     {
