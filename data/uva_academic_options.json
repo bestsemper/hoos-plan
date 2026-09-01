@@ -1,15 +1,15 @@
 {
   "metadata": {
-    "generated_at": "2026-08-01T06:46:14.466893+00:00",
+    "generated_at": "2026-09-01T10:38:08.270768+00:00",
     "source_url": "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_Main",
     "institution": "University of Virginia",
-    "term": "1266",
-    "term_descr": "2026 Summer",
+    "term": "1268",
+    "term_descr": "2026 Fall",
     "career": "",
-    "school_count": 14,
+    "school_count": 15,
     "major_count": 341,
-    "department_count": 73,
-    "subject_count": 202,
+    "department_count": 84,
+    "subject_count": 207,
     "majors_source": "audit_requirements.csv"
   },
   "schools": [
@@ -74,6 +74,11 @@
       "institution": "University of Virginia"
     },
     {
+      "code": "LAW",
+      "name": "School of Law",
+      "institution": "University of Virginia"
+    },
+    {
       "code": "MED",
       "name": "School of Medicine",
       "institution": "University of Virginia"
@@ -88,6 +93,16 @@
     {
       "code": "AAS",
       "name": "African-American & African Std",
+      "institution": "University of Virginia"
+    },
+    {
+      "code": "AIRS",
+      "name": "Air Science",
+      "institution": "University of Virginia"
+    },
+    {
+      "code": "ASL",
+      "name": "American Sign Language",
       "institution": "University of Virginia"
     },
     {
@@ -181,6 +196,16 @@
       "institution": "University of Virginia"
     },
     {
+      "code": "COGS",
+      "name": "Cognitive Science",
+      "institution": "University of Virginia"
+    },
+    {
+      "code": "CGAS",
+      "name": "College & Graduate Arts & Sci",
+      "institution": "University of Virginia"
+    },
+    {
       "code": "CS",
       "name": "Computer Science",
       "institution": "University of Virginia"
@@ -228,6 +253,11 @@
     {
       "code": "GBUSD",
       "name": "Dean of Graduate Business",
+      "institution": "University of Virginia"
+    },
+    {
+      "code": "LAWD",
+      "name": "Dean of Law",
       "institution": "University of Virginia"
     },
     {
@@ -321,8 +351,18 @@
       "institution": "University of Virginia"
     },
     {
+      "code": "JWST",
+      "name": "Jewish Studies",
+      "institution": "University of Virginia"
+    },
+    {
       "code": "EDKI",
       "name": "Kinesiology",
+      "institution": "University of Virginia"
+    },
+    {
+      "code": "LAR",
+      "name": "Landscape Architecture",
       "institution": "University of Virginia"
     },
     {
@@ -361,8 +401,18 @@
       "institution": "University of Virginia"
     },
     {
+      "code": "MISC",
+      "name": "Military Science",
+      "institution": "University of Virginia"
+    },
+    {
       "code": "MUSI",
       "name": "Music",
+      "institution": "University of Virginia"
+    },
+    {
+      "code": "NASC",
+      "name": "Naval Science",
       "institution": "University of Virginia"
     },
     {
@@ -393,6 +443,11 @@
     {
       "code": "PHY",
       "name": "Physiology",
+      "institution": "University of Virginia"
+    },
+    {
+      "code": "PST",
+      "name": "Political & Social Thought",
       "institution": "University of Virginia"
     },
     {
@@ -443,6 +498,11 @@
     {
       "code": "SIE",
       "name": "Systems and Information Engine",
+      "institution": "University of Virginia"
+    },
+    {
+      "code": "PLAN",
+      "name": "Urban & Environmental Planning",
       "institution": "University of Virginia"
     },
     {
@@ -1576,22 +1636,22 @@
       "code": "FORAFF-BA",
       "name": "Foreign Affairs (BA)",
       "displayName": "Foreign Affairs (BA)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "PROV",
+      "schoolName": "Executive VP & Provost"
     },
     {
       "code": "FORAFF-MA",
       "name": "Foreign Affairs (MA)",
       "displayName": "Foreign Affairs (MA)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "PROV",
+      "schoolName": "Executive VP & Provost"
     },
     {
       "code": "FORAFF-PHD",
       "name": "Foreign Affairs (PhD)",
       "displayName": "Foreign Affairs (PhD)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "PROV",
+      "schoolName": "Executive VP & Provost"
     },
     {
       "code": "FRENCH-BA",
@@ -1695,29 +1755,29 @@
       "code": "GOVFOR-BA",
       "name": "Government - Foreign Affairs (BA)",
       "displayName": "Government - Foreign Affairs (BA)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "PROV",
+      "schoolName": "Executive VP & Provost"
     },
     {
       "code": "CRMJGR-CRT",
       "name": "Graduate Criminal Justice Education",
       "displayName": "Graduate Criminal Justice Education",
-      "schoolCode": "GBUS",
-      "schoolName": "Darden Grad School of Business"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "HSMGT-BPS",
       "name": "Health Sciences Management (BPS)",
       "displayName": "Health Sciences Management (BPS)",
-      "schoolCode": "MDS",
-      "schoolName": "Medical School - BIMS/PHS"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "HSMGT-CRT",
       "name": "Health Sciences Management (Cert)",
       "displayName": "Health Sciences Management (Cert)",
-      "schoolCode": "MDS",
-      "schoolName": "Medical School - BIMS/PHS"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "BIOETH-MIN",
@@ -1912,22 +1972,22 @@
       "code": "LAW-JD",
       "name": "Law (JD)",
       "displayName": "Law (JD)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "LAW",
+      "schoolName": "School of Law"
     },
     {
       "code": "LAW-LLM",
       "name": "Law (LLM)",
       "displayName": "Law (LLM)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "LAW",
+      "schoolName": "School of Law"
     },
     {
       "code": "LAW-SJD",
       "name": "Law (SJD)",
       "displayName": "Law (SJD)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "LAW",
+      "schoolName": "School of Law"
     },
     {
       "code": "LEADER-CRT",
@@ -2234,8 +2294,8 @@
       "code": "NEURO-PHD",
       "name": "Neuroscience (PhD)",
       "displayName": "Neuroscience (PhD)",
-      "schoolCode": "MDS",
-      "schoolName": "Medical School - BIMS/PHS"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "NURS-BSN",
@@ -2290,8 +2350,8 @@
       "code": "PHARM-PHD",
       "name": "Pharmacology (PhD)",
       "displayName": "Pharmacology (PhD)",
-      "schoolCode": "MDS",
-      "schoolName": "Medical School - BIMS/PHS"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "PHIL-BA",
@@ -2423,36 +2483,36 @@
       "code": "PUBAD-CRT",
       "name": "Public Administration (Cert)",
       "displayName": "Public Administration (Cert)",
-      "schoolCode": "LEAD",
-      "schoolName": "Batten Leadership & Public Pol"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "PBLHLT-CRT",
       "name": "Public Health (Cert)",
       "displayName": "Public Health (Cert)",
-      "schoolCode": "LEAD",
-      "schoolName": "Batten Leadership & Public Pol"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "PUBHLT-MPH",
       "name": "Public Health (MPH)",
       "displayName": "Public Health (MPH)",
-      "schoolCode": "LEAD",
-      "schoolName": "Batten Leadership & Public Pol"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "PUBHUM-MIN",
       "name": "Public Humanities in Place",
       "displayName": "Public Humanities in Place",
-      "schoolCode": "LEAD",
-      "schoolName": "Batten Leadership & Public Pol"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "PBLEAD-CRT",
       "name": "Public Leadership (Cert)",
       "displayName": "Public Leadership (Cert)",
-      "schoolCode": "LEAD",
-      "schoolName": "Batten Leadership & Public Pol"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "PUBPOL-CRT",
@@ -2486,8 +2546,8 @@
       "code": "PBWTRH-MIN",
       "name": "Public Writing and Rhetoric (Mn)",
       "displayName": "Public Writing and Rhetoric (Mn)",
-      "schoolCode": "LEAD",
-      "schoolName": "Batten Leadership & Public Pol"
+      "schoolCode": "CGAS",
+      "schoolName": "College & Graduate Arts & Sci"
     },
     {
       "code": "QNTANA-MED",
@@ -2563,8 +2623,8 @@
       "code": "SCITEC-MIN",
       "name": "Science and Technology Policy (Min)",
       "displayName": "Science and Technology Policy (Min)",
-      "schoolCode": "MDS",
-      "schoolName": "Medical School - BIMS/PHS"
+      "schoolCode": "PROV",
+      "schoolName": "Executive VP & Provost"
     },
     {
       "code": "STS-MIN",
@@ -2787,36 +2847,36 @@
       "code": "PLAN-BUEP",
       "name": "Urban and Environmental Planning (BUEP)",
       "displayName": "Urban and Environmental Planning (BUEP)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "ARCH",
+      "schoolName": "School of Architecture"
     },
     {
       "code": "URBAN-MIN",
       "name": "Urban and Environmental Planning (Min)",
       "displayName": "Urban and Environmental Planning (Min)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "ARCH",
+      "schoolName": "School of Architecture"
     },
     {
       "code": "PLAN-MUEP",
       "name": "Urban and Environmental Planning (MUEP)",
       "displayName": "Urban and Environmental Planning (MUEP)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "ARCH",
+      "schoolName": "School of Architecture"
     },
     {
       "code": "URBAN-CRT",
       "name": "Urban Design (Cert)",
       "displayName": "Urban Design (Cert)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "ARCH",
+      "schoolName": "School of Architecture"
     },
     {
       "code": "URBAN-MUD",
       "name": "Urban Design (MUD)",
       "displayName": "Urban Design (MUD)",
-      "schoolCode": null,
-      "schoolName": null
+      "schoolCode": "ARCH",
+      "schoolName": "School of Architecture"
     },
     {
       "code": "INSWAG-BA",
@@ -2849,6 +2909,11 @@
     {
       "code": "BUSN",
       "name": "Graduate Business",
+      "institution": "University of Virginia"
+    },
+    {
+      "code": "LAW",
+      "name": "Law",
       "institution": "University of Virginia"
     },
     {
@@ -3349,22 +3414,6 @@
       ]
     },
     {
-      "subject": "CHRK",
-      "label": "CHRK - Cherokee Language and Culture",
-      "schoolCodes": [
-        "CGAS"
-      ],
-      "schoolNames": [
-        "College & Graduate Arts & Sci"
-      ],
-      "majorCodes": [
-        "ANTH"
-      ],
-      "majorNames": [
-        "Anthropology"
-      ]
-    },
-    {
       "subject": "CHTR",
       "label": "CHTR - Chinese in Translation",
       "schoolCodes": [
@@ -3378,22 +3427,6 @@
       ],
       "majorNames": [
         "East Asian Lang, Lit & Culture"
-      ]
-    },
-    {
-      "subject": "CJ",
-      "label": "CJ - Criminal Justice",
-      "schoolCodes": [
-        "SCPS"
-      ],
-      "schoolNames": [
-        "Continuing & Prof Studies"
-      ],
-      "majorCodes": [
-        "SCPSD"
-      ],
-      "majorNames": [
-        "Dean of Continuing & Prof Stds"
       ]
     },
     {
@@ -3522,22 +3555,6 @@
       ],
       "majorNames": [
         "Drama"
-      ]
-    },
-    {
-      "subject": "DEM",
-      "label": "DEM - Democracy Initiative",
-      "schoolCodes": [
-        "CGAS"
-      ],
-      "schoolNames": [
-        "College & Graduate Arts & Sci"
-      ],
-      "majorCodes": [
-        "CGASD"
-      ],
-      "majorNames": [
-        "Dean of Arts & Sciences"
       ]
     },
     {
@@ -3749,6 +3766,22 @@
       ]
     },
     {
+      "subject": "ELA",
+      "label": "ELA - Engaging the Liberal Arts",
+      "schoolCodes": [
+        "CGAS"
+      ],
+      "schoolNames": [
+        "College & Graduate Arts & Sci"
+      ],
+      "majorCodes": [
+        "CGAS"
+      ],
+      "majorNames": [
+        "College & Graduate Arts & Sci"
+      ]
+    },
+    {
       "subject": "ENCW",
       "label": "ENCW - Creative Writing",
       "schoolCodes": [
@@ -3762,6 +3795,22 @@
       ],
       "majorNames": [
         "English"
+      ]
+    },
+    {
+      "subject": "ENGI",
+      "label": "ENGI - Engineering Grad Internship",
+      "schoolCodes": [
+        "ENGR"
+      ],
+      "schoolNames": [
+        "Engineering & Applied Science"
+      ],
+      "majorCodes": [
+        "ENGRD"
+      ],
+      "majorNames": [
+        "Dean Engineering & Applied Sci"
       ]
     },
     {
@@ -3810,22 +3859,6 @@
       ],
       "majorNames": [
         "Dean of Commerce"
-      ]
-    },
-    {
-      "subject": "ENVH",
-      "label": "ENVH - Environmental Humanities",
-      "schoolCodes": [
-        "CGAS"
-      ],
-      "schoolNames": [
-        "College & Graduate Arts & Sci"
-      ],
-      "majorCodes": [
-        "CGASD"
-      ],
-      "majorNames": [
-        "Dean of Arts & Sciences"
       ]
     },
     {
@@ -4117,6 +4150,22 @@
       ]
     },
     {
+      "subject": "GHSS",
+      "label": "GHSS - Grad Humanities & Social Sci",
+      "schoolCodes": [
+        "CGAS"
+      ],
+      "schoolNames": [
+        "College & Graduate Arts & Sci"
+      ],
+      "majorCodes": [
+        "CGASD"
+      ],
+      "majorNames": [
+        "Dean of Arts & Sciences"
+      ]
+    },
+    {
       "subject": "GNUR",
       "label": "GNUR - Graduate Nursing",
       "schoolCodes": [
@@ -4146,6 +4195,22 @@
       ],
       "majorNames": [
         "Classics"
+      ]
+    },
+    {
+      "subject": "GSAS",
+      "label": "GSAS - Graduate Arts & Sciences",
+      "schoolCodes": [
+        "CGAS"
+      ],
+      "schoolNames": [
+        "College & Graduate Arts & Sci"
+      ],
+      "majorCodes": [
+        "CGASD"
+      ],
+      "majorNames": [
+        "Dean of Arts & Sciences"
       ]
     },
     {
@@ -4230,7 +4295,7 @@
     },
     {
       "subject": "HHE",
-      "label": "HHE - Health, Humanities & Ethics",
+      "label": "HHE - Health Humanities & Ethics",
       "schoolCodes": [
         "MDS"
       ],
@@ -4469,6 +4534,22 @@
       ]
     },
     {
+      "subject": "ISCP",
+      "label": "ISCP - IS-Capstone Project",
+      "schoolCodes": [
+        "SCPS"
+      ],
+      "schoolNames": [
+        "Continuing & Prof Studies"
+      ],
+      "majorCodes": [
+        "IDST"
+      ],
+      "majorNames": [
+        "Interdisciplinary Studies"
+      ]
+    },
+    {
       "subject": "ISHU",
       "label": "ISHU - IS-Humanities",
       "schoolCodes": [
@@ -4519,6 +4600,70 @@
     {
       "subject": "ISSS",
       "label": "ISSS - IS-Social Sciences",
+      "schoolCodes": [
+        "SCPS"
+      ],
+      "schoolNames": [
+        "Continuing & Prof Studies"
+      ],
+      "majorCodes": [
+        "IDST"
+      ],
+      "majorNames": [
+        "Interdisciplinary Studies"
+      ]
+    },
+    {
+      "subject": "ISWG",
+      "label": "ISWG - Wise/General Elective",
+      "schoolCodes": [
+        "SCPS"
+      ],
+      "schoolNames": [
+        "Continuing & Prof Studies"
+      ],
+      "majorCodes": [
+        "IDST"
+      ],
+      "majorNames": [
+        "Interdisciplinary Studies"
+      ]
+    },
+    {
+      "subject": "ISWM",
+      "label": "ISWM - Wise/Math",
+      "schoolCodes": [
+        "SCPS"
+      ],
+      "schoolNames": [
+        "Continuing & Prof Studies"
+      ],
+      "majorCodes": [
+        "IDST"
+      ],
+      "majorNames": [
+        "Interdisciplinary Studies"
+      ]
+    },
+    {
+      "subject": "ISWN",
+      "label": "ISWN - Wise/Natural Sciences",
+      "schoolCodes": [
+        "SCPS"
+      ],
+      "schoolNames": [
+        "Continuing & Prof Studies"
+      ],
+      "majorCodes": [
+        "IDST"
+      ],
+      "majorNames": [
+        "Interdisciplinary Studies"
+      ]
+    },
+    {
+      "subject": "ISWS",
+      "label": "ISWS - Wise/Social Sciences",
       "schoolCodes": [
         "SCPS"
       ],
@@ -5109,22 +5254,6 @@
       ]
     },
     {
-      "subject": "NCBM",
-      "label": "NCBM - NC-Business & Management",
-      "schoolCodes": [
-        "SCPS"
-      ],
-      "schoolNames": [
-        "Continuing & Prof Studies"
-      ],
-      "majorCodes": [
-        "SCPSD"
-      ],
-      "majorNames": [
-        "Dean of Continuing & Prof Stds"
-      ]
-    },
-    {
       "subject": "NCPR",
       "label": "NCPR - NC-Professional Review",
       "schoolCodes": [
@@ -5467,6 +5596,22 @@
       ]
     },
     {
+      "subject": "PMCC",
+      "label": "PMCC - Premod Cultures & Communities",
+      "schoolCodes": [
+        "CGAS"
+      ],
+      "schoolNames": [
+        "College & Graduate Arts & Sci"
+      ],
+      "majorCodes": [
+        "CGASD"
+      ],
+      "majorNames": [
+        "Dean of Arts & Sciences"
+      ]
+    },
+    {
       "subject": "POL",
       "label": "POL - Polish",
       "schoolCodes": [
@@ -5640,6 +5785,22 @@
       ],
       "majorNames": [
         "Psychology"
+      ]
+    },
+    {
+      "subject": "QUEC",
+      "label": "QUEC - Quechua",
+      "schoolCodes": [
+        "CGAS"
+      ],
+      "schoolNames": [
+        "College & Graduate Arts & Sci"
+      ],
+      "majorCodes": [
+        "SPAN"
+      ],
+      "majorNames": [
+        "Spanish, Italian & Portuguese"
       ]
     },
     {
@@ -5835,8 +5996,8 @@
       ]
     },
     {
-      "subject": "SATR",
-      "label": "SATR - South Asian Lit in Trans",
+      "subject": "SAST",
+      "label": "SAST - South Asian Studies",
       "schoolCodes": [
         "CGAS"
       ],
@@ -5869,22 +6030,6 @@
     {
       "subject": "SLAV",
       "label": "SLAV - Slavic",
-      "schoolCodes": [
-        "CGAS"
-      ],
-      "schoolNames": [
-        "College & Graduate Arts & Sci"
-      ],
-      "majorCodes": [
-        "SLLT"
-      ],
-      "majorNames": [
-        "Slavic"
-      ]
-    },
-    {
-      "subject": "SLFK",
-      "label": "SLFK - Slavic Folklore & Oral Lit",
       "schoolCodes": [
         "CGAS"
       ],
@@ -6011,6 +6156,22 @@
       ]
     },
     {
+      "subject": "TBTN",
+      "label": "TBTN - Tibetan",
+      "schoolCodes": [
+        "CGAS"
+      ],
+      "schoolNames": [
+        "College & Graduate Arts & Sci"
+      ],
+      "majorCodes": [
+        "RELG"
+      ],
+      "majorNames": [
+        "Religious Studies"
+      ]
+    },
+    {
       "subject": "TURK",
       "label": "TURK - Turkish",
       "schoolCodes": [
@@ -6024,22 +6185,6 @@
       ],
       "majorNames": [
         "Middle Eastern & South Asian"
-      ]
-    },
-    {
-      "subject": "UD",
-      "label": "UD - UD",
-      "schoolCodes": [
-        "ARCH"
-      ],
-      "schoolNames": [
-        "School of Architecture"
-      ],
-      "majorCodes": [
-        "ARCHDP"
-      ],
-      "majorNames": [
-        "Architecture Department"
       ]
     },
     {
